@@ -6,7 +6,7 @@ FROM ${base_image} AS build
 WORKDIR /app
 ADD ./brokerpaks ./brokerpaks
 
-ENV BUILD_ENV=development
+ARG BUILD_ENV=development
 
 # For local builds only, add the ZScaler CA certificate to the trust store so Docker
 # can make HTTPS connections. `csb pak build` needs to do this to download binaries.
