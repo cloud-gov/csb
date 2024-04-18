@@ -7,9 +7,9 @@ platforms:
 - os: linux
   arch: amd64
 terraform_binaries:
-- name: terraform
-  version: 1.7.5
-  source: https://github.com/hashicorp/terraform/archive/v1.7.5.zip
+- name: tofu
+  version: 1.6.2
+  source: https://github.com/opentofu/opentofu/archive/v1.6.2.zip
 service_definitions:
 - empty.yml
 parameters: []
