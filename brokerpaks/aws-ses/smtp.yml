@@ -1,0 +1,175 @@
+version: 1
+name: datagov-smtp
+id: b90ace67-954b-4b33-8f84-95cacc55b94c
+description: SMTP service provided by Amazon Simple Email Service (SES)
+display_name: SMTP (using AWS SES)
+image_url: https://www.pikpng.com/pngl/m/107-1078218_aws-ses-logo-png-transparent-ses-aws-clipart.png
+documentation_url: https://aws.amazon.com/ses/
+support_url: https://github.com/GSA/datagov-brokerpak
+tags: [aws, ses, preview]
+plan_updateable: true
+plans:
+  - name: base
+    id: dc109a6e-c4a8-4fbb-8c49-acf9740ab819
+    description: "Provision SMTP credentials to use for sending transactional mail from your application"
+    display_name: Send-only service
+    properties:
+provision:
+  plan_inputs:
+  user_inputs:
+    - field_name: region
+      type: string
+      details: The region of the SES service.
+      default: ${config("aws.default_region")}
+      enum:
+        us-gov-west-1: us-gov-west-1
+        us-east-2: us-east-2
+        us-east-1: us-east-1
+        us-west-1: us-west-1
+        us-west-2: us-west-2
+        ap-east-1: ap-east-1
+        ap-south-1: ap-south-1
+        ap-northeast-3: ap-northeast-3
+        ap-northeast-2: ap-northeast-2
+        ap-southeast-1: ap-southeast-1
+        ap-southeast-2: ap-southeast-2
+        ap-northeast-1: ap-northeast-1
+        ca-central-1: ca-central-1
+        cn-north-1: cn-north-1
+        cn-northwest-1: cn-northwest-1
+        eu-central-1: eu-central-1
+        eu-west-1: eu-west-1
+        eu-west-2: eu-west-2
+        eu-west-3: eu-west-3
+        eu-north-1: eu-north-1
+        me-south-1: me-south-1
+        sa-east-1: sa-east-1
+    - field_name: domain
+      type: string
+      details: Domain to send mail from
+      default: ""
+    - field_name: email_receipt_error
+      type: string
+      details: Email to recieve DMARC errors
+      default: "datagovhelp@gsa.gov"
+    - field_name: enable_feedback_notifications
+      type: boolean
+      details: Flag to toggle creation of SNS topics for feedback notifications
+      default: false
+    - field_name: mail_from_subdomain
+      type: string
+      details: Subdomain to use as sending email server
+      default: ""
+  computed_inputs:
+    - name: default_domain
+      overwrite: true
+      type: string
+      default: ${config("aws.zone")}
+    - name: labels
+      default: ${json.marshal(request.default_labels)}
+      overwrite: true
+      type: object
+    - name: instance_name
+      type: string
+      default: ${request.instance_id}
+  template_refs:
+    main: terraform/provision/main.tf
+    notification: terraform/provision/notification.tf
+    outputs: terraform/provision/outputs.tf
+    provider: terraform/provision/provider.tf
+    variables: terraform/provision/variables.tf
+    verification: terraform/provision/verification.tf
+  outputs:
+    - field_name: region
+      type: string
+      details: AWS region for the SES instance
+    - field_name: required_records
+      type: object
+      details: If a domain was supplied, the records to be created in that zone
+    - field_name: email_receipt_error
+      type: string
+      details: Email to recieve DMARC errors
+    - field_name: instructions
+      type: string
+      details: Any further steps are needed before using the service.
+    - field_name: domain_arn
+      type: string
+      details: Instance SES domain identity (used when creating bindings)
+    - field_name: bounce_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving bounce feedback notifications
+    - field_name: complaint_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving complaint feedback notifications
+    - field_name: delivery_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving delivery feedback notifications
+bind:
+  plan_inputs: []
+  user_inputs:
+    - field_name: source_ips
+      type: array
+      default:
+        - 52.222.122.97/32
+        - 52.222.123.172/32
+      details: IP Ranges that requests to SES must come from
+      prohibit_update: false
+    - field_name: notification_webhook
+      type: string
+      details: HTTPS endpoint to subscribe to feedback notifications
+      default: ""
+  computed_inputs:
+    - name: region
+      default: ${instance.details["region"]}
+      overwrite: true
+      type: string
+    - name: domain_arn
+      default: ${instance.details["domain_arn"]}
+      overwrite: true
+      type: string
+    - name: user_name
+      default: csb-${instance.name}-${request.binding_id}
+      overwrite: true
+      type: string
+    - name: instance_name
+      type: string
+      default: ${request.instance_id}
+    - name: bounce_topic_arn
+      default: ${instance.details["bounce_topic_arn"]}
+      overwrite: true
+      type: string
+    - name: complaint_topic_arn
+      default: ${instance.details["complaint_topic_arn"]}
+      overwrite: true
+      type: string
+    - name: delivery_topic_arn
+      default: ${instance.details["delivery_topic_arn"]}
+      overwrite: true
+      type: string
+  template_refs:
+    main: terraform/bind/main.tf
+    outputs: terraform/bind/outputs.tf
+    provider: terraform/bind/provider.tf
+    variables: terraform/bind/variables.tf
+  outputs:
+    - field_name: smtp_server
+      type: string
+      details: SMTP server
+    - field_name: smtp_user
+      type: string
+      details: SMTP user and AWS Access Key ID
+    - field_name: smtp_password
+      type: string
+      details: SMTP password
+    - field_name: secret_access_key
+      type: string
+      details: AWS Secret Access Key
+    - field_name: notification_webhook
+      type: string
+      details: Subscribed endpoint for email feedback notifications
+examples:
+  - name: smtp
+    description: SMTP base
+    plan_id: dc109a6e-c4a8-4fbb-8c49-acf9740ab819
+    provision_params: {}
+    bind_params: {}

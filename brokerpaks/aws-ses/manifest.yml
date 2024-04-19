@@ -1,0 +1,31 @@
+packversion: 1
+name: datagov-brokerpak-smtp
+version: current
+metadata:
+  author: Bret Mogilefsky
+platforms:
+  - os: linux
+    arch: amd64
+terraform_binaries:
+  - name: terraform
+    version: 0.13.7
+    source: https://github.com/hashicorp/terraform/archive/v0.13.7.zip
+  - name: terraform-provider-aws
+    version: 3.46.0
+    source: https://github.com/terraform-providers/terraform-provider-aws/archive/v3.46.0.zip
+  - name: terraform-provider-null
+    version: 3.1.0
+    source: https://releases.hashicorp.com/terraform-provider-null/3.1.0/terraform-provider-null_3.1.0_linux_amd64.zip
+service_definitions:
+  - smtp.yml
+parameters: []
+required_env_variables:
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+  - AWS_ZONE
+  - AWS_DEFAULT_REGION
+env_config_mapping:
+  AWS_ACCESS_KEY_ID: aws.access_key_id
+  AWS_SECRET_ACCESS_KEY: aws.secret_access_key
+  AWS_ZONE: aws.zone
+  AWS_DEFAULT_REGION: aws.default_region

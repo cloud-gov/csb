@@ -21,6 +21,8 @@ cp /app/zscaler.crt $CERT_DIR ; update-ca-certificates ; \
 fi
 
 RUN /app/csb pak build brokerpaks/empty
+RUN /app/csb pak build brokerpaks/aws-ses
+
 RUN ls /
 RUN ls /app
 
@@ -28,3 +30,4 @@ FROM ${base_image}
 
 # Copy brokerpaks to final image
 COPY --from=build /app/empty-0.0.1.brokerpak /app/
+COPY --from=build /app/aws-ses-current.brokerpak /app/
