@@ -28,6 +28,8 @@ RUN ls /app
 
 FROM ${base_image}
 
+RUN ls /app
+
 # Copy brokerpaks to final image
 COPY --from=build /app/empty-0.0.1.brokerpak /app/
 COPY --from=build /app/aws-ses-current.brokerpak /app/
