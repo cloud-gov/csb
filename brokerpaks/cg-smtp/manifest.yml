@@ -1,23 +1,23 @@
 packversion: 1
-name: datagov-brokerpak-smtp
-version: current
+name: cg-smtp
+version: 0.1.0
 metadata:
-  author: Bret Mogilefsky
+  author: cloud.gov team
 platforms:
   - os: linux
     arch: amd64
 terraform_binaries:
-  - name: terraform
-    version: 0.13.7
-    source: https://github.com/hashicorp/terraform/archive/v0.13.7.zip
+  - name: tofu
+    version: 1.6.2
+    source: https://github.com/opentofu/opentofu/archive/v1.6.2.zip
   - name: terraform-provider-aws
-    version: 3.46.0
-    source: https://github.com/terraform-providers/terraform-provider-aws/archive/v3.46.0.zip
+    version: 5.46.0
+    source: https://github.com/opentofu/terraform-provider-aws/archive/v5.46.0.zip
   - name: terraform-provider-null
-    version: 3.1.0
-    source: https://releases.hashicorp.com/terraform-provider-null/3.1.0/terraform-provider-null_3.1.0_linux_amd64.zip
+    version: 3.2.2
+    source: https://github.com/opentofu/terraform-provider-null/releases/download/v3.2.2/terraform-provider-null_3.2.2_linux_amd64.zip
 service_definitions:
-  - smtp.yml
+  - cg-smtp.yml
 parameters: []
 required_env_variables:
   - AWS_ACCESS_KEY_ID

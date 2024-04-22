@@ -1,19 +1,25 @@
 version: 1
-name: datagov-smtp
-id: b90ace67-954b-4b33-8f84-95cacc55b94c
+name: cg-smtp
+id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
 description: SMTP service provided by Amazon Simple Email Service (SES)
 display_name: SMTP (using AWS SES)
-image_url: https://www.pikpng.com/pngl/m/107-1078218_aws-ses-logo-png-transparent-ses-aws-clipart.png
-documentation_url: https://aws.amazon.com/ses/
-support_url: https://github.com/GSA/datagov-brokerpak
-tags: [aws, ses, preview]
-plan_updateable: true
+image_url: https://example.com/icon.jpg
+documentation_url: https://aws.amazon.com/ses/ # todo
+provider_display_name: ""
+support_url: https://github.com/cloud-gov/csb/issues
+tags: [aws, ses, smtp]
 plans:
   - name: base
-    id: dc109a6e-c4a8-4fbb-8c49-acf9740ab819
-    description: "Provision SMTP credentials to use for sending transactional mail from your application"
+    id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
+    description: Provision SMTP credentials to use for sending transactional mail from your application.
     display_name: Send-only service
-    properties:
+    bullets: # todo
+      - information point 1
+      - information point 2
+      - some caveat here
+    properties: # todo
+      domain: example.com
+      password_special_chars: '@/ \"?'
 provision:
   plan_inputs:
   user_inputs:
@@ -23,27 +29,6 @@ provision:
       default: ${config("aws.default_region")}
       enum:
         us-gov-west-1: us-gov-west-1
-        us-east-2: us-east-2
-        us-east-1: us-east-1
-        us-west-1: us-west-1
-        us-west-2: us-west-2
-        ap-east-1: ap-east-1
-        ap-south-1: ap-south-1
-        ap-northeast-3: ap-northeast-3
-        ap-northeast-2: ap-northeast-2
-        ap-southeast-1: ap-southeast-1
-        ap-southeast-2: ap-southeast-2
-        ap-northeast-1: ap-northeast-1
-        ca-central-1: ca-central-1
-        cn-north-1: cn-north-1
-        cn-northwest-1: cn-northwest-1
-        eu-central-1: eu-central-1
-        eu-west-1: eu-west-1
-        eu-west-2: eu-west-2
-        eu-west-3: eu-west-3
-        eu-north-1: eu-north-1
-        me-south-1: me-south-1
-        sa-east-1: sa-east-1
     - field_name: domain
       type: string
       details: Domain to send mail from
@@ -72,13 +57,6 @@ provision:
     - name: instance_name
       type: string
       default: ${request.instance_id}
-  template_refs:
-    main: terraform/provision/main.tf
-    notification: terraform/provision/notification.tf
-    outputs: terraform/provision/outputs.tf
-    provider: terraform/provision/provider.tf
-    variables: terraform/provision/variables.tf
-    verification: terraform/provision/verification.tf
   outputs:
     - field_name: region
       type: string
@@ -104,6 +82,13 @@ provision:
     - field_name: delivery_topic_arn
       type: string
       details: ARN of the SNS topic receiving delivery feedback notifications
+  template_refs:
+    main: terraform/provision/main.tf
+    notification: terraform/provision/notification.tf
+    outputs: terraform/provision/outputs.tf
+    provider: terraform/provision/provider.tf
+    variables: terraform/provision/variables.tf
+    verification: terraform/provision/verification.tf
 bind:
   plan_inputs: []
   user_inputs:
@@ -146,11 +131,6 @@ bind:
       default: ${instance.details["delivery_topic_arn"]}
       overwrite: true
       type: string
-  template_refs:
-    main: terraform/bind/main.tf
-    outputs: terraform/bind/outputs.tf
-    provider: terraform/bind/provider.tf
-    variables: terraform/bind/variables.tf
   outputs:
     - field_name: smtp_server
       type: string
@@ -167,9 +147,17 @@ bind:
     - field_name: notification_webhook
       type: string
       details: Subscribed endpoint for email feedback notifications
+  template_refs:
+    template_refs:
+    main: terraform/bind/main.tf
+    outputs: terraform/bind/outputs.tf
+    provider: terraform/bind/provider.tf
+    variables: terraform/bind/variables.tf
 examples:
   - name: smtp
     description: SMTP base
-    plan_id: dc109a6e-c4a8-4fbb-8c49-acf9740ab819
+    plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
     provision_params: {}
     bind_params: {}
+plan_updateable: false
+requiredenvvars: []
