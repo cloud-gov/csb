@@ -20,7 +20,6 @@ RUN set -e; if [ "$BUILD_ENV" = "production" ] ; then echo "production env"; els
 cp /app/zscaler.crt $CERT_DIR ; update-ca-certificates ; \
 fi
 
-RUN /app/csb pak build brokerpaks/empty
 RUN /app/csb pak build brokerpaks/cg-smtp
 
 RUN ls /
@@ -29,5 +28,4 @@ RUN ls /app
 FROM ${base_image}
 
 # Copy brokerpaks to final image
-COPY --from=build /app/empty-0.0.1.brokerpak /app/
 COPY --from=build /app/cg-smtp-0.1.0.brokerpak /app/
