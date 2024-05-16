@@ -1,8 +1,9 @@
 locals {
   instance_id = "ses-${substr(sha256(var.instance_name), 0, 16)}"
 
-  manage_domain = (var.domain == "" ? true : false)
-  domain        = (local.manage_domain ? "${local.instance_id}.${var.default_domain}" : var.domain)
+  manage_domain = (var.domain == "")
+  # When no domain is provided, generate one with pattern `instance_id.default_domain`. TODO: Why? Testing?
+  domain = (local.manage_domain ? "${local.instance_id}.${var.default_domain}" : var.domain)
   txt_verification_record = {
     name    = "_amazonses"
     type    = "TXT"
@@ -11,13 +12,15 @@ locals {
   }
 
   dmarc_verification_record = {
-    name    = "_dmarc.${local.domain}"
-    type    = "TXT"
-    ttl     = "600"
-    records = ["v=DMARC1; p=quarantine; rua=mailto:${var.email_receipt_error}; ruf=mailto:${var.email_receipt_error}"]
+    name = "_dmarc.${local.domain}"
+    type = "TXT"
+    ttl  = "600"
+    // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
+    // todo test this with no dmarc var provided to see if trailing comma breaks it
+    records = ["v=DMARC1; p=reject; rua=mailto:reports@dmarc.cyber.dhs.gov, ${var.dmarc_report_uri_aggregate}; ruf=mailto:${var.dmarc_report_uri_failure}"]
   }
 
-  setting_mail_from = (var.mail_from_subdomain == "" ? false : true)
+  setting_mail_from = (var.mail_from_subdomain != "")
   mail_from_domain  = "${var.mail_from_subdomain}.${aws_ses_domain_identity.identity.domain}"
 
   mx_verification_record = {
