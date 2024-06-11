@@ -33,10 +33,14 @@ provision:
       type: string
       details: Domain to send mail from
       default: ""
-    - field_name: email_receipt_error
+    - field_name: dmarc_report_uri_aggregate
       type: string
-      details: Email to recieve DMARC errors
-      default: "datagovhelp@gsa.gov"
+      details: "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
+      default: ""
+    - field_name: dmarc_report_uri_failure
+      type: string
+      details: "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
+      default: ""
     - field_name: enable_feedback_notifications
       type: boolean
       details: Flag to toggle creation of SNS topics for feedback notifications
@@ -64,9 +68,12 @@ provision:
     - field_name: required_records
       type: object
       details: If a domain was supplied, the records to be created in that zone
-    - field_name: email_receipt_error
+    - field_name: dmarc_report_uri_aggregate
       type: string
-      details: Email to recieve DMARC errors
+      details: "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
+    - field_name: dmarc_report_uri_failure
+      type: string
+      details: "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
     - field_name: instructions
       type: string
       details: Any further steps are needed before using the service.
@@ -141,7 +148,10 @@ bind:
     - field_name: smtp_password
       type: string
       details: SMTP password
-    - field_name: secret_access_key
+    - field_name: aws_access_key_id
+      type: string
+      details: AWS Access Key ID
+    - field_name: aws_secret_access_key
       type: string
       details: AWS Secret Access Key
     - field_name: notification_webhook
