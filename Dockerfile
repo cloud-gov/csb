@@ -22,9 +22,6 @@ fi
 
 RUN /app/csb pak build brokerpaks/cg-smtp
 
-RUN ls /
-RUN ls /app
-
 FROM ${base_image}
 
 # Copy brokerpaks to final image
