@@ -5,8 +5,6 @@ ARG base_image
 FROM ${base_image} AS build
 ADD . /app
 WORKDIR /app
-RUN ls /
-RUN ls /app
 
 ARG BUILD_ENV=development
 
