@@ -12,7 +12,6 @@ terraform_binaries:
     source: https://github.com/opentofu/opentofu/archive/v1.6.2.zip
   - name: terraform-provider-aws
     version: 5.53.0
-    provider: registry.terraform.io/hashicorp/aws
     source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.53.0.zip
 service_definitions:
   - cg-smtp.yml
