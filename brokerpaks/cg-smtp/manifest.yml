@@ -6,6 +6,8 @@ metadata:
 platforms:
   - os: linux
     arch: amd64
+terraform_state_provider_replacements:
+  registry.opentofu.org/hashicorp/aws: "registry.terraform.io/hashicorp/aws"
 terraform_binaries:
   - name: tofu
     version: 1.6.2
