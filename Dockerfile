@@ -24,4 +24,3 @@ FROM ${base_image}
 
 # Copy brokerpaks to final image
 COPY --from=build /app/cg-smtp-0.1.0.brokerpak /app/
-ADD https://github.com/cloudfoundry/csb-brokerpak-aws/releases/download/1.13.0/aws-services-1.13.0.brokerpak /app/
