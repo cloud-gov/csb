@@ -96,6 +96,7 @@ provision:
     provider: terraform/provision/provider.tf
     variables: terraform/provision/variables.tf
     verification: terraform/provision/verification.tf
+    versions: terraform/provision/versions.tf
 bind:
   plan_inputs: []
   user_inputs:
@@ -158,11 +159,11 @@ bind:
       type: string
       details: Subscribed endpoint for email feedback notifications
   template_refs:
-    template_refs:
     main: terraform/bind/main.tf
     outputs: terraform/bind/outputs.tf
     provider: terraform/bind/provider.tf
     variables: terraform/bind/variables.tf
+    versions: terraform/bind/versions.tf
 examples:
   - name: smtp
     description: SMTP base
