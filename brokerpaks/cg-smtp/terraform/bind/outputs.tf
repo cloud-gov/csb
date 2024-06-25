@@ -7,7 +7,8 @@ output "smtp_user" {
 }
 
 output "smtp_password" {
-  value = aws_iam_access_key.access_key.ses_smtp_password_v4
+  value     = aws_iam_access_key.access_key.ses_smtp_password_v4
+  sensitive = true
 }
 
 # TODO should we only expose the SMTP interface?
@@ -17,7 +18,8 @@ output "aws_access_key_id" {
 
 # TODO should we only expose the SMTP interface?
 output "aws_secret_access_key" {
-  value = aws_iam_access_key.access_key.secret
+  value     = aws_iam_access_key.access_key.secret
+  sensitive = true
 }
 
 output "notification_webhook" {
