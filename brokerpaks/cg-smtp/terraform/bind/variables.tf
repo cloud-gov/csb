@@ -1,4 +1,6 @@
-variable "user_name" { type = string }
+variable "user_name" {
+  type = string
+}
 
 variable "instance_name" {
   type    = string
@@ -6,7 +8,8 @@ variable "instance_name" {
 }
 
 variable "region" {
-  type = string
+  type        = string
+  description = "The AWS region in which to create the SES user and credentials."
 }
 
 variable "domain_arn" {

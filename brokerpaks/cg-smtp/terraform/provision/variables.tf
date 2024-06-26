@@ -6,8 +6,7 @@ variable "domain" {
 
 variable "default_domain" {
   type        = string
-  description = "Fallback domain to use if none was supplied"
-  default     = "example.gov"
+  description = "Computed. Fallback domain to use if none was supplied."
 }
 
 variable "instance_name" {
@@ -15,7 +14,8 @@ variable "instance_name" {
 }
 
 variable "region" {
-  type = string
+  type        = string
+  description = "The AWS region in which to create the SES instance."
 }
 
 variable "dmarc_report_uri_aggregate" {

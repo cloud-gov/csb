@@ -11,14 +11,13 @@ tags: [aws, ses, smtp]
 plans:
   - name: base
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
-    description: Provision SMTP credentials to use for sending transactional mail from your application.
+    description: Provision SMTP credentials for sending email from your application.
     display_name: Send-only service
     bullets: # todo
       - information point 1
       - information point 2
       - some caveat here
     properties: # todo
-      domain: example.com
       password_special_chars: '@/ \"?'
 provision:
   plan_inputs:
