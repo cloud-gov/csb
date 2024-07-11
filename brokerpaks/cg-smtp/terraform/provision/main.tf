@@ -2,7 +2,7 @@ locals {
   instance_id = "ses-${substr(sha256(var.instance_name), 0, 16)}"
 
   manage_domain = (var.domain == "")
-  # When no domain is provided, generate one with pattern `instance_id.default_domain`. TODO: Why? Testing?
+  # When no domain is provided, generate one with pattern `instance_id.default_domain`. Useful for testing.
   domain = (local.manage_domain ? "${local.instance_id}.${var.default_domain}" : var.domain)
   txt_verification_record = {
     name    = "_amazonses"

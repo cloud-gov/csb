@@ -1,3 +1,31 @@
+// Provider credentials
+variable "aws_access_key_govcloud" {
+  type = string
+}
+
+variable "aws_secret_key_govcloud" {
+  type      = string
+  sensitive = true
+}
+
+variable "aws_region_govcloud" {
+  type = string
+}
+
+variable "aws_access_key_commercial" {
+  type = string
+}
+
+variable "aws_secret_key_commercial" {
+  type      = string
+  sensitive = true
+}
+
+variable "aws_region_commercial" {
+  type = string
+}
+
+// Brokerpak configuration
 variable "domain" {
   type        = string
   description = "Domain from which to send mail"
@@ -10,7 +38,8 @@ variable "default_domain" {
 }
 
 variable "instance_name" {
-  type = string
+  type        = string
+  description = "TODO"
 }
 
 variable "region" {

@@ -23,12 +23,18 @@ service_definitions:
   - cg-smtp.yml
 parameters: []
 required_env_variables:
-  - AWS_ACCESS_KEY_ID
-  - AWS_SECRET_ACCESS_KEY
   - AWS_ZONE
-  - AWS_DEFAULT_REGION
+  - TF_VAR_AWS_ACCESS_KEY_GOVCLOUD
+  - TF_VAR_AWS_SECRET_KEY_GOVCLOUD
+  - TF_VAR_AWS_REGION_GOVCLOUD
+  - TF_VAR_AWS_ACCESS_KEY_COMMERCIAL
+  - TF_VAR_AWS_SECRET_KEY_COMMERCIAL
+  - TF_VAR_AWS_REGION_COMMERCIAL
 env_config_mapping:
-  AWS_ACCESS_KEY_ID: aws.access_key_id
-  AWS_SECRET_ACCESS_KEY: aws.secret_access_key
+  TF_VAR_AWS_ACCESS_KEY_GOVCLOUD: aws.govcloud.access_key_id
+  TF_VAR_AWS_SECRET_KEY_GOVCLOUD: aws.govcloud.secret_access_key
+  TF_VAR_AWS_REGION_GOVCLOUD: aws.govcloud.region
+  TF_VAR_AWS_ACCESS_KEY_COMMERCIAL: aws.commercial.access_key_id
+  TF_VAR_AWS_SECRET_KEY_COMMERCIAL: aws.commercial.secret_access_key
+  TF_VAR_AWS_REGION_COMMERCIAL: aws.commercial.region
   AWS_ZONE: aws.zone
-  AWS_DEFAULT_REGION: aws.default_region

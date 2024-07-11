@@ -92,7 +92,7 @@ provision:
     main: terraform/provision/main.tf
     notification: terraform/provision/notification.tf
     outputs: terraform/provision/outputs.tf
-    provider: terraform/provision/provider.tf
+    providers: terraform/provision/providers.tf
     variables: terraform/provision/variables.tf
     verification: terraform/provision/verification.tf
     versions: terraform/provision/versions.tf

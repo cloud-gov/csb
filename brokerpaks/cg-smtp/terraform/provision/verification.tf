@@ -1,12 +1,14 @@
 # Get the configured default DNS Zone
 data "aws_route53_zone" "parent_zone" {
-  count = (local.manage_domain ? 1 : 0)
-  name  = var.default_domain
+  provider = aws.commercial
+  count    = (local.manage_domain ? 1 : 0)
+  name     = var.default_domain
 }
 
 # Create Hosted Zone for the specific subdomain name
 resource "aws_route53_zone" "instance_zone" {
-  count = (local.manage_domain ? 1 : 0)
+  provider = aws.commercial
+  count    = (local.manage_domain ? 1 : 0)
 
   name          = local.domain
   force_destroy = true
@@ -18,7 +20,8 @@ resource "aws_route53_zone" "instance_zone" {
 
 # Create the NS record in the parent zone for the instance zone
 resource "aws_route53_record" "instance_ns" {
-  count = (local.manage_domain ? 1 : 0)
+  provider = aws.commercial
+  count    = (local.manage_domain ? 1 : 0)
 
   zone_id = data.aws_route53_zone.parent_zone[0].zone_id
   name    = local.instance_id
@@ -29,7 +32,7 @@ resource "aws_route53_record" "instance_ns" {
 
 # Create any necessary records in the instance_zone
 resource "aws_route53_record" "records" {
-
+  provider = aws.commercial
   for_each = local.route53_records
 
   name    = each.value.name
@@ -42,7 +45,8 @@ resource "aws_route53_record" "records" {
 
 # Create MX record if needed
 resource "aws_route53_record" "mail_from_mx_record" {
-  count = (local.manage_domain && local.setting_mail_from ? 1 : 0)
+  provider = aws.commercial
+  count    = (local.manage_domain && local.setting_mail_from ? 1 : 0)
 
   name    = local.mx_verification_record.name
   type    = local.mx_verification_record.type
@@ -55,7 +59,8 @@ resource "aws_route53_record" "mail_from_mx_record" {
 
 # Wait on the verification to succeed
 resource "aws_ses_domain_identity_verification" "verification" {
-  count = (local.manage_domain ? 1 : 0)
+  provider = aws.commercial
+  count    = (local.manage_domain ? 1 : 0)
 
   domain = local.domain
   timeouts {

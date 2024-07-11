@@ -36,3 +36,7 @@ the broker context here.
    terraform destroy -auto-approve
    exit
    ```
+
+# AWS GovCloud and Commercial
+
+Cloud.gov manages most resources in AWS GovCloud, but uses AWS Commercial to manage DNS with Route53. Since AWS IAM users [cannot have cross-partition permissions](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html), the brokerpak requires two sets of credentials and two providers to create all necessary resources.
