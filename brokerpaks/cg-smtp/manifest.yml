@@ -24,17 +24,17 @@ service_definitions:
 parameters: []
 required_env_variables:
   - AWS_ZONE
-  - TF_VAR_AWS_ACCESS_KEY_GOVCLOUD
-  - TF_VAR_AWS_SECRET_KEY_GOVCLOUD
-  - TF_VAR_AWS_REGION_GOVCLOUD
-  - TF_VAR_AWS_ACCESS_KEY_COMMERCIAL
-  - TF_VAR_AWS_SECRET_KEY_COMMERCIAL
-  - TF_VAR_AWS_REGION_COMMERCIAL
+  - AWS_ACCESS_KEY_GOVCLOUD
+  - AWS_SECRET_KEY_GOVCLOUD
+  - AWS_REGION_GOVCLOUD
+  - AWS_ACCESS_KEY_COMMERCIAL
+  - AWS_SECRET_KEY_COMMERCIAL
+  - AWS_REGION_COMMERCIAL
 env_config_mapping:
-  TF_VAR_AWS_ACCESS_KEY_GOVCLOUD: aws.govcloud.access_key_id
-  TF_VAR_AWS_SECRET_KEY_GOVCLOUD: aws.govcloud.secret_access_key
-  TF_VAR_AWS_REGION_GOVCLOUD: aws.govcloud.region
-  TF_VAR_AWS_ACCESS_KEY_COMMERCIAL: aws.commercial.access_key_id
-  TF_VAR_AWS_SECRET_KEY_COMMERCIAL: aws.commercial.secret_access_key
-  TF_VAR_AWS_REGION_COMMERCIAL: aws.commercial.region
+  AWS_ACCESS_KEY_GOVCLOUD: aws.govcloud.access_key_id
+  AWS_SECRET_KEY_GOVCLOUD: aws.govcloud.secret_access_key
+  AWS_REGION_GOVCLOUD: aws.govcloud.region
+  AWS_ACCESS_KEY_COMMERCIAL: aws.commercial.access_key_id
+  AWS_SECRET_KEY_COMMERCIAL: aws.commercial.secret_access_key
+  AWS_REGION_COMMERCIAL: aws.commercial.region
   AWS_ZONE: aws.zone

@@ -45,6 +45,7 @@ variable "instance_name" {
 variable "region" {
   type        = string
   description = "The AWS region in which to create the SES instance."
+  default     = "us-gov-west-1"
 }
 
 variable "dmarc_report_uri_aggregate" {

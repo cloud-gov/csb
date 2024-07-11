@@ -22,12 +22,6 @@ plans:
 provision:
   plan_inputs:
   user_inputs:
-    - field_name: region
-      type: string
-      details: The region of the SES service.
-      default: ${config("aws.default_region")}
-      enum:
-        us-gov-west-1: us-gov-west-1
     - field_name: domain
       type: string
       details: Domain to send mail from
@@ -49,6 +43,24 @@ provision:
       details: Subdomain to use as sending email server
       default: ""
   computed_inputs:
+    - name: aws_access_key_govcloud
+      type: string
+      default: ${config("aws.govcloud.access_key_id")}
+    - name: aws_secret_key_govcloud
+      type: string
+      default: ${config("aws.govcloud.secret_access_key")}
+    - name: aws_region_govcloud
+      type: string
+      default: ${config("aws.govcloud.region")}
+    - name: aws_access_key_commercial
+      type: string
+      default: ${config("aws.commercial.access_key_id")}
+    - name: aws_secret_key_commercial
+      type: string
+      default: ${config("aws.commercial.secret_access_key")}
+    - name: aws_region_commercial
+      type: string
+      default: ${config("aws.commercial.region")}
     - name: default_domain
       overwrite: true
       type: string
