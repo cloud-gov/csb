@@ -42,12 +42,6 @@ variable "instance_name" {
   description = "TODO"
 }
 
-variable "region" {
-  type        = string
-  description = "The AWS region in which to create the SES instance."
-  default     = "us-gov-west-1"
-}
-
 variable "dmarc_report_uri_aggregate" {
   type        = string
   description = "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."

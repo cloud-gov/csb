@@ -1,4 +1,6 @@
-output "region" { value = var.region }
+output "region" {
+  value = var.aws_region_govcloud
+}
 
 output "required_records" {
   value = local.manage_domain ? null : local.required_records_as_string

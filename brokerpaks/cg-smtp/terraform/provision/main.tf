@@ -27,7 +27,7 @@ locals {
     name    = local.mail_from_domain
     type    = "MX"
     ttl     = "600"
-    records = ["10 feedback-smtp.${var.region}.amazonses.com"]
+    records = ["10 feedback-smtp.${var.aws_region_govcloud}.amazonses.com"]
   }
 
   spf_verification_record = {
