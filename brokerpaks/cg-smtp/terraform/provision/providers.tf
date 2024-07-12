@@ -1,6 +1,5 @@
-// Resources default to the first provider, govcloud.
+// Resources without a `provider` attribute default to this provider, which targets govcloud.
 provider "aws" {
-  alias      = "govcloud"
   access_key = var.aws_access_key_id_govcloud
   secret_key = var.aws_secret_access_key_govcloud
   region     = var.aws_region_govcloud
