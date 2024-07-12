@@ -43,19 +43,19 @@ provision:
       details: Subdomain to use as sending email server
       default: ""
   computed_inputs:
-    - name: aws_access_key_govcloud
+    - name: aws_access_key_id_govcloud
       type: string
       default: ${config("aws.govcloud.access_key_id")}
-    - name: aws_secret_key_govcloud
+    - name: aws_secret_access_key_govcloud
       type: string
       default: ${config("aws.govcloud.secret_access_key")}
     - name: aws_region_govcloud
       type: string
       default: ${config("aws.govcloud.region")}
-    - name: aws_access_key_commercial
+    - name: aws_access_key_id_commercial
       type: string
       default: ${config("aws.commercial.access_key_id")}
-    - name: aws_secret_key_commercial
+    - name: aws_secret_access_key_commercial
       type: string
       default: ${config("aws.commercial.secret_access_key")}
     - name: aws_region_commercial

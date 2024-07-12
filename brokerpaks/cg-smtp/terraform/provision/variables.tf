@@ -1,9 +1,9 @@
 // Provider credentials
-variable "aws_access_key_govcloud" {
+variable "aws_access_key_id_govcloud" {
   type = string
 }
 
-variable "aws_secret_key_govcloud" {
+variable "aws_secret_access_key_govcloud" {
   type      = string
   sensitive = true
 }
@@ -12,11 +12,11 @@ variable "aws_region_govcloud" {
   type = string
 }
 
-variable "aws_access_key_commercial" {
+variable "aws_access_key_id_commercial" {
   type = string
 }
 
-variable "aws_secret_key_commercial" {
+variable "aws_secret_access_key_commercial" {
   type      = string
   sensitive = true
 }
