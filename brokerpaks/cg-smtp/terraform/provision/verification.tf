@@ -59,8 +59,7 @@ resource "aws_route53_record" "mail_from_mx_record" {
 
 # Wait on the verification to succeed
 resource "aws_ses_domain_identity_verification" "verification" {
-  provider = aws.commercial
-  count    = (local.manage_domain ? 1 : 0)
+  count = (local.manage_domain ? 1 : 0)
 
   domain = local.domain
   timeouts {
