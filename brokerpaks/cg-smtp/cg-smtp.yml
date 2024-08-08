@@ -123,6 +123,15 @@ bind:
       details: HTTPS endpoint to subscribe to feedback notifications
       default: ""
   computed_inputs:
+    - name: aws_access_key_id_govcloud
+      type: string
+      default: ${config("aws.govcloud.access_key_id")}
+    - name: aws_secret_access_key_govcloud
+      type: string
+      default: ${config("aws.govcloud.secret_access_key")}
+    - name: aws_region_govcloud
+      type: string
+      default: ${config("aws.govcloud.region")}
     - name: region
       default: ${instance.details["region"]}
       overwrite: true
