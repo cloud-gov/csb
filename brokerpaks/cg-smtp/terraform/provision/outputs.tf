@@ -18,7 +18,7 @@ output "instructions" {
   value = local.instructions
 }
 
-output "identity_arn" {
+output "domain_arn" {
   value = aws_ses_domain_identity.identity.arn
 }
 

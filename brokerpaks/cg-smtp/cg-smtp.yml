@@ -88,9 +88,9 @@ provision:
     - field_name: instructions
       type: string
       details: Any further steps are needed before using the service.
-    - field_name: identity_arn
+    - field_name: domain_arn
       type: string
-      details: ARN of the SES identity provisioned (used when creating bindings)
+      details: Instance SES domain identity (used when creating bindings)
     - field_name: bounce_topic_arn
       type: string
       details: ARN of the SNS topic receiving bounce feedback notifications

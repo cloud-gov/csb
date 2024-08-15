@@ -17,7 +17,7 @@ resource "aws_iam_access_key" "access_key" {
 }
 
 resource "aws_ses_identity_policy" "user_policy" {
-  identity = var.identity_arn
+  identity = var.domain_arn
   name     = format("%s-p", local.user_name)
   policy = jsonencode({
     Version = "2012-10-17"
@@ -27,7 +27,7 @@ resource "aws_ses_identity_policy" "user_policy" {
         "ses:SendEmail",
         "ses:SendRawEmail"
       ]
-      Resource = var.identity_arn
+      Resource = var.domain_arn
       Principal = {
         AWS = [
           aws_iam_user.user.arn

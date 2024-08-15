@@ -27,7 +27,7 @@ variable "region" {
   description = "The AWS region in which to create the SES user and credentials."
 }
 
-variable "identity_arn" {
+variable "domain_arn" {
   type        = string
   description = "ARN of the SES identity."
 }
