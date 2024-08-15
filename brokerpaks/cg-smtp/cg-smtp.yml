@@ -136,8 +136,8 @@ bind:
       default: ${instance.details["region"]}
       overwrite: true
       type: string
-    - name: identity_arn
-      default: ${instance.details["identity_arn"]}
+    - name: domain_arn
+      default: ${instance.details["domain_arn"]}
       overwrite: true
       type: string
     - name: user_name
