@@ -16,9 +16,11 @@ resource "aws_iam_access_key" "access_key" {
   user = aws_iam_user.user.name
 }
 
-resource "aws_ses_identity_policy" "user_policy" {
-  identity = var.domain_arn
-  name     = format("%s-p", local.user_name)
+resource "aws_iam_user_policy" "user_policy" {
+  name = format("%s-p", local.user_name)
+
+  user = aws_iam_user.user.name
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -28,11 +30,6 @@ resource "aws_ses_identity_policy" "user_policy" {
         "ses:SendRawEmail"
       ]
       Resource = var.domain_arn
-      Principal = {
-        AWS = [
-          aws_iam_user.user.arn
-        ]
-      }
       Condition = {
         "ForAnyValue:IpAddress" = {
           "aws:SourceIp" = var.source_ips
