@@ -81,3 +81,8 @@ variable "organization_name" {
 variable "space_guid" {
   type = string
 }
+
+variable "space_name" {
+  type = string
+}
+

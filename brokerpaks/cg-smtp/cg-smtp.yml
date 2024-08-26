@@ -82,6 +82,9 @@ provision:
     - name: space_guid
       type: string
       default: ${request.context.space_guid}
+    - name: space_name
+      type: string
+      default: ${request.context.space_name}
   outputs:
     - field_name: region
       type: string
