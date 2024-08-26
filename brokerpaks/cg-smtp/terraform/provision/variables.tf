@@ -68,3 +68,21 @@ variable "mail_from_subdomain" {
   description = "Subdomain to set as the mail-from value"
   default     = ""
 }
+
+# Tagging variables
+variable "organization_guid" {
+  type = string
+}
+
+variable "organization_name" {
+  type = string
+}
+
+variable "space_guid" {
+  type = string
+}
+
+variable "space_name" {
+  type = string
+}
+

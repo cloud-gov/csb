@@ -4,12 +4,6 @@ locals {
   manage_domain = (var.domain == "")
   # When no domain is provided, generate one with pattern `instance_id.default_domain`. Useful for testing.
   domain = (local.manage_domain ? "${local.instance_id}.${var.default_domain}" : var.domain)
-  txt_verification_record = {
-    name    = "_amazonses"
-    type    = "TXT"
-    ttl     = "600"
-    records = [aws_ses_domain_identity.identity.verification_token]
-  }
 
   dmarc_verification_record = {
     name = "_dmarc.${local.domain}"
@@ -21,7 +15,7 @@ locals {
   }
 
   setting_mail_from = (var.mail_from_subdomain != "")
-  mail_from_domain  = "${var.mail_from_subdomain}.${aws_ses_domain_identity.identity.domain}"
+  mail_from_domain  = "${var.mail_from_subdomain}.${aws_sesv2_email_identity.identity.email_identity}"
 
   mx_verification_record = {
     name    = local.mail_from_domain
@@ -37,7 +31,7 @@ locals {
     records = ["v=spf1 include:amazonses.com -all"]
   }
 
-  dkim_records = [for i, token in aws_ses_domain_dkim.dkim.dkim_tokens :
+  dkim_records = [for i, token in aws_sesv2_email_identity.identity.dkim_signing_attributes[0].tokens :
     {
       name    = "${token}._domainkey.${local.domain}"
       type    = "CNAME"
@@ -47,7 +41,6 @@ locals {
   ]
 
   required_records = {
-    txt_verification_record   = local.txt_verification_record
     dmarc_verification_record = local.dmarc_verification_record
     spf_verification_record   = local.spf_verification_record
     dkim_record_0             = local.dkim_records[0]
@@ -97,17 +90,27 @@ locals {
   instructions = (local.manage_domain ? null : "Your SMTP service was provisioned, but is not yet verified. To verify your control of the ${var.domain} domain, create the 'required_records' provided here in the ${var.domain} zone before using the service.")
 }
 
-resource "aws_ses_domain_identity" "identity" {
-  domain = local.domain
+resource "aws_sesv2_email_identity" "identity" {
+  configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
+  email_identity         = local.domain
+  # Should match https://github.com/cloud-gov/go-broker-tags/blob/main/tags.go#L10
+  tags = {
+    "broker"                = "Cloud Service Broker"
+    "client"                = "Cloud Foundry"
+    "environment"           = "development" # todo
+    "Instance GUID"         = var.instance_name
+    "Organization GUID"     = var.organization_guid
+    "Organization name"     = var.organization_name
+    "Service offering name" = "" # todo
+    "Service plan name"     = "" # todo
+    "Space GUID"            = var.space_guid
+    "Space name"            = var.space_name
+  }
 }
 
-resource "aws_ses_domain_dkim" "dkim" {
-  domain = aws_ses_domain_identity.identity.domain
-}
-
-resource "aws_ses_domain_mail_from" "mail_from" {
+resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
   count = (local.setting_mail_from ? 1 : 0)
 
-  domain           = aws_ses_domain_identity.identity.domain
+  email_identity   = aws_sesv2_email_identity.identity.email_identity
   mail_from_domain = local.mail_from_domain
 }

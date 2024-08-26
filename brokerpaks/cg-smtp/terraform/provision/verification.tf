@@ -9,6 +9,7 @@ data "aws_route53_zone" "parent_zone" {
 resource "aws_route53_zone" "instance_zone" {
   provider = aws.commercial
   count    = (local.manage_domain ? 1 : 0)
+  comment  = "Created for a customer using the Cloud Service Broker and SMTP Brokerpak."
 
   name          = local.domain
   force_destroy = true
@@ -54,20 +55,4 @@ resource "aws_route53_record" "mail_from_mx_record" {
   records = local.mx_verification_record.records
 
   zone_id = aws_route53_zone.instance_zone[0].zone_id
-}
-
-
-# Wait on the verification to succeed
-resource "aws_ses_domain_identity_verification" "verification" {
-  count = (local.manage_domain ? 1 : 0)
-
-  domain = local.domain
-  timeouts {
-    create = "3m"
-  }
-  depends_on = [
-    aws_route53_record.instance_ns,
-    aws_route53_record.records,
-    aws_ses_domain_dkim.dkim
-  ]
 }

@@ -19,7 +19,7 @@ output "instructions" {
 }
 
 output "domain_arn" {
-  value = aws_ses_domain_identity.identity.arn
+  value = aws_sesv2_email_identity.identity.arn
 }
 
 output "bounce_topic_arn" {
