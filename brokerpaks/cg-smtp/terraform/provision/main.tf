@@ -104,7 +104,6 @@ resource "aws_sesv2_email_identity" "identity" {
     "Service offering name" = "" # todo
     "Service plan name"     = "" # todo
     "Space GUID"            = var.space_guid
-    "Space name"            = var.space_name
   }
 }
 
