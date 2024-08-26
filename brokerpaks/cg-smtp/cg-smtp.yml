@@ -75,16 +75,16 @@ provision:
     # Inputs used for tagging resources
     - name: organization_guid
       type: string
-      default: ${request.context.organization_guid}
+      default: ${request.context["organization_guid"]}
     - name: organization_name
       type: string
-      default: ${request.context.organization_name}
+      default: ${request.context["organization_name"]}
     - name: space_guid
       type: string
-      default: ${request.context.space_guid}
+      default: ${request.context["space_guid"]}
     - name: space_name
       type: string
-      default: ${request.context.space_name}
+      default: ${request.context["space_name"]}
   outputs:
     - field_name: region
       type: string
@@ -97,7 +97,7 @@ provision:
       details: "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
     - field_name: dmarc_report_uri_failure
       type: string
-      details: "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
+      details: "The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
     - field_name: instructions
       type: string
       details: Any further steps are needed before using the service.
