@@ -18,6 +18,10 @@ output "instructions" {
   value = local.instructions
 }
 
+output "configuration_set_arn" {
+  value = aws_sesv2_configuration_set.config.arn
+}
+
 output "domain_arn" {
   value = aws_sesv2_email_identity.identity.arn
 }

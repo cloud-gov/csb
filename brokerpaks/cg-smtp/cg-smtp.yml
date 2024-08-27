@@ -88,6 +88,9 @@ provision:
     - field_name: instructions
       type: string
       details: Any further steps are needed before using the service.
+    - field_name: configuration_set_arn
+      type: string
+      details: ARN of the SES Configuration Set associated with the identity. Used to create bindings.
     - field_name: domain_arn
       type: string
       details: Instance SES domain identity (used when creating bindings)
@@ -134,6 +137,10 @@ bind:
       default: ${config("aws.govcloud.region")}
     - name: region
       default: ${instance.details["region"]}
+      overwrite: true
+      type: string
+    - name: configuration_set_arn
+      default: ${instance.details["configuration_set_arn"]}
       overwrite: true
       type: string
     - name: domain_arn
