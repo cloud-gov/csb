@@ -72,19 +72,6 @@ provision:
     - name: instance_name
       type: string
       default: ${request.instance_id}
-    # Inputs used for tagging resources
-    - name: organization_guid
-      type: string
-      default: ${request.context["organization_guid"]}
-    - name: organization_name
-      type: string
-      default: ${request.context["organization_name"]}
-    - name: space_guid
-      type: string
-      default: ${request.context["space_guid"]}
-    - name: space_name
-      type: string
-      default: ${request.context["space_name"]}
   outputs:
     - field_name: region
       type: string

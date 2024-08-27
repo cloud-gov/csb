@@ -99,12 +99,8 @@ resource "aws_sesv2_email_identity" "identity" {
     "client"                = "Cloud Foundry"
     "environment"           = "development" # todo
     "Instance GUID"         = var.instance_name
-    "Organization GUID"     = var.organization_guid
-    "Organization name"     = var.organization_name
     "Service offering name" = "" # todo
     "Service plan name"     = "" # todo
-    "Space GUID"            = var.space_guid
-    "Space name"            = var.space_name
   }
 }
 
