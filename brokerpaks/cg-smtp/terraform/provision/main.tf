@@ -94,16 +94,6 @@ resource "aws_sesv2_email_identity" "identity" {
   configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
   email_identity         = local.domain
   # Should match https://github.com/cloud-gov/go-broker-tags/blob/main/tags.go#L10
-  tags = {
-    "broker"                = "Cloud Service Broker"
-    "client"                = "Cloud Foundry"
-    "environment"           = "development" # todo, parameterize at CSB level
-    "Instance GUID"         = var.instance_name
-    "Organization GUID"     = "" # todo, see https://github.com/cloud-gov/product/issues/3107#issuecomment-2312442514
-    "Organization name"     = "" # todo
-    "Service offering name" = "" # todo
-    "Service plan name"     = "" # todo
-  }
 }
 
 resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
