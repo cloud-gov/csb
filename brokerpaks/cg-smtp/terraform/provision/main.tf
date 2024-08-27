@@ -97,8 +97,10 @@ resource "aws_sesv2_email_identity" "identity" {
   tags = {
     "broker"                = "Cloud Service Broker"
     "client"                = "Cloud Foundry"
-    "environment"           = "development" # todo
+    "environment"           = "development" # todo, parameterize at CSB level
     "Instance GUID"         = var.instance_name
+    "Organization GUID"     = "" # todo, see https://github.com/cloud-gov/product/issues/3107#issuecomment-2312442514
+    "Organization name"     = "" # todo
     "Service offering name" = "" # todo
     "Service plan name"     = "" # todo
   }
