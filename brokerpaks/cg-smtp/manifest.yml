@@ -6,6 +6,8 @@ metadata:
 platforms:
   - os: linux
     arch: amd64
+  - os: darwin
+    arch: arm64
 terraform_upgrade_path:
   - version: 1.6.2
 terraform_state_provider_replacements:
