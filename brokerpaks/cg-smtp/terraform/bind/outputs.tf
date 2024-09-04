@@ -1,5 +1,5 @@
 output "smtp_server" {
-  value = format("email-smtp.%s.amazonaws.com", var.region)
+  value = format("email-smtp-fips.%s.amazonaws.com", var.region)
 }
 
 output "smtp_user" {
