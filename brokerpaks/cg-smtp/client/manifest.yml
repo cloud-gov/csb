@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://json.schemastore.org/cloudfoundry-application-manifest.json
+applications:
+  - name: smtp-client
+    buildpacks:
+      - "go_buildpack"
+    env:
+      GOVERSION: "1.22"
+    services:
+      - name: email
