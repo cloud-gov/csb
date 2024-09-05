@@ -4,12 +4,20 @@ resource "aws_sesv2_configuration_set" "config" {
   delivery_options {
     tls_policy = "REQUIRE" # TODO check if BOD requires this
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Create SNS topic for bounce messages
 resource "aws_sns_topic" "bounce_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_name}-bounce"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "bounce" {
@@ -31,6 +39,10 @@ resource "aws_sesv2_configuration_set_event_destination" "bounce" {
 resource "aws_sns_topic" "complaint_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_name}-complaint"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "name" {
@@ -50,6 +62,10 @@ resource "aws_sesv2_configuration_set_event_destination" "name" {
 resource "aws_sns_topic" "delivery_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_name}-delivery"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "delivery" {

@@ -10,7 +10,6 @@ locals {
     type = "TXT"
     ttl  = "600"
     // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
-    // todo test this with no dmarc var provided to see if trailing comma breaks it
     records = ["v=DMARC1; p=reject; rua=mailto:reports@dmarc.cyber.dhs.gov, ${var.dmarc_report_uri_aggregate}; ruf=mailto:${var.dmarc_report_uri_failure}"]
   }
 
@@ -94,6 +93,10 @@ resource "aws_sesv2_email_identity" "identity" {
   configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
   email_identity         = local.domain
   # Should match https://github.com/cloud-gov/go-broker-tags/blob/main/tags.go#L10
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
@@ -101,4 +104,8 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
 
   email_identity   = aws_sesv2_email_identity.identity.email_identity
   mail_from_domain = local.mail_from_domain
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
