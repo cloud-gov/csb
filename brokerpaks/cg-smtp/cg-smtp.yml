@@ -6,42 +6,34 @@ display_name: SMTP (using AWS SES)
 image_url: https://example.com/icon.jpg
 documentation_url: https://aws.amazon.com/ses/ # todo
 provider_display_name: ""
-support_url: https://github.com/cloud-gov/csb/issues
+support_url: https://cloud.gov/contact/
 tags: [aws, ses, smtp]
 plans:
   - name: base
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
-    description: Provision SMTP credentials for sending email from your application.
+    description: Provision SMTP credentials for sending email from any user at a domain, like 'agency.gov'.
     display_name: Send-only service
-    bullets: # todo
-      - information point 1
-      - information point 2
-      - some caveat here
-    properties: # todo
-      password_special_chars: '@/ \"?'
 provision:
   plan_inputs:
   user_inputs:
     - field_name: domain
       type: string
-      details: Domain to send mail from
-      default: ""
+      details: Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
       type: string
-      details: "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
-      default: ""
+      required: true
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
     - field_name: dmarc_report_uri_failure
       type: string
-      details: "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
-      default: ""
+      required: true
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
     - field_name: enable_feedback_notifications
       type: boolean
-      details: Flag to toggle creation of SNS topics for feedback notifications
+      details: Flag to toggle creation of SNS topics for feedback notifications.
       default: false
     - field_name: mail_from_subdomain
       type: string
-      details: Subdomain to use as sending email server
-      default: ""
+      details: Subdomain to use as the sending email server.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
@@ -75,19 +67,19 @@ provision:
   outputs:
     - field_name: region
       type: string
-      details: AWS region for the SES instance
+      details: AWS region of the SES identity.
     - field_name: required_records
       type: object
-      details: If a domain was supplied, the records to be created in that zone
+      details: If a domain was supplied, you must create these records in that zone in your DNS system.
     - field_name: dmarc_report_uri_aggregate
       type: string
-      details: "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
     - field_name: dmarc_report_uri_failure
       type: string
-      details: "The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
     - field_name: instructions
       type: string
-      details: Any further steps are needed before using the service.
+      details: Any further steps that you must take before using the service.
     - field_name: configuration_set_arn
       type: string
       details: ARN of the SES Configuration Set associated with the identity. Used to create bindings.
@@ -96,13 +88,13 @@ provision:
       details: Instance SES domain identity (used when creating bindings)
     - field_name: bounce_topic_arn
       type: string
-      details: ARN of the SNS topic receiving bounce feedback notifications
+      details: ARN of the SNS topic receiving bounce feedback notifications.
     - field_name: complaint_topic_arn
       type: string
-      details: ARN of the SNS topic receiving complaint feedback notifications
+      details: ARN of the SNS topic receiving complaint feedback notifications.
     - field_name: delivery_topic_arn
       type: string
-      details: ARN of the SNS topic receiving delivery feedback notifications
+      details: ARN of the SNS topic receiving delivery feedback notifications.
   template_refs:
     main: terraform/provision/main.tf
     notification: terraform/provision/notification.tf
@@ -116,15 +108,11 @@ bind:
   user_inputs:
     - field_name: source_ips
       type: array
-      default:
-        - 52.222.122.97/32
-        - 52.222.123.172/32
-      details: IP Ranges that requests to SES must come from
+      details: IP Ranges that requests to SES must come from.
       prohibit_update: false
     - field_name: notification_webhook
       type: string
-      details: HTTPS endpoint to subscribe to feedback notifications
-      default: ""
+      details: HTTPS endpoint to subscribe to feedback notifications.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
@@ -169,19 +157,19 @@ bind:
   outputs:
     - field_name: smtp_server
       type: string
-      details: SMTP server
+      details: SMTP server.
     - field_name: smtp_user
       type: string
-      details: SMTP user and AWS Access Key ID
+      details: SMTP user.
     - field_name: smtp_password
       type: string
-      details: SMTP password
+      details: SMTP password.
     - field_name: aws_access_key_id
       type: string
-      details: AWS Access Key ID
+      details: AWS Access Key ID.
     - field_name: aws_secret_access_key
       type: string
-      details: AWS Secret Access Key
+      details: AWS Secret Access Key.
     - field_name: notification_webhook
       type: string
       details: Subscribed endpoint for email feedback notifications
@@ -195,7 +183,9 @@ examples:
   - name: smtp
     description: SMTP base
     plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
-    provision_params: {}
+    provision_params:
+      dmarc_report_uri_aggregate: "mailto:dmarc@agency.gov"
+      dmarc_report_uri_failure: "mailto:dmarc@agency.gov"
     bind_params: {}
 plan_updateable: false
 requiredenvvars: []
