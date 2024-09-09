@@ -22,8 +22,8 @@ provider "aws" {
       "Organization name"     = local.organization_name
       "Space name"            = local.space_name
       "Space GUID"            = local.space_guid
-      "Service offering name" = "" # todo
-      "Service plan name"     = "" # todo
+      "Service offering name" = var.service_offering_name
+      "Service plan name"     = var.service_plan_name
     }
   }
 }
@@ -48,8 +48,8 @@ provider "aws" {
       "Organization name"     = local.organization_name
       "Space name"            = local.space_name
       "Space GUID"            = local.space_guid
-      "Service offering name" = "" # todo
-      "Service plan name"     = "" # todo
+      "Service offering name" = var.service_offering_name
+      "Service plan name"     = var.service_plan_name
     }
   }
 }

@@ -71,6 +71,12 @@ provision:
     # Inputs used for tagging resources
     - name: context
       default: ${request.context}
+    - name: service_offering_name
+      type: string
+      default: cg-smtp
+    - name: service_plan_name
+      type: string
+      default: base
   outputs:
     - field_name: region
       type: string
@@ -166,6 +172,12 @@ bind:
     # Inputs used for tagging resources
     - name: context
       default: ${request.context}
+    - name: service_offering_name
+      type: string
+      default: cg-smtp
+    - name: service_plan_name
+      type: string
+      default: base
   outputs:
     - field_name: smtp_server
       type: string

@@ -65,3 +65,13 @@ variable "context" {
   type        = any
   description = "Cloud Foundry context object from provision call. Useful for tagging resources."
 }
+
+variable "service_offering_name" {
+  type        = string
+  description = "Name of the Cloud Foundry service offering. Used for tagging."
+}
+
+variable "service_plan_name" {
+  type        = string
+  description = "Name of the Cloud Foundry service plan. Used for tagging."
+}
