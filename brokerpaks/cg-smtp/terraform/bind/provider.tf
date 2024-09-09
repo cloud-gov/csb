@@ -1,3 +1,10 @@
+locals {
+  space_name        = try(var.context.space_name, "")
+  organization_name = try(var.context.organization_name, "")
+  space_guid        = try(var.context.space_guid, "")
+  organization_guid = try(var.context.organization_guid, "")
+}
+
 provider "aws" {
   access_key = var.aws_access_key_id_govcloud
   secret_key = var.aws_secret_access_key_govcloud
@@ -7,10 +14,12 @@ provider "aws" {
     tags = {
       "broker"                = "Cloud Service Broker"
       "client"                = "Cloud Foundry"
-      "environment"           = "development" # todo, parameterize at CSB level
-      "Instance GUID"         = var.instance_name
-      "Organization GUID"     = "" # todo, see https://github.com/cloud-gov/product/issues/3107#issuecomment-2312442514
-      "Organization name"     = "" # todo
+      "environment"           = "local" # todo, parameterize at CSB level
+      "Instance GUID"         = var.instance_id
+      "Organization GUID"     = local.organization_guid
+      "Organization name"     = local.organization_name
+      "Space name"            = local.space_name
+      "Space GUID"            = local.space_guid
       "Service offering name" = "" # todo
       "Service plan name"     = "" # todo
     }

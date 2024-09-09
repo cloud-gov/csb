@@ -60,3 +60,8 @@ variable "notification_webhook" {
   type    = string
   default = ""
 }
+
+variable "context" {
+  type        = any
+  description = "Cloud Foundry context object from provision call. Useful for tagging resources."
+}

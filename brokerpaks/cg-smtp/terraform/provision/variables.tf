@@ -69,3 +69,8 @@ variable "mail_from_subdomain" {
   description = "Subdomain to set as the mail-from value"
   default     = ""
 }
+
+variable "context" {
+  type        = any
+  description = "Cloud Foundry context object from provision call. Useful for tagging resources."
+}

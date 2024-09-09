@@ -68,6 +68,9 @@ provision:
     - name: instance_id
       type: string
       default: ${request.instance_id}
+    # Inputs used for tagging resources
+    - name: context
+      default: ${request.context}
   outputs:
     - field_name: region
       type: string
@@ -160,6 +163,9 @@ bind:
       default: ${instance.details["delivery_topic_arn"]}
       overwrite: true
       type: string
+    # Inputs used for tagging resources
+    - name: context
+      default: ${request.context}
   outputs:
     - field_name: smtp_server
       type: string
