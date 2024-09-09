@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"log/syslog"
 	"net/http"
 	"net/smtp"
 	"os"
