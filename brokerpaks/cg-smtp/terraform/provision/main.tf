@@ -1,9 +1,9 @@
 locals {
-  instance_id = "ses-${substr(sha256(var.instance_name), 0, 16)}"
+  instance_sha = "ses-${substr(sha256(var.instance_id), 0, 16)}"
 
+  # If no domain was provided, we create and manage one instead.
   manage_domain = (var.domain == "")
-  # When no domain is provided, generate one with pattern `instance_id.default_domain`. Useful for testing.
-  domain = (local.manage_domain ? "${local.instance_id}.${var.default_domain}" : var.domain)
+  domain        = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
 
   dmarc_verification_record = {
     name = "_dmarc.${local.domain}"

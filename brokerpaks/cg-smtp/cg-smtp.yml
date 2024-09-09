@@ -18,14 +18,17 @@ provision:
   user_inputs:
     - field_name: domain
       type: string
+      default: ""
       details: Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
       type: string
       required: true
+      default: ""
       details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
     - field_name: dmarc_report_uri_failure
       type: string
       required: true
+      default: ""
       details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
     - field_name: enable_feedback_notifications
       type: boolean
@@ -33,6 +36,7 @@ provision:
       default: false
     - field_name: mail_from_subdomain
       type: string
+      default: ""
       details: Subdomain to use as the sending email server.
   computed_inputs:
     - name: aws_access_key_id_govcloud
@@ -61,7 +65,7 @@ provision:
       default: ${json.marshal(request.default_labels)}
       overwrite: true
       type: object
-    - name: instance_name
+    - name: instance_id
       type: string
       default: ${request.instance_id}
   outputs:
@@ -108,10 +112,12 @@ bind:
   user_inputs:
     - field_name: source_ips
       type: array
+      default: []
       details: IP Ranges that requests to SES must come from.
       prohibit_update: false
     - field_name: notification_webhook
       type: string
+      default: ""
       details: HTTPS endpoint to subscribe to feedback notifications.
   computed_inputs:
     - name: aws_access_key_id_govcloud
@@ -139,7 +145,7 @@ bind:
       default: csb-${instance.name}-${request.binding_id}
       overwrite: true
       type: string
-    - name: instance_name
+    - name: instance_id
       type: string
       default: ${request.instance_id}
     - name: bounce_topic_arn

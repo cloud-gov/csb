@@ -14,7 +14,7 @@ resource "aws_route53_zone" "instance_zone" {
   name          = local.domain
   force_destroy = true
   tags = merge(var.labels, {
-    environment = var.instance_name
+    environment = var.instance_id
     domain      = local.domain
   })
 }
@@ -25,7 +25,7 @@ resource "aws_route53_record" "instance_ns" {
   count    = (local.manage_domain ? 1 : 0)
 
   zone_id = data.aws_route53_zone.parent_zone[0].zone_id
-  name    = local.instance_id
+  name    = local.instance_sha
   type    = "NS"
   ttl     = "30"
   records = aws_route53_zone.instance_zone[0].name_servers

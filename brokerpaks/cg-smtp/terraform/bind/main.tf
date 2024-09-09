@@ -1,6 +1,6 @@
 locals {
-  instance_id                      = "ses-${substr(sha256(var.instance_name), 0, 16)}"
-  user_name                        = "${local.instance_id}-${var.user_name}"
+  instance_sha                     = "ses-${substr(sha256(var.instance_id), 0, 16)}"
+  user_name                        = "${local.instance_sha}-${var.user_name}"
   subscribe_bounce_notification    = (var.bounce_topic_arn != "" && var.notification_webhook != "")
   subscribe_complaint_notification = (var.complaint_topic_arn != "" && var.notification_webhook != "")
   subscribe_delivery_notification  = (var.delivery_topic_arn != "" && var.notification_webhook != "")

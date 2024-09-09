@@ -28,7 +28,7 @@ variable "aws_region_commercial" {
 // Brokerpak configuration
 variable "domain" {
   type        = string
-  description = "Domain from which to send mail"
+  description = "Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated."
   default     = ""
 }
 
@@ -37,9 +37,10 @@ variable "default_domain" {
   description = "Computed. Fallback domain to use if none was supplied."
 }
 
-variable "instance_name" {
+variable "instance_id" {
   type        = string
-  description = "TODO"
+  default     = ""
+  description = "The identifier for the instance, which together with the Plan ID and Service ID is unique. When CAPI sends the provision request, this is a GUID."
 }
 
 variable "dmarc_report_uri_aggregate" {
