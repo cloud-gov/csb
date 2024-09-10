@@ -11,12 +11,10 @@ output "smtp_password" {
   sensitive = true
 }
 
-# TODO should we only expose the SMTP interface?
 output "aws_access_key_id" {
   value = aws_iam_access_key.access_key.id
 }
 
-# TODO should we only expose the SMTP interface?
 output "aws_secret_access_key" {
   value     = aws_iam_access_key.access_key.secret
   sensitive = true
