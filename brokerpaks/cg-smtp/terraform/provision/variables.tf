@@ -84,3 +84,8 @@ variable "service_plan_name" {
   type        = string
   description = "Name of the Cloud Foundry service plan. Used for tagging."
 }
+
+variable "cloud_gov_environment" {
+  type        = string
+  description = "The cloud.gov environment the broker is deployed in. For example: local, development, staging, or production."
+}

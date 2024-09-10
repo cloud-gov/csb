@@ -77,6 +77,9 @@ provision:
     - name: service_plan_name
       type: string
       default: base
+    - name: cloud_gov_environment
+      type: string
+      default: ${config("cloud_gov.environment")}
   outputs:
     - field_name: region
       type: string
@@ -178,6 +181,9 @@ bind:
     - name: service_plan_name
       type: string
       default: base
+    - name: cloud_gov_environment
+      type: string
+      default: ${config("cloud_gov.environment")}
   outputs:
     - field_name: smtp_server
       type: string

@@ -14,7 +14,7 @@ provider "aws" {
     tags = {
       "broker"                = "Cloud Service Broker"
       "client"                = "Cloud Foundry"
-      "environment"           = "local" # todo, parameterize at CSB level
+      "environment"           = var.cloud_gov_environment
       "Instance GUID"         = var.instance_id
       "Organization GUID"     = local.organization_guid
       "Organization name"     = local.organization_name

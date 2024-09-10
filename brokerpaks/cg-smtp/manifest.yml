@@ -32,6 +32,7 @@ required_env_variables:
   - AWS_ACCESS_KEY_ID_COMMERCIAL
   - AWS_SECRET_ACCESS_KEY_COMMERCIAL
   - AWS_REGION_COMMERCIAL
+  - CLOUD_GOV_ENVIRONMENT
 env_config_mapping:
   AWS_ACCESS_KEY_ID_GOVCLOUD: aws.govcloud.access_key_id
   AWS_SECRET_ACCESS_KEY_GOVCLOUD: aws.govcloud.secret_access_key
@@ -40,3 +41,4 @@ env_config_mapping:
   AWS_SECRET_ACCESS_KEY_COMMERCIAL: aws.commercial.secret_access_key
   AWS_REGION_COMMERCIAL: aws.commercial.region
   AWS_ZONE: aws.zone
+  CLOUD_GOV_ENVIRONMENT: cloud_gov.environment
