@@ -1,1 +1,7 @@
+*.tfvars
+*.brokerpak
+# Configuration for the CSB CLI client.
+clientconfig.yml
+# Configuration for the CSB server.
+secrets.env
 zscaler.crt

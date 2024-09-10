@@ -1,0 +1,221 @@
+version: 1
+name: cg-smtp
+id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
+description: SMTP service provided by Amazon Simple Email Service (SES)
+display_name: SMTP (using AWS SES)
+image_url: https://example.com/icon.jpg
+documentation_url: https://aws.amazon.com/ses/ # todo
+provider_display_name: ""
+support_url: https://cloud.gov/contact/
+tags: [aws, ses, smtp]
+plans:
+  - name: base
+    id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
+    description: Provision SMTP credentials for sending email from any user at a domain, like 'agency.gov'.
+    display_name: Send-only service
+provision:
+  plan_inputs:
+  user_inputs:
+    - field_name: domain
+      type: string
+      default: ""
+      details: Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
+    - field_name: dmarc_report_uri_aggregate
+      type: string
+      required: true
+      default: ""
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
+    - field_name: dmarc_report_uri_failure
+      type: string
+      required: true
+      default: ""
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
+    - field_name: enable_feedback_notifications
+      type: boolean
+      details: Flag to toggle creation of SNS topics for feedback notifications.
+      default: false
+    - field_name: mail_from_subdomain
+      type: string
+      default: ""
+      details: Subdomain to use as the sending email server.
+  computed_inputs:
+    - name: aws_access_key_id_govcloud
+      type: string
+      default: ${config("aws.govcloud.access_key_id")}
+    - name: aws_secret_access_key_govcloud
+      type: string
+      default: ${config("aws.govcloud.secret_access_key")}
+    - name: aws_region_govcloud
+      type: string
+      default: ${config("aws.govcloud.region")}
+    - name: aws_access_key_id_commercial
+      type: string
+      default: ${config("aws.commercial.access_key_id")}
+    - name: aws_secret_access_key_commercial
+      type: string
+      default: ${config("aws.commercial.secret_access_key")}
+    - name: aws_region_commercial
+      type: string
+      default: ${config("aws.commercial.region")}
+    - name: default_domain
+      overwrite: true
+      type: string
+      default: ${config("aws.zone")}
+    - name: labels
+      default: ${json.marshal(request.default_labels)}
+      overwrite: true
+      type: object
+    - name: instance_id
+      type: string
+      default: ${request.instance_id}
+    # Inputs used for tagging resources
+    - name: context
+      default: ${request.context}
+    - name: service_offering_name
+      type: string
+      default: cg-smtp
+    - name: service_plan_name
+      type: string
+      default: base
+    - name: cloud_gov_environment
+      type: string
+      default: ${config("cloud_gov.environment")}
+  outputs:
+    - field_name: region
+      type: string
+      details: AWS region of the SES identity.
+    - field_name: required_records
+      type: object
+      details: If a domain was supplied, you must create these records in that zone in your DNS system.
+    - field_name: dmarc_report_uri_aggregate
+      type: string
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
+    - field_name: dmarc_report_uri_failure
+      type: string
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
+    - field_name: instructions
+      type: string
+      details: Any further steps that you must take before using the service.
+    - field_name: configuration_set_arn
+      type: string
+      details: ARN of the SES Configuration Set associated with the identity. Used to create bindings.
+    - field_name: domain_arn
+      type: string
+      details: Instance SES domain identity (used when creating bindings)
+    - field_name: bounce_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving bounce feedback notifications.
+    - field_name: complaint_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving complaint feedback notifications.
+    - field_name: delivery_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving delivery feedback notifications.
+  template_refs:
+    main: terraform/provision/main.tf
+    notification: terraform/provision/notification.tf
+    outputs: terraform/provision/outputs.tf
+    providers: terraform/provision/providers.tf
+    variables: terraform/provision/variables.tf
+    verification: terraform/provision/verification.tf
+    versions: terraform/provision/versions.tf
+bind:
+  plan_inputs: []
+  user_inputs:
+    - field_name: source_ips
+      type: array
+      default: []
+      details: IP Ranges that requests to SES must come from.
+      prohibit_update: false
+    - field_name: notification_webhook
+      type: string
+      default: ""
+      details: HTTPS endpoint to subscribe to feedback notifications.
+  computed_inputs:
+    - name: aws_access_key_id_govcloud
+      type: string
+      default: ${config("aws.govcloud.access_key_id")}
+    - name: aws_secret_access_key_govcloud
+      type: string
+      default: ${config("aws.govcloud.secret_access_key")}
+    - name: aws_region_govcloud
+      type: string
+      default: ${config("aws.govcloud.region")}
+    - name: region
+      default: ${instance.details["region"]}
+      overwrite: true
+      type: string
+    - name: configuration_set_arn
+      default: ${instance.details["configuration_set_arn"]}
+      overwrite: true
+      type: string
+    - name: domain_arn
+      default: ${instance.details["domain_arn"]}
+      overwrite: true
+      type: string
+    - name: user_name
+      default: csb-${instance.name}-${request.binding_id}
+      overwrite: true
+      type: string
+    - name: instance_id
+      type: string
+      default: ${request.instance_id}
+    - name: bounce_topic_arn
+      default: ${instance.details["bounce_topic_arn"]}
+      overwrite: true
+      type: string
+    - name: complaint_topic_arn
+      default: ${instance.details["complaint_topic_arn"]}
+      overwrite: true
+      type: string
+    - name: delivery_topic_arn
+      default: ${instance.details["delivery_topic_arn"]}
+      overwrite: true
+      type: string
+    # Inputs used for tagging resources
+    - name: context
+      default: ${request.context}
+    - name: service_offering_name
+      type: string
+      default: cg-smtp
+    - name: service_plan_name
+      type: string
+      default: base
+    - name: cloud_gov_environment
+      type: string
+      default: ${config("cloud_gov.environment")}
+  outputs:
+    - field_name: smtp_server
+      type: string
+      details: SMTP server.
+    - field_name: smtp_user
+      type: string
+      details: SMTP user.
+    - field_name: smtp_password
+      type: string
+      details: SMTP password.
+    - field_name: aws_access_key_id
+      type: string
+      details: AWS Access Key ID.
+    - field_name: aws_secret_access_key
+      type: string
+      details: AWS Secret Access Key.
+    - field_name: notification_webhook
+      type: string
+      details: Subscribed endpoint for email feedback notifications
+  template_refs:
+    main: terraform/bind/main.tf
+    outputs: terraform/bind/outputs.tf
+    provider: terraform/bind/provider.tf
+    variables: terraform/bind/variables.tf
+    versions: terraform/bind/versions.tf
+examples:
+  - name: smtp
+    description: SMTP base
+    plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
+    provision_params:
+      dmarc_report_uri_aggregate: "mailto:dmarc@agency.gov"
+      dmarc_report_uri_failure: "mailto:dmarc@agency.gov"
+    bind_params: {}
+plan_updateable: false
+requiredenvvars: []

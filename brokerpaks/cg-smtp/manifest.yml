@@ -1,0 +1,44 @@
+packversion: 1
+name: cg-smtp
+version: 0.1.0
+metadata:
+  author: cloud.gov team
+platforms:
+  - os: linux
+    arch: amd64
+  - os: darwin
+    arch: arm64
+terraform_upgrade_path:
+  - version: 1.8.2
+terraform_state_provider_replacements:
+  registry.opentofu.org/hashicorp/aws: "registry.terraform.io/hashicorp/aws"
+terraform_binaries:
+  - name: tofu
+    version: 1.8.2
+    source: https://github.com/opentofu/opentofu/archive/v1.8.2.zip
+    url_template: https://github.com/opentofu/opentofu/releases/download/v${version}/tofu_${version}_${os}_${arch}.zip
+    default: true
+  - name: terraform-provider-aws
+    version: 5.53.0
+    source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.53.0.zip
+service_definitions:
+  - cg-smtp.yml
+parameters: []
+required_env_variables:
+  - AWS_ZONE
+  - AWS_ACCESS_KEY_ID_GOVCLOUD
+  - AWS_SECRET_ACCESS_KEY_GOVCLOUD
+  - AWS_REGION_GOVCLOUD
+  - AWS_ACCESS_KEY_ID_COMMERCIAL
+  - AWS_SECRET_ACCESS_KEY_COMMERCIAL
+  - AWS_REGION_COMMERCIAL
+  - CLOUD_GOV_ENVIRONMENT
+env_config_mapping:
+  AWS_ACCESS_KEY_ID_GOVCLOUD: aws.govcloud.access_key_id
+  AWS_SECRET_ACCESS_KEY_GOVCLOUD: aws.govcloud.secret_access_key
+  AWS_REGION_GOVCLOUD: aws.govcloud.region
+  AWS_ACCESS_KEY_ID_COMMERCIAL: aws.commercial.access_key_id
+  AWS_SECRET_ACCESS_KEY_COMMERCIAL: aws.commercial.secret_access_key
+  AWS_REGION_COMMERCIAL: aws.commercial.region
+  AWS_ZONE: aws.zone
+  CLOUD_GOV_ENVIRONMENT: cloud_gov.environment

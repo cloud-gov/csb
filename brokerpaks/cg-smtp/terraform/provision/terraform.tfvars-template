@@ -1,0 +1,6 @@
+region              = "us-west-2"               # Region to host SMTP server in
+domain              = ""                        # Custom domain
+default_domain      = "ssb-dev.data.gov"        # Domain under which to create a domain if none was supplied
+instance_id       = "instance-yourname"       # Avoids collisions with others
+email_receipt_error = "youraddress@yourdomain"  # Address where notification of email recipt errors should be sent
+mail_from_subdomain = "mail"
