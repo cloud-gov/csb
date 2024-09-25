@@ -75,20 +75,25 @@ func main() {
 	}
 
 	walk([]*Node{n}, func(n *Node) bool {
-		if n.XMLName.Local == "body" {
+		if n.XMLName.Local == "head" {
 			n.Nodes = append(n.Nodes, &Node{
 				XMLName: xml.Name{
-					Local: "a",
+					Local: "link",
 				},
 				Attrs: []xml.Attr{
 					xml.Attr{
 						Name: xml.Name{
+							Local: "rel",
+						},
+						Value: "stylesheet",
+					},
+					xml.Attr{
+						Name: xml.Name{
 							Local: "href",
 						},
-						Value: "https://google.com",
+						Value: "styles.css",
 					},
 				},
-				Content: "Google",
 			})
 		}
 		return true
