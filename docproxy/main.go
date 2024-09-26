@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -43,7 +42,6 @@ func insertStylesheet(n *html.Node) {
 			return false
 		} else if n.Type == html.TextNode && n.Parent.Type == html.ElementNode && n.Parent.Data == "h1" {
 			// Trim whitespace from header, which has a leading space
-			fmt.Println("Found h1 text")
 			n.Data = strings.Trim(n.Data, " ")
 		}
 		return false
