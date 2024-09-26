@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 	"log/slog"
 	"net/http"
@@ -52,10 +53,23 @@ func insertStylesheet(n *html.Node) {
 //go:embed styles.css
 var stylesheet []byte
 
+//go:embed fonts
+var fonts embed.FS
+
 func run() error {
+	slog.SetLogLoggerLevel(slog.LevelInfo)
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css; charset=utf-8")
 		w.Write(stylesheet)
+	})
+	http.HandleFunc("/fonts/", func(w http.ResponseWriter, r *http.Request) {
+		b, err := fonts.ReadFile(strings.TrimPrefix(r.URL.Path, "/"))
+		if err != nil {
+			slog.Error("Reading font file", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		w.Header().Add("Content-Type", "font/woff2")
+		w.Write(b)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get("https://csb.dev.us-gov-west-1.aws-us-gov.cloud.gov")
@@ -78,7 +92,7 @@ func run() error {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	})
-
+	slog.Info("Starting server...")
 	return http.ListenAndServe("localhost:8080", nil)
 }
 
