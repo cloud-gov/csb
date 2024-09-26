@@ -1,8 +1,9 @@
 package main
 
 import (
+	_ "embed"
+	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -48,26 +49,41 @@ func insertStylesheet(n *html.Node) {
 	})
 }
 
+//go:embed styles.css
+var stylesheet []byte
+
+func run() error {
+	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "text/css; charset=utf-8")
+		w.Write(stylesheet)
+	})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := http.Get("https://csb.dev.us-gov-west-1.aws-us-gov.cloud.gov")
+		if err != nil {
+			slog.Error("Getting CSB site", "error", err)
+			w.WriteHeader(http.StatusBadGateway)
+		}
+
+		doc, err := html.Parse(resp.Body)
+		if err != nil {
+			slog.Error("Parsing CSB response body", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		insertStylesheet(doc)
+
+		err = html.Render(w, doc)
+		if err != nil {
+			slog.Error("Rendering HTML", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+
+	return http.ListenAndServe("localhost:8080", nil)
+}
+
 func main() {
-	resp, err := http.Get("https://csb.dev.us-gov-west-1.aws-us-gov.cloud.gov")
-	if err != nil {
-		panic(err)
-	}
-
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	insertStylesheet(doc)
-
-	file, err := os.Create("index.html")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close() // need to look up that thing about dealing with Close() errors.
-
-	err = html.Render(file, doc)
+	err := run()
 	if err != nil {
 		panic(err)
 	}
