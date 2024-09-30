@@ -2,9 +2,9 @@ package main
 
 import (
 	"embed"
-	_ "embed"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -24,27 +24,74 @@ func walk(n *html.Node, f func(*html.Node) bool) bool {
 	return false
 }
 
-func insertStylesheet(n *html.Node) {
-	walk(n, func(n *html.Node) bool {
-		if n.Type == html.ElementNode && n.Data == "head" {
-			n.AppendChild(&html.Node{
-				Type: html.ElementNode,
-				Data: "link",
-				Attr: []html.Attribute{
-					{
-						Key: "rel",
-						Val: "stylesheet",
+// modifyDocument makes a series of changes to the html.Node in-place.
+func modifyDocument(n *html.Node) {
+	modifications := []func(*html.Node) bool{
+		func(n *html.Node) bool {
+			if n.Type == html.ElementNode && n.Data == "head" {
+				// Inject our custom stylesheet.
+				n.AppendChild(&html.Node{
+					Type: html.ElementNode,
+					Data: "link",
+					Attr: []html.Attribute{
+						{
+							Key: "rel",
+							Val: "stylesheet",
+						},
+						{
+							Key: "href",
+							Val: "styles.css",
+						},
 					},
-					{
-						Key: "href",
-						Val: "styles.css",
+				})
+				// Inject favicon.
+				n.AppendChild(&html.Node{
+					Type: html.ElementNode,
+					Data: "link",
+					Attr: []html.Attribute{
+						{
+							Key: "rel",
+							Val: "icon",
+						},
+						{
+							Key: "type",
+							Val: "image/vnd.microsoft.icon",
+						},
+						{
+							Key: "sizes",
+							Val: "192x192",
+						},
+						{
+							Key: "href",
+							Val: "/images/favicon.ico",
+						},
 					},
-				},
-			})
+				})
+			}
 			return false
-		} else if n.Type == html.TextNode && n.Parent.Type == html.ElementNode && n.Parent.Data == "h1" {
-			// Trim whitespace from header, which has a leading space
-			n.Data = strings.Trim(n.Data, " ")
+		},
+		func(n *html.Node) bool {
+			if n.Type == html.TextNode && n.Parent.Type == html.ElementNode && n.Parent.Data == "h1" {
+				// Trim whitespace from header, which has a leading space.
+				n.Data = strings.Trim(n.Data, " ")
+			}
+			return false
+		},
+		func(n *html.Node) bool {
+			if n.Type == html.TextNode && n.Parent.Type == html.ElementNode && n.Parent.Data == "title" {
+				// Add title that is consistent with cloud.gov page titles.
+				n.Data = "Services Reference | cloud.gov"
+			}
+
+			return false
+		},
+	}
+	walk(n, func(n *html.Node) bool {
+		for _, m := range modifications {
+			stop := m(n)
+			if stop {
+				return true
+			}
 		}
 		return false
 	})
@@ -56,6 +103,11 @@ var stylesheet []byte
 //go:embed fonts
 var fonts embed.FS
 
+//go:embed images/favicon.ico
+var favicon []byte
+
+// run registers routes and starts the server. It is separate from main so it
+// can return errors conventionally and main can handle them all in one place.
 func run() error {
 	slog.SetLogLoggerLevel(slog.LevelInfo)
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +123,10 @@ func run() error {
 		w.Header().Add("Content-Type", "font/woff2")
 		w.Write(b)
 	})
+	http.HandleFunc("/images/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "image/vnd.microsoft.icon")
+		w.Write(favicon)
+	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get("https://csb.dev.us-gov-west-1.aws-us-gov.cloud.gov")
 		if err != nil {
@@ -84,7 +140,7 @@ func run() error {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		insertStylesheet(doc)
+		modifyDocument(doc)
 
 		err = html.Render(w, doc)
 		if err != nil {
@@ -99,6 +155,7 @@ func run() error {
 func main() {
 	err := run()
 	if err != nil {
-		panic(err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 }
