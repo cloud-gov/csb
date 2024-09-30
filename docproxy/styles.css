@@ -1,0 +1,91 @@
+body {
+  background-color: #fff;
+  font-family:
+    Public Sans Web,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif,
+    Apple Color Emoji,
+    Segoe UI Emoji,
+    Segoe UI Symbol;
+}
+
+nav {
+  background-color: #f8f9fa !important;
+  border-bottom: 4px solid #007bff !important;
+  background-image: url(https://cloud.gov/assets/images/content/cloud-gov-logo.svg);
+  background-position: right;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}
+
+a.navbar-brand,
+a.nav-link {
+  color: black !important;
+}
+
+code,
+pre {
+  border-radius: 3px;
+  border-width: 1px;
+  border-color: #bcc5cd;
+  border-style: solid;
+  background-color: #f8f9fa;
+  padding: 0.1em;
+  color: #212529;
+}
+
+pre code {
+  border: revert;
+}
+
+h1::first-letter {
+  font-size: 0;
+}
+
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: normal;
+  font-weight: 300;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-Light.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: normal;
+  font-weight: 400;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-Regular.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: normal;
+  font-weight: 700;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-Bold.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: italic;
+  font-weight: 300;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-LightItalic.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: italic;
+  font-weight: 400;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-Italic.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Public Sans Web";
+  font-style: italic;
+  font-weight: 700;
+  font-display: fallback;
+  src: url(fonts/public-sans/PublicSans-BoldItalic.woff2) format("woff2");
+}
