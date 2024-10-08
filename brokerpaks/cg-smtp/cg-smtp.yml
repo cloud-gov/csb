@@ -19,7 +19,7 @@ provision:
     - field_name: domain
       type: string
       default: ""
-      details: Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
+      details: Domain from which mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
       type: string
       required: true
@@ -60,7 +60,7 @@ provision:
     - name: default_domain
       overwrite: true
       type: string
-      default: ${config("aws.zone")}
+      default: ${config("cg_smtp.aws.zone")}
     - name: labels
       default: ${json.marshal(request.default_labels)}
       overwrite: true
