@@ -39,6 +39,7 @@ provision:
       default: ""
       details: Subdomain to use as the sending email server.
     - field_name: new_field
+      required: true
       type: string
       details: Testing out migration service instances when their plans change.
   computed_inputs:
