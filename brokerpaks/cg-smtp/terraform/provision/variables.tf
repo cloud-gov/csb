@@ -89,3 +89,7 @@ variable "cloud_gov_environment" {
   type        = string
   description = "The cloud.gov environment the broker is deployed in. For example: local, development, staging, or production."
 }
+
+variable "new_field" {
+  type = string
+}
