@@ -7,7 +7,7 @@ image_url: https://example.com/icon.jpg
 documentation_url: https://aws.amazon.com/ses/ # todo
 provider_display_name: "Cloud.gov"
 support_url: https://cloud.gov/contact/
-tags: [aws, ses, smtp]
+tags: [aws, csb]
 plans:
   - name: base
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
