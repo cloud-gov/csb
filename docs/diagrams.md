@@ -91,9 +91,9 @@ flowchart LR
 
 New HTTP services introduced by the Cloud Service Broker SCR are in green. (For brevity, not all existing Cloud.gov web services are depicted.)
 
-- The CSB fulfills provisioning and binding requests for certain service offerings. It accepts HTTPS requests on an internal-only domain.
-- The Documentation Proxy is a server that displays documentation for service offerings maintained by the CSB. The CSB exposes a documentation endpoint, `docs/`. When a user makes a request to this service, the service GETs the `docs/` page and returns it to the user with some visual changes.
-- The Updater Service regularly updates customer service instances so the instances stay up to date with the latest plans offered by the CSB. It may accept administrative HTTPS requests, but only on an internal domain.
+- The **CSB** fulfills provisioning and binding requests for certain service offerings. It accepts HTTPS requests on an internal-only domain.
+- The **Documentation Proxy** is a server that displays documentation for service offerings maintained by the CSB. The CSB exposes a documentation endpoint, `docs/`. When a user makes a request to this service, the service GETs the `docs/` page and returns it to the user with some visual changes.
+- The **Service Updater** regularly updates customer service instances so the instances stay up to date with the latest plans offered by the CSB. It may accept administrative HTTPS requests, but only on an internal domain.
 
 ```mermaid
 flowchart LR
@@ -122,4 +122,5 @@ flowchart LR
     u -->|OSBAPI requests| capi
     u -->|Documentation page| docproxy
     capi --> csb
+    docproxy --> csb
 ```
