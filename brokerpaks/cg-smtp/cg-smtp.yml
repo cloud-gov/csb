@@ -37,10 +37,6 @@ provision:
       type: string
       required: false
       details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
-    - field_name: new_field
-      required: true
-      type: string
-      details: Testing out migration service instances when their plans change.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
