@@ -2,9 +2,12 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -106,10 +109,7 @@ var fonts embed.FS
 //go:embed images/favicon.ico
 var favicon []byte
 
-// run registers routes and starts the server. It is separate from main so it
-// can return errors conventionally and main can handle them all in one place.
-func run() error {
-	slog.SetLogLoggerLevel(slog.LevelInfo)
+func routes(c config) {
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css; charset=utf-8")
 		w.Write(stylesheet)
@@ -128,7 +128,7 @@ func run() error {
 		w.Write(favicon)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		resp, err := http.Get("https://csb.dev.us-gov-west-1.aws-us-gov.cloud.gov")
+		resp, err := http.Get(c.BrokerURL.String())
 		if err != nil {
 			slog.Error("Getting CSB site", "error", err)
 			w.WriteHeader(http.StatusBadGateway)
@@ -148,8 +148,46 @@ func run() error {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	})
+}
+
+type config struct {
+	Port uint16
+	BrokerURL *url.URL
+}
+
+func loadConfig() (config, error) {
+	c := config{}
+
+	port := os.Getenv("PORT")
+	p, err := strconv.ParseUint(port, 10, 16)
+	if err != nil {
+		return config{}, fmt.Errorf("Invalid PORT: %w", err)
+	}
+	c.Port = uint16(p)
+
+	brokerURL := os.Getenv("BROKER_URL")
+	u, err := url.Parse(brokerURL)
+	if err != nil {
+		return config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
+	}
+	c.BrokerURL = u
+
+	return c, nil
+}
+
+// run registers routes and starts the server. It is separate from main so it
+// can return errors conventionally and main can handle them all in one place.
+func run() error {
+	slog.SetLogLoggerLevel(slog.LevelInfo)
+	config, err := loadConfig()
+	if err != nil {
+		return err
+	}
+
+	routes(config)
+	addr := fmt.Sprintf("localhost:%v", config.Port)
 	slog.Info("Starting server...")
-	return http.ListenAndServe("localhost:8080", nil)
+	return http.ListenAndServe(addr, nil)
 }
 
 func main() {
