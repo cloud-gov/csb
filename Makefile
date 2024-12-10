@@ -6,4 +6,11 @@ run: build
 	@bash -c 'env $$(cat secrets.env | xargs) cloud-service-broker serve'
 
 watch:
-	find . | grep -E '\.env|\.tf' | entr -r make run
+	find . | grep -E '\.env|\.tf|\.yml' | entr -r make run
+
+clean:
+	rm -r /tmp/pak-build-cache
+	rm *.brokerpak
+
+run-docproxy:
+	find docproxy | entr -r go run ./docproxy/.
