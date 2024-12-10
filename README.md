@@ -6,3 +6,7 @@ This repo contains configuration, including brokerpaks, for the cloud.gov deploy
 
 - https://github.com/GSA-TTS/datagov-brokerpak-smtp
 - https://github.com/GSA/ttsnotify-brokerpak-sms
+
+## Credits
+
+- AWS Architecture icons are sourced from https://aws.amazon.com/architecture/icons/.

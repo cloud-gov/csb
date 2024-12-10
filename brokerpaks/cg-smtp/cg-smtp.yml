@@ -3,7 +3,7 @@ name: cg-smtp
 id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
 description: Send email from verified domains using Amazon Simple Email Service (SES). Supports SMTP and the SES HTTP API.
 display_name: AWS Simple Email Service
-image_url: https://example.com/icon.jpg
+image_url: images/amazon-ses.svg
 documentation_url: https://aws.amazon.com/ses/ # todo
 provider_display_name: "Cloud.gov"
 support_url: https://cloud.gov/contact/

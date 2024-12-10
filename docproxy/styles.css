@@ -43,8 +43,17 @@ pre code {
   border: revert;
 }
 
-h1::first-letter {
-  font-size: 0;
+h1 {
+  /* Align text to center of image */
+  padding-top: 8px;
+}
+
+h1 img {
+  height: 48px;
+  width: 48px;
+  margin-right: 0.5em;
+  /* Compensate for h1 padding */
+  margin-top: -8px;
 }
 
 @font-face {

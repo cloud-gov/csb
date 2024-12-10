@@ -126,6 +126,9 @@ var favicon []byte
 //go:embed images/cloud-gov-logo.svg
 var logo []byte
 
+//go:embed images/amazon-ses.svg
+var amazonSES []byte
+
 func routes(c config) {
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css; charset=utf-8")
@@ -147,6 +150,10 @@ func routes(c config) {
 	http.HandleFunc("/images/cloud-gov-logo.svg", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/svg+xml")
 		w.Write(logo)
+	})
+	http.HandleFunc("/images/amazon-ses.svg", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "image/svg+xml")
+		w.Write(amazonSES)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(c.BrokerURL.String())
