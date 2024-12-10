@@ -5,3 +5,5 @@ clientconfig.yml
 # Configuration for the CSB server.
 secrets.env
 zscaler.crt
+# Sqlite database for local development.
+.csb.db

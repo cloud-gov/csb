@@ -1,43 +1,42 @@
 version: 1
-name: cg-smtp
+name: aws-ses
 id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
-description: SMTP service provided by Amazon Simple Email Service (SES)
-display_name: SMTP (using AWS SES)
-image_url: https://example.com/icon.jpg
+description: Send email from verified domains using Amazon Simple Email Service (SES). Supports SMTP and the SES HTTP API.
+display_name: AWS Simple Email Service
+image_url: https://services.cloud.gov/images/amazon-ses.svg
 documentation_url: https://aws.amazon.com/ses/ # todo
-provider_display_name: ""
+provider_display_name: "Cloud.gov"
 support_url: https://cloud.gov/contact/
-tags: [aws, ses, smtp]
+tags: [aws, csb]
 plans:
   - name: base
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
-    description: Provision SMTP credentials for sending email from any user at a domain, like 'agency.gov'.
+    description: Provision SMTP credentials for sending email from any user at a domain, like `agency.gov`.
     display_name: Send-only service
 provision:
   plan_inputs:
   user_inputs:
     - field_name: domain
       type: string
-      default: ""
-      details: Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated.
+      required: false
+      prohibit_update: true
+      details: Domain from which mail will be sent. For example, `agency.gov`. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
       type: string
       required: true
-      default: ""
-      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
     - field_name: dmarc_report_uri_failure
       type: string
       required: true
-      default: ""
-      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
     - field_name: enable_feedback_notifications
       type: boolean
       details: Flag to toggle creation of SNS topics for feedback notifications.
       default: false
     - field_name: mail_from_subdomain
       type: string
-      default: ""
-      details: Subdomain to use as the sending email server.
+      required: false
+      details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
@@ -60,7 +59,7 @@ provision:
     - name: default_domain
       overwrite: true
       type: string
-      default: ${config("aws.zone")}
+      default: ${config("cg_smtp.aws.zone")}
     - name: labels
       default: ${json.marshal(request.default_labels)}
       overwrite: true
@@ -73,7 +72,7 @@ provision:
       default: ${request.context}
     - name: service_offering_name
       type: string
-      default: cg-smtp
+      default: aws-ses
     - name: service_plan_name
       type: string
       default: base
@@ -89,10 +88,10 @@ provision:
       details: If a domain was supplied, you must create these records in that zone in your DNS system.
     - field_name: dmarc_report_uri_aggregate
       type: string
-      details: The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'. Reports are automatically sent to reports@dmarc.cyber.dhs.gov.
+      details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`.
     - field_name: dmarc_report_uri_failure
       type: string
-      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'.
+      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`.
     - field_name: instructions
       type: string
       details: Any further steps that you must take before using the service.
@@ -101,7 +100,7 @@ provision:
       details: ARN of the SES Configuration Set associated with the identity. Used to create bindings.
     - field_name: domain_arn
       type: string
-      details: Instance SES domain identity (used when creating bindings)
+      details: Instance SES domain identity. Used to create bindings.
     - field_name: bounce_topic_arn
       type: string
       details: ARN of the SNS topic receiving bounce feedback notifications.
@@ -125,11 +124,10 @@ bind:
     - field_name: source_ips
       type: array
       default: []
-      details: IP Ranges that requests to SES must come from.
+      details: A list of IP ranges in CIDR format. If specified, requests made with this binding must originate from the specified ranges. By default, all requests are allowed.
       prohibit_update: false
     - field_name: notification_webhook
       type: string
-      default: ""
       details: HTTPS endpoint to subscribe to feedback notifications.
   computed_inputs:
     - name: aws_access_key_id_govcloud
@@ -177,7 +175,7 @@ bind:
       default: ${request.context}
     - name: service_offering_name
       type: string
-      default: cg-smtp
+      default: aws-ses
     - name: service_plan_name
       type: string
       default: base

@@ -7,6 +7,10 @@ locals {
   subscribed_webhook               = ((local.subscribe_bounce_notification || local.subscribe_complaint_notification || local.subscribe_delivery_notification) ? var.notification_webhook : null)
 }
 
+# Trivy: It is best practice to manage access via groups intead of by directly attaching
+# policies to users. However, each binding may specify separate source IP constraints
+# on sending, so we cannot use a group with a single policy for all users.
+#trivy:ignore:AVD-AWS-0143
 resource "aws_iam_user" "user" {
   name = local.user_name
   path = "/cf/"
