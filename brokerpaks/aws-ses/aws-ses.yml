@@ -59,7 +59,7 @@ provision:
     - name: default_domain
       overwrite: true
       type: string
-      default: ${config("cg_smtp.aws.zone")}
+      default: ${config("brokerpaks.aws_ses.default_zone")}
     - name: labels
       default: ${json.marshal(request.default_labels)}
       overwrite: true

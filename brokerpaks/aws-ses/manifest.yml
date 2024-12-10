@@ -31,7 +31,7 @@ required_env_variables:
   - AWS_REGION_GOVCLOUD
   - AWS_SECRET_ACCESS_KEY_COMMERCIAL
   - AWS_SECRET_ACCESS_KEY_GOVCLOUD
-  - CG_SMTP_AWS_ZONE
+  - BP_AWS_SES_DEFAULT_ZONE
   - CLOUD_GOV_ENVIRONMENT
 env_config_mapping:
   AWS_ACCESS_KEY_ID_COMMERCIAL: aws.commercial.access_key_id
@@ -40,5 +40,5 @@ env_config_mapping:
   AWS_REGION_GOVCLOUD: aws.govcloud.region
   AWS_SECRET_ACCESS_KEY_COMMERCIAL: aws.commercial.secret_access_key
   AWS_SECRET_ACCESS_KEY_GOVCLOUD: aws.govcloud.secret_access_key
-  CG_SMTP_AWS_ZONE: cg_smtp.aws.zone
+  BP_AWS_SES_DEFAULT_ZONE: brokerpaks.aws_ses.default_zone
   CLOUD_GOV_ENVIRONMENT: cloud_gov.environment
