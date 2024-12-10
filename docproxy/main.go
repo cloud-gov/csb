@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -86,6 +87,18 @@ func modifyDocument(n *html.Node) {
 				n.Data = "Services Reference | cloud.gov"
 			}
 
+			return false
+		},
+		func(n *html.Node) bool {
+			if n.Type == html.TextNode && n.Parent.Parent.Type == html.ElementNode && n.Parent.Data == "a" {
+				cls := html.Attribute{
+					Key: "class",
+					Val: "navbar-brand",
+				}
+				if i := slices.Index(n.Parent.Attr, cls); i >= 0 {
+					n.Data = "Services Reference"
+				}
+			}
 			return false
 		},
 	}
