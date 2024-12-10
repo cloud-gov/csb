@@ -15,7 +15,7 @@ import (
 type VCAPServices struct {
 	SMTPService []struct {
 		Credentials Credentials `json:"credentials"`
-	} `json:"cg-smtp"`
+	} `json:"aws-ses"`
 }
 
 type Credentials struct {

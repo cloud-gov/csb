@@ -1,5 +1,5 @@
 build:
-	PAK_BUILD_CACHE_PATH=/tmp/pak-build-cache cloud-service-broker pak build brokerpaks/cg-smtp
+	PAK_BUILD_CACHE_PATH=/tmp/pak-build-cache cloud-service-broker pak build brokerpaks/aws-ses
 
 run: build
 	# Load environment variables from secrets.env, scoped to this command only.

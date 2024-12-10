@@ -1,5 +1,5 @@
 version: 1
-name: cg-smtp
+name: aws-ses
 id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
 description: Send email from verified domains using Amazon Simple Email Service (SES). Supports SMTP and the SES HTTP API.
 display_name: AWS Simple Email Service
@@ -72,7 +72,7 @@ provision:
       default: ${request.context}
     - name: service_offering_name
       type: string
-      default: cg-smtp
+      default: aws-ses
     - name: service_plan_name
       type: string
       default: base
@@ -175,7 +175,7 @@ bind:
       default: ${request.context}
     - name: service_offering_name
       type: string
-      default: cg-smtp
+      default: aws-ses
     - name: service_plan_name
       type: string
       default: base

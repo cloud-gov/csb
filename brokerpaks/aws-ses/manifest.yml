@@ -1,5 +1,5 @@
 packversion: 1
-name: cg-smtp
+name: aws-ses
 version: 0.1.0
 metadata:
   author: cloud.gov team
@@ -22,7 +22,7 @@ terraform_binaries:
     version: 5.53.0
     source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.53.0.zip
 service_definitions:
-  - cg-smtp.yml
+  - aws-ses.yml
 parameters: []
 required_env_variables:
   - AWS_ACCESS_KEY_ID_COMMERCIAL
