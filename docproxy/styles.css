@@ -17,7 +17,7 @@ body {
 nav {
   background-color: #f8f9fa !important;
   border-bottom: 4px solid #007bff !important;
-  background-image: url(https://cloud.gov/assets/images/content/cloud-gov-logo.svg);
+  background-image: url(images/cloud-gov-logo.svg);
   background-position: right;
   background-repeat: no-repeat;
   background-origin: content-box;

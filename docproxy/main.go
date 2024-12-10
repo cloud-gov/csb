@@ -96,6 +96,7 @@ func modifyDocument(n *html.Node) {
 					Val: "navbar-brand",
 				}
 				if i := slices.Index(n.Parent.Attr, cls); i >= 0 {
+					// Change page title.
 					n.Data = "Services Reference"
 				}
 			}
@@ -122,6 +123,9 @@ var fonts embed.FS
 //go:embed images/favicon.ico
 var favicon []byte
 
+//go:embed images/cloud-gov-logo.svg
+var logo []byte
+
 func routes(c config) {
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css; charset=utf-8")
@@ -139,6 +143,10 @@ func routes(c config) {
 	http.HandleFunc("/images/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/vnd.microsoft.icon")
 		w.Write(favicon)
+	})
+	http.HandleFunc("/images/cloud-gov-logo.svg", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "image/svg+xml")
+		w.Write(logo)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(c.BrokerURL.String())
