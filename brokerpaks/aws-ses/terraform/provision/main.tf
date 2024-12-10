@@ -93,10 +93,6 @@ resource "aws_sesv2_email_identity" "identity" {
   configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
   email_identity         = local.domain
 
-  tags = {
-    "new field" = var.new_field
-  }
-
   lifecycle {
     prevent_destroy = true
   }
