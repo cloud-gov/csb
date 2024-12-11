@@ -1,8 +1,7 @@
-ARG builder_image
 ARG base_image
 
 # Builder: Build the Go app using an image with the Go toolchain installed.
-FROM ${builder_image} AS build
+FROM golang AS build
 ADD . /app
 WORKDIR /app
 RUN go build .
