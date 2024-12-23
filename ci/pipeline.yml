@@ -14,7 +14,7 @@ jobs:
             trigger: true
           - get: src
             resource: src
-            trigger: false
+            trigger: true # rebuild when pipeline changes
             passed: [set-self]
           # Changes to the iaas state file trigger a build. This is not a step
           # input because the state is accessed separately using a
@@ -28,14 +28,15 @@ jobs:
             trigger: true
           - get: csb-docproxy-image
             trigger: true
-      - load_var: csb-image-repository
-        file: csb-image/repository
-      - load_var: csb-image-digest
-        file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - in_parallel:
+          - load_var: csb-image-repository
+            file: csb-image/repository
+          - load_var: csb-image-digest
+            file: csb-image/digest
+          - load_var: csb-docproxy-image-repository
+            file: csb-docproxy-image/repository
+          - load_var: csb-docproxy-image-digest
+            file: csb-docproxy-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
@@ -123,14 +124,15 @@ jobs:
             trigger: true
           - get: csb-docproxy-image
             trigger: true
-      - load_var: csb-image-repository
-        file: csb-image/repository
-      - load_var: csb-image-digest
-        file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - in_parallel:
+          - load_var: csb-image-repository
+            file: csb-image/repository
+          - load_var: csb-image-digest
+            file: csb-image/digest
+          - load_var: csb-docproxy-image-repository
+            file: csb-docproxy-image/repository
+          - load_var: csb-docproxy-image-digest
+            file: csb-docproxy-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
@@ -218,14 +220,15 @@ jobs:
             trigger: true
           - get: csb-docproxy-image
             trigger: true
-      - load_var: csb-image-repository
-        file: csb-image/repository
-      - load_var: csb-image-digest
-        file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - in_parallel:
+          - load_var: csb-image-repository
+            file: csb-image/repository
+          - load_var: csb-image-digest
+            file: csb-image/digest
+          - load_var: csb-docproxy-image-repository
+            file: csb-docproxy-image/repository
+          - load_var: csb-docproxy-image-digest
+            file: csb-docproxy-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
