@@ -312,7 +312,7 @@ resources:
     source:
       commit_verification_keys: ((cloud-gov-pgp-keys))
       uri: https://github.com/cloud-gov/csb.git
-      branch: main
+      branch: brokerpak-topic
       paths:
         - ci/terraform/*
 
