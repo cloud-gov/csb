@@ -30,6 +30,7 @@ func walk(n *html.Node, f func(*html.Node) bool) bool {
 
 // modifyDocument makes a series of changes to the html.Node in-place.
 func modifyDocument(n *html.Node) {
+ModifyDocument:
 	modifications := []func(*html.Node) bool{
 		func(n *html.Node) bool {
 			if n.Type == html.ElementNode && n.Data == "head" {
@@ -98,6 +99,22 @@ func modifyDocument(n *html.Node) {
 				if i := slices.Index(n.Parent.Attr, cls); i >= 0 {
 					// Change page title.
 					n.Data = "Services Reference"
+				}
+			}
+			return false
+		},
+		func(n *html.Node) bool {
+			if n.Type == html.ElementNode && n.Data == "img" {
+				src := html.Attribute{
+					Key: "src",
+					Val: "https://example.com/icon.jpg",
+				}
+				newSrc := html.Attribute{
+					Key: "src",
+					Val: "images/amazon-ses.svg",
+				}
+				if i := slices.Index(n.Attr, src); i >= 0 {
+					n.Attr[i] = newSrc
 				}
 			}
 			return false
@@ -179,12 +196,16 @@ func routes(c config) {
 }
 
 type config struct {
-	Port uint16
+	Host      string
+	Port      uint16
 	BrokerURL *url.URL
 }
 
 func loadConfig() (config, error) {
 	c := config{}
+
+	// Host can be empty, for local development, a value like "localhost".
+	c.Host = os.Getenv("HOST")
 
 	port := os.Getenv("PORT")
 	p, err := strconv.ParseUint(port, 10, 16)
@@ -213,7 +234,7 @@ func run() error {
 	}
 
 	routes(config)
-	addr := fmt.Sprintf("localhost:%v", config.Port)
+	addr := fmt.Sprintf("%v:%v", config.Host, config.Port)
 	slog.Info("Starting server...")
 	return http.ListenAndServe(addr, nil)
 }
