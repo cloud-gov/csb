@@ -30,7 +30,6 @@ func walk(n *html.Node, f func(*html.Node) bool) bool {
 
 // modifyDocument makes a series of changes to the html.Node in-place.
 func modifyDocument(n *html.Node) {
-ModifyDocument:
 	modifications := []func(*html.Node) bool{
 		func(n *html.Node) bool {
 			if n.Type == html.ElementNode && n.Data == "head" {
