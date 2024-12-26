@@ -74,7 +74,7 @@ resource "cloudfoundry_route" "csb_docs" {
   space  = data.cloudfoundry_space.brokers.id
   domain = data.cloudfoundry_domain.brokers_domain.id
   host   = "csb"
-  path   = "docs"
+  path   = "/docs"
 
   destinations = [{
     app_id = cloudfoundry_app.csb.id

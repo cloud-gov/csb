@@ -15,7 +15,6 @@ resource "cloudfoundry_app" "docproxy" {
 
   environment = {
     "BROKER_URL" = cloudfoundry_route.csb.url
-    "PORT"       = 8080
   }
 }
 
