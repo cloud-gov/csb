@@ -104,9 +104,11 @@ func modifyDocument(n *html.Node) {
 		},
 		func(n *html.Node) bool {
 			if n.Type == html.ElementNode && n.Data == "img" {
+				// Replace the SES logo with a relative path. The brokerpak only compiles
+				// with a full URL, so this must be done here.
 				src := html.Attribute{
 					Key: "src",
-					Val: "https://example.com/icon.jpg",
+					Val: "https://services.cloud.gov/images/amazon-ses.svg",
 				}
 				newSrc := html.Attribute{
 					Key: "src",
