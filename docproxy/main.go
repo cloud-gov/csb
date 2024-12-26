@@ -215,9 +215,14 @@ func loadConfig() (config, error) {
 
 	brokerURL := os.Getenv("BROKER_URL")
 	u, err := url.Parse(brokerURL)
+
 	if err != nil {
 		return config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
 	}
+	if u.Scheme == "" {
+		u.Scheme = "https"
+	}
+
 	c.BrokerURL = u
 
 	return c, nil
