@@ -19,12 +19,12 @@ resource "cloudfoundry_app" "docproxy" {
   }
 }
 
-data "cloudfoundry_domain" "cloudgov_platform_domain" {
+data "cloudfoundry_domain" "docproxy_parent_domain" {
   name = var.docproxy_domain
 }
 
 resource "cloudfoundry_route" "docproxy" {
-  domain = data.cloudfoundry_domain.cloudgov_platform_domain.id
+  domain = data.cloudfoundry_domain.docproxy_parent_domain.id
   space  = data.cloudfoundry_space.brokers.id
   host   = "services"
 
@@ -40,6 +40,8 @@ data "cloudfoundry_service_plans" "external_domain" {
 }
 
 resource "cloudfoundry_service_instance" "docproxy_external_domain" {
+  count = var.stack_name == "development" ? 0 : 1
+
   name  = "docproxy-domain"
   space = data.cloudfoundry_space.brokers.id
   type  = "managed"
