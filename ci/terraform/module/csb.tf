@@ -77,7 +77,7 @@ resource "cloudfoundry_route" "csb_docs" {
   path   = "/docs"
 
   destinations = [{
-    app_id = cloudfoundry_app.csb.id
+    app_id = cloudfoundry_app.docproxy.id
   }]
 }
 
