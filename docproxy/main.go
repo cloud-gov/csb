@@ -215,16 +215,21 @@ func routes(c config) http.Handler {
 }
 
 type config struct {
-	Host      string
-	Port      uint16
+	// Host is the public URL for the application. Required for redirects to work.
+	Host string
+	// ListenAddr is the TCP address (without port) the process will bind to. For production, leave empty. For local development, use "localhost". Specify the port separately with [config.Port].
+	ListenAddr string
+	// Port is the TCP port the process will listen on. Specified separately because Cloud Foundry provides it to applications automatically.
+	Port uint16
+	// BrokerURL is the URL of the Cloud Service Broker instance that serves the documentation page.
 	BrokerURL url.URL
 }
 
 func loadConfig() (config, error) {
 	c := config{}
 
-	// Host can be empty, for local development, a value like "localhost".
 	c.Host = os.Getenv("HOST")
+	c.ListenAddr = os.Getenv("LISTEN_ADDR")
 
 	port := os.Getenv("PORT")
 	p, err := strconv.ParseUint(port, 10, 16)
@@ -262,7 +267,7 @@ func run() error {
 	}
 
 	mux := routes(config)
-	addr := fmt.Sprintf("%v:%v", config.Host, config.Port)
+	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
 	slog.Info("Starting server...")
 	return http.ListenAndServe(addr, mux)
 }
