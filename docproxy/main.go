@@ -105,7 +105,7 @@ func modifyDocument(n *html.Node) {
 		func(n *html.Node) bool {
 			if n.Type == html.ElementNode && n.Data == "img" {
 				// Replace the SES logo with a relative path. The brokerpak only compiles
-				// with a full URL, so this must be done here.
+				// with a full URL (not relative), so this must be done here.
 				src := html.Attribute{
 					Key: "src",
 					Val: "https://services.cloud.gov/images/amazon-ses.svg",
@@ -147,12 +147,29 @@ var logo []byte
 //go:embed images/amazon-ses.svg
 var amazonSES []byte
 
-func routes(c config) {
-	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
+func redirectHost(h http.Handler, c config) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// The CSB path /docs is routed to this app, but the Host header is still
+		// the CSB's host. Redirect it.
+		if strings.EqualFold(r.Host, c.BrokerURL.Host) {
+			// Get Path and RawQuery from original request
+			u := *r.URL
+			u.Host = c.Host
+			u.Scheme = "https"
+			http.Redirect(w, r, u.String(), http.StatusMovedPermanently)
+		} else {
+			h.ServeHTTP(w, r)
+		}
+	})
+}
+
+func routes(c config) http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css; charset=utf-8")
 		w.Write(stylesheet)
 	})
-	http.HandleFunc("/fonts/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/fonts/", func(w http.ResponseWriter, r *http.Request) {
 		b, err := fonts.ReadFile(strings.TrimPrefix(r.URL.Path, "/"))
 		if err != nil {
 			slog.Error("Reading font file", "error", err)
@@ -161,19 +178,19 @@ func routes(c config) {
 		w.Header().Add("Content-Type", "font/woff2")
 		w.Write(b)
 	})
-	http.HandleFunc("/images/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/images/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/vnd.microsoft.icon")
 		w.Write(favicon)
 	})
-	http.HandleFunc("/images/cloud-gov-logo.svg", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/images/cloud-gov-logo.svg", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/svg+xml")
 		w.Write(logo)
 	})
-	http.HandleFunc("/images/amazon-ses.svg", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/images/amazon-ses.svg", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/svg+xml")
 		w.Write(amazonSES)
 	})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(c.BrokerURL.String())
 		if err != nil {
 			slog.Error("Getting CSB site", "error", err)
@@ -194,12 +211,13 @@ func routes(c config) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	})
+	return redirectHost(mux, c)
 }
 
 type config struct {
 	Host      string
 	Port      uint16
-	BrokerURL *url.URL
+	BrokerURL url.URL
 }
 
 func loadConfig() (config, error) {
@@ -217,15 +235,19 @@ func loadConfig() (config, error) {
 
 	brokerURL := os.Getenv("BROKER_URL")
 	u, err := url.Parse(brokerURL)
-
 	if err != nil {
 		return config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
 	}
+	// Add a scheme and parse again, or else the URL will be parsed as relative and fields we need later, like Host, will be empty. See [url.Parse] docs.
 	if u.Scheme == "" {
-		u.Scheme = "https"
+		brokerURL = "https://" + brokerURL
+	}
+	u, err = url.Parse(brokerURL)
+	if err != nil {
+		return config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
 	}
 
-	c.BrokerURL = u
+	c.BrokerURL = *u
 
 	return c, nil
 }
@@ -239,10 +261,10 @@ func run() error {
 		return err
 	}
 
-	routes(config)
+	mux := routes(config)
 	addr := fmt.Sprintf("%v:%v", config.Host, config.Port)
 	slog.Info("Starting server...")
-	return http.ListenAndServe(addr, nil)
+	return http.ListenAndServe(addr, mux)
 }
 
 func main() {

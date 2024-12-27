@@ -15,6 +15,7 @@ resource "cloudfoundry_app" "docproxy" {
 
   environment = {
     "BROKER_URL" = cloudfoundry_route.csb.url
+    "HOST"       = cloudfoundry_route.docproxy.url
   }
 }
 
