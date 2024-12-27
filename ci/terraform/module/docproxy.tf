@@ -15,7 +15,9 @@ resource "cloudfoundry_app" "docproxy" {
 
   environment = {
     "BROKER_URL" = cloudfoundry_route.csb.url
-    "HOST"       = cloudfoundry_route.docproxy.url
+    // Can't reference cloudfoundry_route.docproxy.url like above because it creates a cycle,
+    // so manually build the host instead
+    "HOST" = "services.${data.cloudfoundry_domain.docproxy_parent_domain.id}"
   }
 }
 
