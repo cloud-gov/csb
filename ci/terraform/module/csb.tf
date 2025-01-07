@@ -46,7 +46,9 @@ resource "cloudfoundry_app" "csb" {
     AWS_REGION_COMMERCIAL            = var.aws_region_commercial
 
     # Other values that are used by convention by all brokerpaks
-    CLOUD_GOV_ENVIRONMENT = var.stack_name
+    CLOUD_GOV_ENVIRONMENT                  = var.stack_name
+    CLOUD_GOV_EMAIL_NOTIFICATION_TOPIC_ARN = var.email_notification_topic_arn
+    CLOUD_GOV_SLACK_NOTIFICATION_TOPIC_ARN = var.slack_notification_topic_arn
 
     # Brokerpak-specific variables
     BP_AWS_SES_DEFAULT_ZONE = var.aws_ses_default_zone

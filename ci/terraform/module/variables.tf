@@ -77,6 +77,16 @@ variable "rds_password" {
 
 # CSB Configuration
 
+variable "email_notification_topic_arn" {
+  type        = string
+  description = "ARN of an SNS topic. The CSB will send email alarms to the Cloud.gov team via this topic."
+}
+
+variable "slack_notification_topic_arn" {
+  type        = string
+  description = "ARN of an SNS topic. The CSB will send slack alarms to the Cloud.gov team via this topic."
+}
+
 variable "aws_ses_default_zone" {
   type        = string
   description = "When the user does not provide a domain, a subdomain will be created for them under this DNS zone."
