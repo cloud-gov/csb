@@ -31,8 +31,8 @@ module "csb" {
   docker_image_version = var.csb_docker_image_version
   broker_route_domain  = var.csb_broker_route_domain
 
-  docproxy_domain               = var.csb_docproxy_domain
-  docproxy_instances            = var.csb_docproxy_instances
-  docproxy_docker_image_name    = var.csb_docproxy_docker_image_name
-  docproxy_docker_image_version = var.csb_docproxy_docker_image_version
+  docproxy_domain             = var.csb_docproxy_domain
+  helper_instances            = var.csb_helper_instances
+  helper_docker_image_name    = var.csb_helper_docker_image_name
+  helper_docker_image_version = var.csb_helper_docker_image_version
 }
