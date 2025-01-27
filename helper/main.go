@@ -3,10 +3,12 @@ package main
 import (
 	"embed"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -44,7 +46,7 @@ func modifyDocument(n *html.Node) {
 						},
 						{
 							Key: "href",
-							Val: "styles.css",
+							Val: "assets/styles.css",
 						},
 					},
 				})
@@ -67,7 +69,7 @@ func modifyDocument(n *html.Node) {
 						},
 						{
 							Key: "href",
-							Val: "/images/favicon.ico",
+							Val: "assets/images/favicon.ico",
 						},
 					},
 				})
@@ -112,7 +114,7 @@ func modifyDocument(n *html.Node) {
 				}
 				newSrc := html.Attribute{
 					Key: "src",
-					Val: "images/amazon-ses.svg",
+					Val: "assets/images/amazon-ses.svg",
 				}
 				if i := slices.Index(n.Attr, src); i >= 0 {
 					n.Attr[i] = newSrc
@@ -132,20 +134,8 @@ func modifyDocument(n *html.Node) {
 	})
 }
 
-//go:embed styles.css
-var stylesheet []byte
-
-//go:embed fonts
-var fonts embed.FS
-
-//go:embed images/favicon.ico
-var favicon []byte
-
-//go:embed images/cloud-gov-logo.svg
-var logo []byte
-
-//go:embed images/amazon-ses.svg
-var amazonSES []byte
+//go:embed assets
+var assets embed.FS
 
 func redirectHost(h http.Handler, c config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -163,32 +153,47 @@ func redirectHost(h http.Handler, c config) http.Handler {
 	})
 }
 
+func httpError(w http.ResponseWriter, code int, message string) {
+	w.WriteHeader(code)
+	io.WriteString(w, message)
+}
+
+func serveAsset(w http.ResponseWriter, path string) {
+	errBody := "An error in Cloud.gov occurred while serving this asset."
+
+	asset, err := assets.ReadFile(path)
+	if err != nil {
+		httpError(w, http.StatusInternalServerError, errBody)
+		slog.Error("failed to read asset from embedded fs", "path", path, "err", err)
+		return
+	}
+
+	ext := filepath.Ext(path)
+	var contentType string
+	switch ext {
+	case ".svg":
+		contentType = "image/svg+xml"
+	case ".ico":
+		contentType = "image/vnd.microsoft.icon"
+	case ".woff2":
+		contentType = "font/woff2"
+	case ".css":
+		contentType = "text/css; charset=utf-8"
+	default:
+		slog.Error("tried serving asset with unknown file extension, and therefore no mapped content-type", "path", path)
+		httpError(w, http.StatusInternalServerError, errBody)
+		return
+	}
+
+	w.Header().Add("Content-Type", contentType)
+	w.Write(asset)
+}
+
 func routes(c config) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/css; charset=utf-8")
-		w.Write(stylesheet)
-	})
-	mux.HandleFunc("/fonts/", func(w http.ResponseWriter, r *http.Request) {
-		b, err := fonts.ReadFile(strings.TrimPrefix(r.URL.Path, "/"))
-		if err != nil {
-			slog.Error("Reading font file", "error", err)
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		w.Header().Add("Content-Type", "font/woff2")
-		w.Write(b)
-	})
-	mux.HandleFunc("/images/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "image/vnd.microsoft.icon")
-		w.Write(favicon)
-	})
-	mux.HandleFunc("/images/cloud-gov-logo.svg", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "image/svg+xml")
-		w.Write(logo)
-	})
-	mux.HandleFunc("/images/amazon-ses.svg", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "image/svg+xml")
-		w.Write(amazonSES)
+	mux.HandleFunc("/assets/", func(w http.ResponseWriter, r *http.Request) {
+		fpath := strings.Join(strings.Split(r.URL.Path, "/")[1:], "/")
+		serveAsset(w, fpath)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(c.BrokerURL.String())
