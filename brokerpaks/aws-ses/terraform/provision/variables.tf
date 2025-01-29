@@ -45,12 +45,12 @@ variable "instance_id" {
 
 variable "dmarc_report_uri_aggregate" {
   type        = string
-  description = "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
+  description = "One or more comma-separated mailto URIs to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov,mailto:another@example.gov'."
 }
 
 variable "dmarc_report_uri_failure" {
   type        = string
-  description = "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
+  description = "One or more comma-separated mailto URIs to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov,mailto:another@example.gov'."
 }
 
 variable "labels" {
