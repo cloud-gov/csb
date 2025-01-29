@@ -5,12 +5,14 @@ locals {
   manage_domain = (var.domain == "")
   domain        = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
 
+  // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
+  dmarc_rua = join(",", ["mailto:reports@dmarc.cyber.dhs.gov", var.dmarc_report_uri_aggregate])
+
   dmarc_verification_record = {
-    name = "_dmarc.${local.domain}"
-    type = "TXT"
-    ttl  = "600"
-    // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
-    records = ["v=DMARC1; p=reject; rua=mailto:reports@dmarc.cyber.dhs.gov, ${var.dmarc_report_uri_aggregate}; ruf=mailto:${var.dmarc_report_uri_failure}"]
+    name    = "_dmarc.${local.domain}"
+    type    = "TXT"
+    ttl     = "600"
+    records = ["v=DMARC1; p=reject; rua=${local.dmarc_rua}; ruf=${var.dmarc_report_uri_failure}"]
   }
 
   setting_mail_from = (var.mail_from_subdomain != "")
