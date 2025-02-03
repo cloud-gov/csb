@@ -27,14 +27,14 @@ func Load() (Config, error) {
 	port := os.Getenv("PORT")
 	p, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
-		return Config{}, fmt.Errorf("Invalid PORT: %w", err)
+		return Config{}, fmt.Errorf("invalid PORT: %w", err)
 	}
 	c.Port = uint16(p)
 
 	brokerURL := os.Getenv("BROKER_URL")
 	u, err := url.Parse(brokerURL)
 	if err != nil {
-		return Config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
+		return Config{}, fmt.Errorf("invalid BROKER_URL: %w", err)
 	}
 	// Add a scheme and parse again, or else the URL will be parsed as relative and fields we need later, like Host, will be empty. See [url.Parse] docs.
 	if u.Scheme == "" {
@@ -42,7 +42,7 @@ func Load() (Config, error) {
 	}
 	u, err = url.Parse(brokerURL)
 	if err != nil {
-		return Config{}, fmt.Errorf("Invalid BROKER_URL: %w", err)
+		return Config{}, fmt.Errorf("invalid BROKER_URL: %w", err)
 	}
 
 	c.BrokerURL = *u

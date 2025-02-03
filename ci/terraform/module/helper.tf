@@ -55,3 +55,16 @@ resource "cloudfoundry_service_instance" "docproxy_external_domain" {
     domains = ["services.${var.docproxy_domain}"]
   })
 }
+
+resource "aws_sns_topic_subscription" "platform_ses_notifications" {
+  endpoint  = "https://${cloudfoundry_route.docproxy.url}/brokerpaks/ses/reputation-alarm"
+  protocol  = "https"
+  topic_arn = var.email_notification_topic_arn
+  filter_policy = jsonencode({
+    "AlarmName" : [
+      { "prefix" : "SES-BounceRate-Critical-Identity-" },
+      { "prefix" : "SES-ComplaintRate-Critical-Identity-" }
+    ]
+  })
+  filter_policy_scope = "MessageBody"
+}
