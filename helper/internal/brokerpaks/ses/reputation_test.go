@@ -25,10 +25,11 @@ var otherAlarm = `{
 
 func TestParseRequest(t *testing.T) {
 	r := strings.NewReader(otherAlarm)
-	alarm, err := ses.ParseRequest(r)
+	req, err := ses.ParseRequest(r)
 	if err != nil {
 		t.Fatal("error while parsing request: ", err)
 	}
+	alarm := req.Message
 	expectedName := "Example alarm name"
 	if alarm.AlarmName != expectedName {
 		t.Fatalf("expected alarm name %v, got %v", expectedName, alarm.AlarmName)

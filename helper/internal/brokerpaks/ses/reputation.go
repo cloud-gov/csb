@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 )
 
 type SESClient interface {
@@ -18,8 +19,9 @@ type SESClient interface {
 }
 
 type SNSRequest struct {
-	Message string
-	Subject string
+	Message      CloudWatchAlarm
+	Subject      string
+	SubscribeURL string
 }
 
 type CloudWatchAlarm struct {
@@ -31,6 +33,28 @@ type CloudWatchAlarm struct {
 			Value string
 		}
 	}
+}
+
+// UnmarshalJSON is custom implemented here because the Message field contains a JSON object
+// (the SNS message) encoded in a string, with escaped quotes. The default Unmarshaller cannot
+// handle this.
+func (s *SNSRequest) UnmarshalJSON(b []byte) error {
+	// Unmarshal to an auxiliary type to get the string contents of all fields, including Message
+	var aux struct {
+		Message      string
+		Subject      string
+		SubscribeURL string
+	}
+
+	if err := json.Unmarshal(b, &aux); err != nil {
+		return err
+	}
+
+	s.Subject = aux.Subject
+	s.SubscribeURL = aux.SubscribeURL
+
+	// Unmarshal the Message field separately
+	return json.Unmarshal([]byte(aux.Message), &s.Message)
 }
 
 func (a *CloudWatchAlarm) Valid() map[string]string {
@@ -54,44 +78,42 @@ func (a *CloudWatchAlarm) Valid() map[string]string {
 }
 
 // parseRequests extracts the CloudWatch alarm from the body of the SNS request.
-func ParseRequest(body io.Reader) (CloudWatchAlarm, error) {
-	var a CloudWatchAlarm
+func ParseRequest(body io.Reader) (SNSRequest, error) {
+	var s SNSRequest
 	b, err := io.ReadAll(body)
 	if err != nil {
-		return a, fmt.Errorf("reading SNS request body: %w", err)
+		return s, fmt.Errorf("reading SNS request body: %w", err)
 	}
 	if len(b) == 0 {
-		return a, fmt.Errorf("SNS request body was 0 bytes")
+		return s, fmt.Errorf("SNS request body was 0 bytes")
 	}
-	var s SNSRequest
 	err = json.Unmarshal(b, &s)
 	if err != nil {
-		return a, fmt.Errorf("unmarshalling SNS request body: %w", err)
+		return s, fmt.Errorf("unmarshalling SNS request body: %w", err)
 	}
-
-	err = json.Unmarshal([]byte(s.Message), &a)
-	if err != nil {
-		return a, fmt.Errorf("unmarshalling CloudWatch alarm from SNS request message field: %w", err)
-	}
-
-	return a, nil
+	return s, nil
 }
 
 // TODO verify the SNS signature.
 // TODO confirm subscription.
-func HandleAlarm(sesclient *ses.Client) http.Handler {
+func HandleAlarm(sesclient *ses.Client, snsclient *sns.Client) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			alarm, err := ParseRequest(r.Body)
+			// todo: check if request is subscription request.
+			// check for SubscribeURL key?
+
+			req, err := ParseRequest(r.Body)
 			if err != nil {
 				slog.Error("error processing CloudWatch alarm SNS request", "err", err)
 				return
 			}
-			if errs := alarm.Valid(); len(errs) > 0 {
+			if errs := req.Message.Valid(); len(errs) > 0 {
 				slog.Error("error validating CloudWatch alarm. is the SNS subscription FilterPolicy allowing non-SES notifications?", "errs", errs)
 			}
 
-			cset := alarm.Trigger.Dimensions[0].Value
+			snsclient.ConfirmSubscription(context.Background(), &sns.ConfirmSubscriptionInput{})
+
+			cset := req.Message.Trigger.Dimensions[0].Value
 
 			_, err = sesclient.UpdateConfigurationSetSendingEnabled(r.Context(), &ses.UpdateConfigurationSetSendingEnabledInput{
 				ConfigurationSetName: aws.String(cset),
