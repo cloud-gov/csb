@@ -3,6 +3,9 @@ resource "aws_sns_topic" "bounce_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_id}-bounce"
 
+  # Use an AWS-managed key for topic encryption.
+  kms_master_key_id = "alias/aws/kms"
+
   lifecycle {
     prevent_destroy = true
   }
@@ -28,6 +31,9 @@ resource "aws_sns_topic" "complaint_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_id}-complaint"
 
+  # Use an AWS-managed key for topic encryption.
+  kms_master_key_id = "alias/aws/kms"
+
   lifecycle {
     prevent_destroy = true
   }
@@ -50,6 +56,9 @@ resource "aws_sesv2_configuration_set_event_destination" "name" {
 resource "aws_sns_topic" "delivery_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${var.instance_id}-delivery"
+
+  # Use an AWS-managed key for topic encryption.
+  kms_master_key_id = "alias/aws/kms"
 
   lifecycle {
     prevent_destroy = true

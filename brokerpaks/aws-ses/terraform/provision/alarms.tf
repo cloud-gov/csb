@@ -2,6 +2,9 @@
 resource "aws_sns_topic" "ses_reputation_notifications" {
   name = "${var.instance_id}-ses-reputation-notifications"
 
+  # Use an AWS-managed key for topic encryption.
+  kms_master_key_id = "alias/aws/kms"
+
   lifecycle {
     prevent_destroy = true
   }
