@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -14,14 +15,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 )
 
-type SESClient interface {
-	UpdateConfigurationSetSendingEnabled(context.Context, ses.UpdateConfigurationSetSendingEnabledInput) (ses.UpdateConfigurationSetSendingEnabledOutput, error)
-}
+const (
+	snsMessageTypeHeader                   = "x-amz-sns-message-type"
+	snsMessageTypeNotification             = "Notification"
+	snsMessageTypeSubscriptionConfirmation = "SubscriptionConfirmation"
+)
 
-type SNSRequest struct {
-	Message      CloudWatchAlarm
-	Subject      string
-	SubscribeURL string
+type SESClient interface {
+	UpdateConfigurationSetSendingEnabled(context.Context, *ses.UpdateConfigurationSetSendingEnabledInput, ...func(*ses.Options)) (*ses.UpdateConfigurationSetSendingEnabledOutput, error)
 }
 
 type CloudWatchAlarm struct {
@@ -33,28 +34,6 @@ type CloudWatchAlarm struct {
 			Value string
 		}
 	}
-}
-
-// UnmarshalJSON is custom implemented here because the Message field contains a JSON object
-// (the SNS message) encoded in a string, with escaped quotes. The default Unmarshaller cannot
-// handle this.
-func (s *SNSRequest) UnmarshalJSON(b []byte) error {
-	// Unmarshal to an auxiliary type to get the string contents of all fields, including Message
-	var aux struct {
-		Message      string
-		Subject      string
-		SubscribeURL string
-	}
-
-	if err := json.Unmarshal(b, &aux); err != nil {
-		return err
-	}
-
-	s.Subject = aux.Subject
-	s.SubscribeURL = aux.SubscribeURL
-
-	// Unmarshal the Message field separately
-	return json.Unmarshal([]byte(aux.Message), &s.Message)
 }
 
 func (a *CloudWatchAlarm) Valid() map[string]string {
@@ -77,9 +56,8 @@ func (a *CloudWatchAlarm) Valid() map[string]string {
 	return verrs
 }
 
-// parseRequests extracts the CloudWatch alarm from the body of the SNS request.
-func ParseRequest(body io.Reader) (SNSRequest, error) {
-	var s SNSRequest
+func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
+	var s SNSMessage
 	b, err := io.ReadAll(body)
 	if err != nil {
 		return s, fmt.Errorf("reading SNS request body: %w", err)
@@ -94,33 +72,70 @@ func ParseRequest(body io.Reader) (SNSRequest, error) {
 	return s, nil
 }
 
-// TODO verify the SNS signature.
-// TODO confirm subscription.
-func HandleAlarm(sesclient *ses.Client, snsclient *sns.Client) http.Handler {
+func handleSubscriptionConfirmation(msg SNSMessage) {
+	_, err := http.Get(msg.SubscribeURL)
+	if err != nil {
+		slog.Error("error confirming SNS subscription", "err", err)
+	} else {
+		slog.Info("confirmed subscription to SNS topic", "topic", msg.TopicArn)
+	}
+}
+
+func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient) {
+	var a CloudWatchAlarm
+	err := json.Unmarshal([]byte(msg.Message), &a)
+	if err != nil {
+		slog.Error("unmarshalling CloudWatch alarm from SNS message body", "err", err)
+	}
+
+	if errs := a.Valid(); len(errs) > 0 {
+		slog.Error("error validating CloudWatch alarm. is the SNS subscription FilterPolicy allowing non-SES notifications?", "errs", errs)
+	}
+
+	cset := a.Trigger.Dimensions[0].Value
+	slog.Info("pausing sending on SES identity via Configuration Set", "configuration-set", cset)
+	_, err = sesclient.UpdateConfigurationSetSendingEnabled(ctx, &ses.UpdateConfigurationSetSendingEnabledInput{
+		ConfigurationSetName: aws.String(cset),
+		Enabled:              false,
+	})
+	if err != nil {
+		slog.Error("error pausing sending on configuration set", "name", cset, "err", err)
+	}
+}
+
+// HandleSNSRequest handles requests from the platform notifications SNS topic subscription.
+func HandleSNSRequest(sesclient *ses.Client, snsclient *sns.Client) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			// todo: check if request is subscription request.
-			// check for SubscribeURL key?
-
-			req, err := ParseRequest(r.Body)
+			defer r.Body.Close() // todo, can return an error
+			msg, err := UnmarshalMessage(r.Body)
 			if err != nil {
 				slog.Error("error processing CloudWatch alarm SNS request", "err", err)
 				return
 			}
-			if errs := req.Message.Valid(); len(errs) > 0 {
-				slog.Error("error validating CloudWatch alarm. is the SNS subscription FilterPolicy allowing non-SES notifications?", "errs", errs)
+			u, err := url.Parse(*snsclient.Options().BaseEndpoint)
+			if err != nil {
+				slog.Error("initialized SNS client had no base endpoint -- this should never happen")
 			}
 
-			snsclient.ConfirmSubscription(context.Background(), &sns.ConfirmSubscriptionInput{})
+			if err = VerifySNSMessage(msg, u.Host); err != nil {
+				slog.Error("failed to verify SNS message signature", "err", err)
+				return
+			}
 
-			cset := req.Message.Trigger.Dimensions[0].Value
-
-			_, err = sesclient.UpdateConfigurationSetSendingEnabled(r.Context(), &ses.UpdateConfigurationSetSendingEnabledInput{
-				ConfigurationSetName: aws.String(cset),
-				Enabled:              false,
-			})
-			if err != nil {
-				slog.Error("error pausing sending on configuration set", "name", cset, "err", err)
+			// once verified, switch on request type
+			mtype := r.Header.Get(snsMessageTypeHeader)
+			if mtype == "" {
+				slog.Error("SNS message passed verification but type header was empty -- this should never happen")
+				return
+			}
+			switch mtype {
+			case snsMessageTypeSubscriptionConfirmation:
+				handleSubscriptionConfirmation(msg)
+			case snsMessageTypeNotification:
+				handleNotification(r.Context(), msg, sesclient)
+			default:
+				// UnsubscribeConfirmation is a noop.
 			}
 		},
 	)

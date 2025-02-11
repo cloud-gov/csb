@@ -11,6 +11,6 @@ import (
 
 func Handle(sesclient *awsses.Client, snsclient *sns.Client) http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("POST /ses/reputation-alarm", ses.HandleAlarm(sesclient, snsclient))
+	mux.Handle("POST /ses/reputation-alarm", ses.HandleSNSRequest(sesclient, snsclient))
 	return mux
 }

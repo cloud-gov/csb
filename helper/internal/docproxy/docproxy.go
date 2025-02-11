@@ -179,7 +179,7 @@ func HandleDocs(c config.Config) http.Handler {
 				slog.Error("Getting CSB site", "error", err)
 				w.WriteHeader(http.StatusBadGateway)
 			}
-
+			defer resp.Body.Close() // todo can return error
 			doc, err := html.Parse(resp.Body)
 			if err != nil {
 				slog.Error("Parsing CSB response body", "error", err)

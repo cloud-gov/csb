@@ -1,15 +1,14 @@
 package ses_test
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
 	"github.com/cloud-gov/csb/helper/internal/brokerpaks/ses"
 )
 
-var sesAlarm = ""
-
-var otherAlarm = `{
+var referenceAlarm = `{
     "Type": "Notification",
     "MessageId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "TopicArn": "arn:aws:sns:eu-west-1:000000000000:cloudwatch-alarms",
@@ -24,12 +23,16 @@ var otherAlarm = `{
   }`
 
 func TestParseRequest(t *testing.T) {
-	r := strings.NewReader(otherAlarm)
-	req, err := ses.ParseRequest(r)
+	r := strings.NewReader(referenceAlarm)
+	msg, err := ses.UnmarshalMessage(r)
 	if err != nil {
 		t.Fatal("error while parsing request: ", err)
 	}
-	alarm := req.Message
+	var alarm ses.CloudWatchAlarm
+	if err = json.Unmarshal([]byte(msg.Message), &alarm); err != nil {
+		t.Fatalf("unmarshalling alarm: %v", err.Error())
+	}
+
 	expectedName := "Example alarm name"
 	if alarm.AlarmName != expectedName {
 		t.Fatalf("expected alarm name %v, got %v", expectedName, alarm.AlarmName)
