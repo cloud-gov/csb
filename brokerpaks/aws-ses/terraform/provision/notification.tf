@@ -4,7 +4,7 @@ resource "aws_sns_topic" "bounce_topic" {
   name  = "${var.instance_id}-bounce"
 
   # Use an AWS-managed key for topic encryption.
-  kms_master_key_id = "alias/aws/kms"
+  kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
     prevent_destroy = true
@@ -32,7 +32,7 @@ resource "aws_sns_topic" "complaint_topic" {
   name  = "${var.instance_id}-complaint"
 
   # Use an AWS-managed key for topic encryption.
-  kms_master_key_id = "alias/aws/kms"
+  kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
     prevent_destroy = true
@@ -58,7 +58,7 @@ resource "aws_sns_topic" "delivery_topic" {
   name  = "${var.instance_id}-delivery"
 
   # Use an AWS-managed key for topic encryption.
-  kms_master_key_id = "alias/aws/kms"
+  kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
     prevent_destroy = true
