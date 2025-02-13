@@ -42,7 +42,7 @@ resource "cloudfoundry_app" "csb" {
     TERRAFORM_UPGRADES_ENABLED = true
 
     # Access keys for managing resources provisioned by brokerpaks
-    AWS_USE_FIPS_ENDPOINTS           = true
+    AWS_USE_FIPS_ENDPOINT            = true
     AWS_ACCESS_KEY_ID_GOVCLOUD       = var.aws_access_key_id_govcloud
     AWS_SECRET_ACCESS_KEY_GOVCLOUD   = var.aws_secret_access_key_govcloud
     AWS_REGION_GOVCLOUD              = var.aws_region_govcloud

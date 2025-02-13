@@ -46,6 +46,7 @@ jobs:
           STACK_NAME: cf-apps-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
@@ -142,6 +143,7 @@ jobs:
           STACK_NAME: cf-apps-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-staging))
           CF_CLIENT_ID: ((cf-client-id-staging))
           CF_CLIENT_SECRET: ((cf-client-secret-staging))
@@ -238,6 +240,7 @@ jobs:
           STACK_NAME: cf-apps-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-production))
           CF_CLIENT_ID: ((cf-client-id-production))
           CF_CLIENT_SECRET: ((cf-client-secret-production))

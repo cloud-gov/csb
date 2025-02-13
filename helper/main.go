@@ -61,7 +61,7 @@ func run(ctx context.Context) error {
 	if err != nil {
 		slog.Error("failed to resolve SES endpoint")
 	}
-	slog.Info("resolved SES endpoint", "endpoint", snsendpoint)
+	slog.Info("resolved SES endpoint", "endpoint", fmt.Sprintf("%+v", snsendpoint))
 
 	mux := routes(config, sesclient, snsendpoint.URI.Host)
 	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
