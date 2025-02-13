@@ -1,9 +1,27 @@
 package ses_test
 
 import (
+	"bytes"
+	"context"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha1"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
+	"math/big"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
+	"time"
+
+	awsses "github.com/aws/aws-sdk-go-v2/service/ses"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/cloud-gov/csb/helper/internal/brokerpaks/ses"
 )
@@ -200,4 +218,94 @@ func TestAlarmValid(t *testing.T) {
 			}
 		})
 	}
+}
+
+type MockSESClient struct {
+	ReturnOutput *awsses.UpdateConfigurationSetSendingEnabledOutput
+	ReturnErr    error
+}
+
+func (s *MockSESClient) UpdateConfigurationSetSendingEnabled(ctx context.Context, input *awsses.UpdateConfigurationSetSendingEnabledInput, opts ...func(*awsses.Options)) (*awsses.UpdateConfigurationSetSendingEnabledOutput, error) {
+	return s.ReturnOutput, s.ReturnErr
+}
+
+type MockSNSClient struct {
+	Opts sns.Options
+}
+
+func (c *MockSNSClient) Options() sns.Options {
+	return c.Opts
+}
+
+func TestHandleSNSRequest(t *testing.T) {
+	t.Run("valid subscription request", func(t *testing.T) {
+		// 1. Generate an RSA key pair
+		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		errNil(t, err)
+
+		// 2. Create a self-signed certificate
+		template := &x509.Certificate{
+			SerialNumber: big.NewInt(1),
+			NotBefore:    time.Now().Add(-time.Hour),
+			NotAfter:     time.Now().Add(time.Hour),
+			KeyUsage:     x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+			Subject:      pkix.Name{CommonName: "Test Cert"},
+		}
+		derBytes, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
+		errNil(t, err)
+
+		// 3. Encode cert to PEM
+		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+
+		// 4. Serve the certificate via httptest.Server
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write(certPEM)
+		}))
+		defer ts.Close()
+
+		// 5. Create an SNSMessage to verify
+		testMsg := ses.SNSMessage{
+			Type:             "Notification",
+			MessageId:        "mid",
+			Message:          "Hello",
+			Subject:          "subject",
+			Timestamp:        "2021-01-01T00:00:00Z",
+			TopicArn:         "arn:aws:sns:us-east-1:123456789012:MyTopic",
+			SignatureVersion: "1",
+			SigningCertURL:   ts.URL,
+			SubscribeURL:     ts.URL,
+		}
+		// 6. Hash and sign the known good string-to-sign
+		hashed := sha1.Sum([]byte(stringToSign))
+		signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA1, hashed[:])
+		errNil(t, err)
+
+		// 7. Put the signature in base64 form in the message
+		testMsg.Signature = base64.StdEncoding.EncodeToString(signature)
+
+		rec := httptest.NewRecorder()
+
+		sesclient := MockSESClient{}
+
+		u, err := url.Parse(ts.URL)
+		if err != nil {
+			t.Fatal("error parsing test server URL. This is a problem with the test.", err)
+		}
+
+		body, err := json.Marshal(testMsg)
+		if err != nil {
+			t.Fatal("error marshalling test request JSON. This is a problem with the test.", err)
+		}
+
+		req, err := http.NewRequest("POST", "localhost/brokerpaks/ses/reputation-alarm", bytes.NewReader(body))
+		req.Header.Add("x-amz-sns-message-type", "SubscriptionConfirmation")
+		if err != nil {
+			t.Fatal("error creating the test HTTP request. This is a problem with the test.", err)
+		}
+
+		ses.HandleSNSRequest(&sesclient, u.Host).ServeHTTP(rec, req)
+		if code := rec.Result().StatusCode; code != http.StatusOK {
+			t.Fatalf("expected HTTP status %v, got %v", http.StatusOK, code)
+		}
+	})
 }

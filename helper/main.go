@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
@@ -22,28 +23,11 @@ import (
 //go:embed assets
 var assets embed.FS
 
-func sesClient(ctx context.Context) (*ses.Client, error) {
-	cfg, err := awscfg.LoadDefaultConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return ses.NewFromConfig(cfg), nil
-}
-
-func snsClient(ctx context.Context) (*sns.Client, error) {
-	cfg, err := awscfg.LoadDefaultConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return sns.NewFromConfig(cfg), nil
-}
-
-func routes(c config.Config, sesclient *ses.Client, snsclient *sns.Client) http.Handler {
+func routes(c config.Config, sesclient *ses.Client, snsdomain string) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/", docproxy.HandleDocs(c))
 	mux.Handle("/assets/", docproxy.HandleAssets(assets))
-
-	mux.Handle("/brokerpaks/", brokerpaks.Handle(sesclient, snsclient))
+	mux.Handle("/brokerpaks/", brokerpaks.Handle(sesclient, snsdomain))
 
 	// The CSB path /docs is routed to this app by Cloud Foundry, but the Host
 	// header is still the CSB's host. Redirect it.
@@ -60,19 +44,26 @@ func run(ctx context.Context) error {
 	slog.SetLogLoggerLevel(slog.LevelInfo)
 	config, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("loading config: %w", err)
+		return fmt.Errorf("loading CSB Helper config: %w", err)
 	}
 
-	sesclient, err := sesClient(ctx)
+	awscfg, err := awscfg.LoadDefaultConfig(ctx)
 	if err != nil {
-		return fmt.Errorf("creating AWS SES client: %w", err)
-	}
-	snsclient, err := snsClient(ctx)
-	if err != nil {
-		return fmt.Errorf("creating AWS SNS client: %w", err)
+		return fmt.Errorf("loading AWS config: %w", err)
 	}
 
-	mux := routes(config, sesclient, snsclient)
+	sesclient := ses.NewFromConfig(awscfg)
+
+	snsendpoint, err := sns.NewDefaultEndpointResolverV2().ResolveEndpoint(ctx, sns.EndpointParameters{
+		Region:  aws.String(awscfg.Region),
+		UseFIPS: aws.Bool(true),
+	})
+	if err != nil {
+		slog.Error("failed to resolve SES endpoint")
+	}
+	slog.Info("resolved SES endpoint", "endpoint", snsendpoint)
+
+	mux := routes(config, sesclient, snsendpoint.URI.Host)
 	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
 	slog.Info("Starting server...")
 	return http.ListenAndServe(addr, mux)

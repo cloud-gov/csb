@@ -7,12 +7,10 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
-	"github.com/aws/aws-sdk-go-v2/service/sns"
 )
 
 const (
@@ -72,24 +70,25 @@ func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
 	return s, nil
 }
 
-func handleSubscriptionConfirmation(msg SNSMessage) {
+func handleSubscriptionConfirmation(msg SNSMessage) error {
 	_, err := http.Get(msg.SubscribeURL)
 	if err != nil {
-		slog.Error("error confirming SNS subscription", "err", err)
+		return err
 	} else {
 		slog.Info("confirmed subscription to SNS topic", "topic", msg.TopicArn)
+		return nil
 	}
 }
 
-func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient) {
+func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient) error {
 	var a CloudWatchAlarm
 	err := json.Unmarshal([]byte(msg.Message), &a)
 	if err != nil {
-		slog.Error("unmarshalling CloudWatch alarm from SNS message body", "err", err)
+		return fmt.Errorf("unmarshalling CloudWatch alarm from SNS message body: %w", err)
 	}
 
 	if errs := a.Valid(); len(errs) > 0 {
-		slog.Error("error validating CloudWatch alarm. is the SNS subscription FilterPolicy allowing non-SES notifications?", "errs", errs)
+		return fmt.Errorf("one or more errors validating CloudWatch alarm. is the SNS subscription FilterPolicy allowing non-SES notifications? errors were: %v", errs)
 	}
 
 	cset := a.Trigger.Dimensions[0].Value
@@ -99,27 +98,26 @@ func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient
 		Enabled:              false,
 	})
 	if err != nil {
-		slog.Error("error pausing sending on configuration set", "name", cset, "err", err)
+		return fmt.Errorf("error pausing sending on configuration set %v: %w", cset, err)
 	}
+	return nil
 }
 
 // HandleSNSRequest handles requests from the platform notifications SNS topic subscription.
-func HandleSNSRequest(sesclient *ses.Client, snsclient *sns.Client) http.Handler {
+func HandleSNSRequest(sesclient SESClient, snsdomain string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer r.Body.Close() // todo, can return an error
 			msg, err := UnmarshalMessage(r.Body)
 			if err != nil {
 				slog.Error("error processing CloudWatch alarm SNS request", "err", err)
+				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
-			u, err := url.Parse(*snsclient.Options().BaseEndpoint)
-			if err != nil {
-				slog.Error("initialized SNS client had no base endpoint -- this should never happen")
-			}
 
-			if err = VerifySNSMessage(msg, u.Host); err != nil {
+			if err = VerifySNSMessage(msg, snsdomain); err != nil {
 				slog.Error("failed to verify SNS message signature", "err", err)
+				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 
@@ -127,13 +125,22 @@ func HandleSNSRequest(sesclient *ses.Client, snsclient *sns.Client) http.Handler
 			mtype := r.Header.Get(snsMessageTypeHeader)
 			if mtype == "" {
 				slog.Error("SNS message passed verification but type header was empty -- this should never happen")
+				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			switch mtype {
 			case snsMessageTypeSubscriptionConfirmation:
-				handleSubscriptionConfirmation(msg)
+				if err = handleSubscriptionConfirmation(msg); err != nil {
+					slog.Error("error confirming SNS subscription", "err", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 			case snsMessageTypeNotification:
-				handleNotification(r.Context(), msg, sesclient)
+				if err = handleNotification(r.Context(), msg, sesclient); err != nil {
+					slog.Error("error handling SNS notification", "err", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 			default:
 				// UnsubscribeConfirmation is a noop.
 			}

@@ -89,6 +89,7 @@ func TestVerifySNSMessage(t *testing.T) {
 	})
 
 	t.Run("Valid signature => success", func(t *testing.T) {
+		// TODO: Extract this to create the test message and the test server, for reuse with reputation_test.go.
 		// 1. Generate an RSA key pair
 		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 		errNil(t, err)
