@@ -48,7 +48,7 @@ resource "cloudfoundry_service_instance" "docproxy_external_domain" {
 }
 
 resource "aws_sns_topic_subscription" "platform_ses_notifications" {
-  endpoint  = "https://services.${local.helper_route}/brokerpaks/ses/reputation-alarm"
+  endpoint  = "https://${local.helper_route}/brokerpaks/ses/reputation-alarm"
   protocol  = "https"
   topic_arn = var.email_notification_topic_arn
   filter_policy = jsonencode({
