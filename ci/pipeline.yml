@@ -11,7 +11,7 @@ jobs:
       - in_parallel:
           - get: terraform-templates
             resource: terraform-config
-            trigger: true
+            trigger: false # not needed because src triggers a build
           - get: src
             resource: src
             trigger: true # rebuild when pipeline changes
