@@ -1,3 +1,7 @@
+locals {
+  csb_route = "csb.${var.broker_route_domain}"
+}
+
 resource "random_password" "csb_app_password" {
   length      = 32
   special     = false
@@ -57,36 +61,15 @@ resource "cloudfoundry_app" "csb" {
 
   readiness_health_check_type          = "http"
   readiness_health_check_http_endpoint = "/ready"
-}
 
-data "cloudfoundry_domain" "brokers_domain" {
-  name = var.broker_route_domain
-}
-
-resource "cloudfoundry_route" "csb" {
-  space  = data.cloudfoundry_space.brokers.id
-  domain = data.cloudfoundry_domain.brokers_domain.id
-  host   = "csb"
-
-  destinations = [{
-    app_id = cloudfoundry_app.csb.id
-  }]
-}
-
-resource "cloudfoundry_route" "csb_docs" {
-  space  = data.cloudfoundry_space.brokers.id
-  domain = data.cloudfoundry_domain.brokers_domain.id
-  host   = "csb"
-  path   = "/docs"
-
-  destinations = [{
-    app_id = cloudfoundry_app.helper.id
+  routes = [{
+    route = local.csb_route
   }]
 }
 
 resource "cloudfoundry_service_broker" "csb" {
   name     = "csb"
   password = random_password.csb_app_password.result
-  url      = "https://${cloudfoundry_route.csb.url}"
+  url      = "https://${local.csb_route}"
   username = "broker"
 }

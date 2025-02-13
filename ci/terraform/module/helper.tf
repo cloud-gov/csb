@@ -1,3 +1,7 @@
+locals {
+  helper_route = "services.${var.docproxy_domain}"
+}
+
 resource "cloudfoundry_app" "helper" {
   name       = "csb-helper"
   org_name   = var.org_name
@@ -14,25 +18,12 @@ resource "cloudfoundry_app" "helper" {
   memory    = "128M"
 
   environment = {
-    "BROKER_URL" = cloudfoundry_route.csb.url
-    // Can't reference cloudfoundry_route.docproxy.url like above because it creates a cycle,
-    // so manually build the host instead
-    "HOST" = "services.${data.cloudfoundry_domain.docproxy_parent_domain.name}"
+    "BROKER_URL" = "https://${local.csb_route}"
+    "HOST"       = local.helper_route
   }
-}
 
-data "cloudfoundry_domain" "docproxy_parent_domain" {
-  name = var.docproxy_domain
-}
-
-// Route is specific to the documentation feature of the csb-helper.
-resource "cloudfoundry_route" "docproxy" {
-  domain = data.cloudfoundry_domain.docproxy_parent_domain.id
-  space  = data.cloudfoundry_space.brokers.id
-  host   = "services"
-
-  destinations = [{
-    app_id = cloudfoundry_app.helper.id
+  routes = [{
+    route = local.helper_route
   }]
 }
 
@@ -52,12 +43,12 @@ resource "cloudfoundry_service_instance" "docproxy_external_domain" {
   service_plan = data.cloudfoundry_service_plans.external_domain.service_plans[0].id
 
   parameters = jsonencode({
-    domains = ["services.${var.docproxy_domain}"]
+    domains = [local.helper_route]
   })
 }
 
 resource "aws_sns_topic_subscription" "platform_ses_notifications" {
-  endpoint  = "https://${cloudfoundry_route.docproxy.url}/brokerpaks/ses/reputation-alarm"
+  endpoint  = "https://services.${local.helper_route}/brokerpaks/ses/reputation-alarm"
   protocol  = "https"
   topic_arn = var.email_notification_topic_arn
   filter_policy = jsonencode({
