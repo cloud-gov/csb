@@ -51,13 +51,61 @@ arn:aws:sns:us-east-1:123456789012:MyTopic
 Type
 Notification`
 
+// newSignedMessage creates a new signed SNSMessage and an httptest.Server that serves the signing certificate. The TopicARN will be populated with arn. The caller is responsible for calling Close on the test server.
+func newSignedMessage(t *testing.T, arn string) (ses.SNSMessage, *httptest.Server) {
+	// 1. Generate an RSA key pair
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	errNil(t, err)
+
+	// 2. Create a self-signed certificate
+	template := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		NotBefore:    time.Now().Add(-time.Hour),
+		NotAfter:     time.Now().Add(time.Hour),
+		KeyUsage:     x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		Subject:      pkix.Name{CommonName: "Test Cert"},
+	}
+	derBytes, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
+	errNil(t, err)
+
+	// 3. Encode cert to PEM
+	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+
+	// 4. Serve the certificate via httptest.Server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(certPEM)
+	}))
+
+	// 5. Create an SNSMessage to verify
+	testMsg := ses.SNSMessage{
+		Type:             "Notification",
+		MessageId:        "mid",
+		Message:          "Hello",
+		Subject:          "subject",
+		Timestamp:        "2021-01-01T00:00:00Z",
+		TopicArn:         arn,
+		SignatureVersion: "1",
+		SigningCertURL:   ts.URL, // must match domain check below
+	}
+
+	// 6. Hash and sign the known good string-to-sign
+	hashed := sha1.Sum([]byte(stringToSign))
+	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA1, hashed[:])
+	errNil(t, err)
+
+	// 7. Put the signature in base64 form in the message
+	testMsg.Signature = base64.StdEncoding.EncodeToString(signature)
+
+	return testMsg, ts
+}
+
 // TestVerifySNSMessage tests certificate fetching, domain checks, and signature verification.
 func TestVerifySNSMessage(t *testing.T) {
 	t.Run("SignatureVersion not 1 => error", func(t *testing.T) {
 		msg := ses.SNSMessage{
 			SignatureVersion: "2",
 		}
-		err := ses.VerifySNSMessage(msg, "sns.example.com")
+		err := ses.VerifySNSMessage(msg, "sns.example.com", "")
 		errIs(t, err, ses.ErrSNSUnsupportedSignatureVersion)
 	})
 
@@ -65,16 +113,16 @@ func TestVerifySNSMessage(t *testing.T) {
 		msg := ses.SNSMessage{
 			SignatureVersion: "1",
 		}
-		err := ses.VerifySNSMessage(msg, "sns.example.com")
+		err := ses.VerifySNSMessage(msg, "sns.example.com", "")
 		errIs(t, err, ses.ErrSNSMissingSigningCertURL)
 	})
 
-	t.Run("Domain mismatch => error", func(t *testing.T) {
+	t.Run("SigningCertURL domain mismatch => error", func(t *testing.T) {
 		msg := ses.SNSMessage{
 			SignatureVersion: "1",
 			SigningCertURL:   "https://malicious.com/cert.pem",
 		}
-		err := ses.VerifySNSMessage(msg, "sns.example.com")
+		err := ses.VerifySNSMessage(msg, "sns.example.com", "")
 		errIs(t, err, ses.ErrSNSWrongSigningCertDomain)
 	})
 
@@ -84,47 +132,14 @@ func TestVerifySNSMessage(t *testing.T) {
 			SignatureVersion: "1",
 			SigningCertURL:   "http://127.0.0.1:9999/cert.pem",
 		}
-		err := ses.VerifySNSMessage(msg, "127.0.0.1:9999")
+		err := ses.VerifySNSMessage(msg, "127.0.0.1:9999", "")
 		errNotNil(t, err)
 	})
 
-	t.Run("Valid signature => success", func(t *testing.T) {
-		// TODO: Extract this to create the test message and the test server, for reuse with reputation_test.go.
-		// 1. Generate an RSA key pair
-		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-		errNil(t, err)
-
-		// 2. Create a self-signed certificate
-		template := &x509.Certificate{
-			SerialNumber: big.NewInt(1),
-			NotBefore:    time.Now().Add(-time.Hour),
-			NotAfter:     time.Now().Add(time.Hour),
-			KeyUsage:     x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-			Subject:      pkix.Name{CommonName: "Test Cert"},
-		}
-		derBytes, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
-		errNil(t, err)
-
-		// 3. Encode cert to PEM
-		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
-
-		// 4. Serve the certificate via httptest.Server
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(certPEM)
-		}))
+	t.Run("ARN mismatch => error", func(t *testing.T) {
+		arn := "arn:aws:sns:us-east-1:123456789012:MyTopic"
+		msg, ts := newSignedMessage(t, arn)
 		defer ts.Close()
-
-		// 5. Create an SNSMessage to verify
-		testMsg := ses.SNSMessage{
-			Type:             "Notification",
-			MessageId:        "mid",
-			Message:          "Hello",
-			Subject:          "subject",
-			Timestamp:        "2021-01-01T00:00:00Z",
-			TopicArn:         "arn:aws:sns:us-east-1:123456789012:MyTopic",
-			SignatureVersion: "1",
-			SigningCertURL:   ts.URL, // must match domain check below
-		}
 
 		// Extract host+port to make sure the domain check passes
 		u, err := url.Parse(ts.URL)
@@ -133,16 +148,25 @@ func TestVerifySNSMessage(t *testing.T) {
 		}
 		hostPort := u.Host
 
-		// 6. Hash and sign the known good string-to-sign
-		hashed := sha1.Sum([]byte(stringToSign))
-		signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA1, hashed[:])
-		errNil(t, err)
+		err = ses.VerifySNSMessage(msg, hostPort, "bad arn")
+		errIs(t, err, ses.ErrSNSWrongTopicARN)
+	})
 
-		// 7. Put the signature in base64 form in the message
-		testMsg.Signature = base64.StdEncoding.EncodeToString(signature)
+	t.Run("Valid signature and ARN => success", func(t *testing.T) {
+		arn := "arn:aws:sns:us-east-1:123456789012:MyTopic"
 
-		// 8. Confirm the message verifies without error
-		err = ses.VerifySNSMessage(testMsg, hostPort)
+		msg, ts := newSignedMessage(t, arn)
+		defer ts.Close()
+
+		// Extract host+port to make sure the domain check passes
+		u, err := url.Parse(ts.URL)
+		if err != nil {
+			t.Fatal("problem with the test; httptest server URL not valid")
+		}
+		hostPort := u.Host
+
+		// Confirm the message verifies without error
+		err = ses.VerifySNSMessage(msg, hostPort, arn)
 		errNil(t, err)
 	})
 }
@@ -202,6 +226,6 @@ func FuzzVerifySNSMessage(f *testing.F) {
 		}
 
 		// Drop the error, since we're only fuzzing for panics.
-		_ = ses.VerifySNSMessage(msg, "example.com")
+		_ = ses.VerifySNSMessage(msg, "example.com", "")
 	})
 }

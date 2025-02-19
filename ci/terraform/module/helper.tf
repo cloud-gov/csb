@@ -18,8 +18,11 @@ resource "cloudfoundry_app" "helper" {
   memory    = "128M"
 
   environment = {
-    "BROKER_URL" = "https://${local.csb_route}"
-    "HOST"       = local.helper_route
+    "AWS_USE_FIPS_ENDPOINT" = true
+
+    "BROKER_URL"                         = "https://${local.csb_route}"
+    "CG_PLATFORM_NOTIFICATION_TOPIC_ARN" = var.email_notification_topic_arn
+    "HOST"                               = local.helper_route
   }
 
   routes = [{

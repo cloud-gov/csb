@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 )
 
 const (
@@ -21,6 +22,10 @@ const (
 
 type SESClient interface {
 	UpdateConfigurationSetSendingEnabled(context.Context, *ses.UpdateConfigurationSetSendingEnabledInput, ...func(*ses.Options)) (*ses.UpdateConfigurationSetSendingEnabledOutput, error)
+}
+
+type SNSClient interface {
+	ConfirmSubscription(ctx context.Context, params *sns.ConfirmSubscriptionInput, optFns ...func(*sns.Options)) (*sns.ConfirmSubscriptionOutput, error)
 }
 
 type CloudWatchAlarm struct {
@@ -70,8 +75,11 @@ func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
 	return s, nil
 }
 
-func handleSubscriptionConfirmation(msg SNSMessage) error {
-	_, err := http.Get(msg.SubscribeURL)
+func handleSubscriptionConfirmation(ctx context.Context, msg SNSMessage, client SNSClient) error {
+	_, err := client.ConfirmSubscription(ctx, &sns.ConfirmSubscriptionInput{
+		Token:    &msg.Token,
+		TopicArn: &msg.TopicArn,
+	})
 	if err != nil {
 		return err
 	} else {
@@ -104,7 +112,7 @@ func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient
 }
 
 // HandleSNSRequest handles requests from the platform notifications SNS topic subscription.
-func HandleSNSRequest(sesclient SESClient, snsdomain string) http.Handler {
+func HandleSNSRequest(sesclient SESClient, snsclient SNSClient, topicarn string, snsdomain string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer r.Body.Close() // todo, can return an error
@@ -115,7 +123,7 @@ func HandleSNSRequest(sesclient SESClient, snsdomain string) http.Handler {
 				return
 			}
 
-			if err = VerifySNSMessage(msg, snsdomain); err != nil {
+			if err = VerifySNSMessage(msg, snsdomain, topicarn); err != nil {
 				slog.Error("failed to verify SNS message signature", "err", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
@@ -130,7 +138,7 @@ func HandleSNSRequest(sesclient SESClient, snsdomain string) http.Handler {
 			}
 			switch mtype {
 			case snsMessageTypeSubscriptionConfirmation:
-				if err = handleSubscriptionConfirmation(msg); err != nil {
+				if err = handleSubscriptionConfirmation(r.Context(), msg, snsclient); err != nil {
 					slog.Error("error confirming SNS subscription", "err", err)
 					w.WriteHeader(http.StatusInternalServerError)
 					return

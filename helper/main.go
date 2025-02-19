@@ -23,11 +23,11 @@ import (
 //go:embed assets
 var assets embed.FS
 
-func routes(c config.Config, sesclient *ses.Client, snsdomain string) http.Handler {
+func routes(c config.Config, sesclient *ses.Client, snsclient *sns.Client, snsdomain string) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/", docproxy.HandleDocs(c))
 	mux.Handle("/assets/", docproxy.HandleAssets(assets))
-	mux.Handle("/brokerpaks/", brokerpaks.Handle(sesclient, snsdomain))
+	mux.Handle("/brokerpaks/", brokerpaks.Handle(sesclient, snsclient, c.PlatformNotificationsTopicARN, snsdomain))
 
 	// The CSB path /docs is routed to this app by Cloud Foundry, but the Host
 	// header is still the CSB's host. Redirect it.
@@ -53,17 +53,18 @@ func run(ctx context.Context) error {
 	}
 
 	sesclient := ses.NewFromConfig(awscfg)
+	snsclient := sns.NewFromConfig(awscfg)
 
 	snsendpoint, err := sns.NewDefaultEndpointResolverV2().ResolveEndpoint(ctx, sns.EndpointParameters{
 		Region:  aws.String(awscfg.Region),
-		UseFIPS: aws.Bool(true),
+		UseFIPS: aws.Bool(false), // This is used to validate the domain of the SigningCertURL, which will be non-FIPS
 	})
 	if err != nil {
-		slog.Error("failed to resolve SES endpoint")
+		slog.Error("failed to resolve SNS endpoint")
 	}
-	slog.Info("resolved SES endpoint", "endpoint", fmt.Sprintf("%+v", snsendpoint))
+	slog.Info("resolved SNS endpoint", "endpoint", fmt.Sprintf("%+v", snsendpoint))
 
-	mux := routes(config, sesclient, snsendpoint.URI.Host)
+	mux := routes(config, sesclient, snsclient, snsendpoint.URI.Host)
 	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
 	slog.Info("Starting server...")
 	return http.ListenAndServe(addr, mux)
