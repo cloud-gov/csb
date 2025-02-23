@@ -141,3 +141,12 @@ variable "helper_instances" {
   type        = number
   description = "Number of instances of the helper app to run."
 }
+
+variable "helper_aws_access_key_id" {
+  type = string
+}
+
+variable "helper_aws_secret_access_key" {
+  type      = string
+  sensitive = true
+}

@@ -22,6 +22,9 @@ module "csb" {
   aws_secret_access_key_commercial = data.terraform_remote_state.external.outputs.csb.broker_user.secret_access_key_curr
   aws_region_commercial            = var.csb_aws_region_commercial
 
+  helper_aws_access_key_id     = data.terraform_remote_state.iaas.outputs.csb.iam.csb_helper.access_key_id_curr
+  helper_aws_secret_access_key = data.terraform_remote_state.iaas.outputs.csb.iam.csb_helper.secret_access_key_curr
+
   email_notification_topic_arn = data.terraform_remote_state.iaas.outputs.csb.notification_topics.email_notification_topic_arn
   slack_notification_topic_arn = data.terraform_remote_state.iaas.outputs.csb.notification_topics.slack_notification_topic_arn
 

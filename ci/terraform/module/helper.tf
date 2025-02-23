@@ -19,6 +19,9 @@ resource "cloudfoundry_app" "helper" {
 
   environment = {
     "AWS_USE_FIPS_ENDPOINT" = true
+    "AWS_DEFAULT_REGION"    = var.aws_region_govcloud
+    "AWS_ACCESS_KEY_ID"     = var.helper_aws_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.helper_aws_secret_access_key
 
     "BROKER_URL"                         = "https://${local.csb_route}"
     "CG_PLATFORM_NOTIFICATION_TOPIC_ARN" = var.email_notification_topic_arn
