@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -49,6 +50,7 @@ type SNSMessage struct {
 //
 // [AWS documentation]: https://docs.aws.amazon.com/sns/latest/dg/sns-verify-signature-of-message-verify-message-signature.html
 func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
+	slog.Info(fmt.Sprintf("Verifying signature of message: %+v", msg))
 	if msg.SignatureVersion != "1" {
 		return ErrSNSUnsupportedSignatureVersion
 	}
@@ -100,11 +102,13 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 
 	// Build the string-to-sign depending on the message type
 	stringToSign := buildStringToSign(msg)
+	slog.Info(fmt.Sprintf("Built string to sign: %v", stringToSign))
 
-	// Verify the signature using SHA-256
+	// Verify the signature using SHA-1
 	hashed := sha1.Sum([]byte(stringToSign))
+	slog.Info(fmt.Sprintf("Got signature %v", hashed))
 	if err := rsa.VerifyPKCS1v15(pubKey, crypto.Hash(x509.SHA1WithRSA), hashed[:], signature); err != nil {
-		return ErrSNSSignatureVerification
+		return fmt.Errorf("%w: %w", ErrSNSSignatureVerification, err)
 	}
 
 	// The message is authentically from SNS. Check if it's for the expected topic.
