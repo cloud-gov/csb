@@ -1,9 +1,6 @@
 package ses
 
 import (
-	"crypto"
-	"crypto/rsa"
-	"crypto/sha1"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
@@ -30,17 +27,17 @@ var (
 // SNSMessage represents the fields from an SNS JSON message.
 // Message formats are described here: https://docs.aws.amazon.com/sns/latest/dg/sns-message-and-json-formats.html
 type SNSMessage struct {
-	Type             string
-	MessageId        string
-	Token            string
-	Subject          string
 	Message          string
+	MessageId        string
+	Signature        string
+	SignatureVersion string
+	SigningCertURL   string
+	Subject          string
 	SubscribeURL     string
 	Timestamp        string
-	Signature        string
-	SigningCertURL   string
-	SignatureVersion string
+	Token            string
 	TopicArn         string
+	Type             string
 }
 
 // VerifySNSMessage fetches the certificate from SigningCertURL, builds the "string to sign",
@@ -89,10 +86,6 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 	if err != nil {
 		return err
 	}
-	pubKey, ok := cert.PublicKey.(*rsa.PublicKey)
-	if !ok {
-		return ErrSNSPublicKeyRSA
-	}
 
 	// Decode the SNS signature
 	signature, err := base64.StdEncoding.DecodeString(msg.Signature)
@@ -100,15 +93,10 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 		return err
 	}
 
-	// Build the string-to-sign depending on the message type
-	stringToSign := buildStringToSign(msg)
-	slog.Info(fmt.Sprintf("Built string to sign: %v", stringToSign))
-
-	// Verify the signature using SHA-1
-	hashed := sha1.Sum([]byte(stringToSign))
-	slog.Info(fmt.Sprintf("Got signature %v", hashed))
-	if err := rsa.VerifyPKCS1v15(pubKey, crypto.Hash(x509.SHA1WithRSA), hashed[:], signature); err != nil {
-		return fmt.Errorf("%w: %w", ErrSNSSignatureVerification, err)
+	// Check the decoded signature
+	err = cert.CheckSignature(x509.SHA1WithRSA, []byte(buildStringToSign(msg)), signature)
+	if err != nil {
+		return ErrSNSSignatureVerification
 	}
 
 	// The message is authentically from SNS. Check if it's for the expected topic.
