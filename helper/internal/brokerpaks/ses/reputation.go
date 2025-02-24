@@ -62,6 +62,7 @@ func (a *CloudWatchAlarm) Valid() map[string]string {
 func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
 	var s SNSMessage
 	b, err := io.ReadAll(body)
+	slog.Info(string(b))
 	if err != nil {
 		return s, fmt.Errorf("reading SNS request body: %w", err)
 	}

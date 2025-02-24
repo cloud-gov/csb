@@ -93,10 +93,12 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 		return err
 	}
 
+	toSign := buildStringToSign(msg)
+	slog.Info(fmt.Sprintf("string to sign: \n%v", toSign))
 	// Check the decoded signature
-	err = cert.CheckSignature(x509.SHA1WithRSA, []byte(buildStringToSign(msg)), signature)
+	err = cert.CheckSignature(x509.SHA1WithRSA, []byte(toSign), signature)
 	if err != nil {
-		return ErrSNSSignatureVerification
+		return fmt.Errorf("%w: %w", ErrSNSSignatureVerification, err)
 	}
 
 	// The message is authentically from SNS. Check if it's for the expected topic.
