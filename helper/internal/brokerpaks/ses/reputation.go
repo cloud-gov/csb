@@ -62,7 +62,6 @@ func (a *CloudWatchAlarm) Valid() map[string]string {
 func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
 	var s SNSMessage
 	b, err := io.ReadAll(body)
-	slog.Info(string(b))
 	if err != nil {
 		return s, fmt.Errorf("reading SNS request body: %w", err)
 	}
@@ -76,7 +75,7 @@ func UnmarshalMessage(body io.Reader) (SNSMessage, error) {
 	return s, nil
 }
 
-func handleSubscriptionConfirmation(ctx context.Context, msg SNSMessage, client SNSClient) error {
+func handleSubscriptionConfirmation(ctx context.Context, logger *slog.Logger, msg SNSMessage, client SNSClient) error {
 	_, err := client.ConfirmSubscription(ctx, &sns.ConfirmSubscriptionInput{
 		Token:    &msg.Token,
 		TopicArn: &msg.TopicArn,
@@ -84,12 +83,12 @@ func handleSubscriptionConfirmation(ctx context.Context, msg SNSMessage, client 
 	if err != nil {
 		return err
 	} else {
-		slog.Info("confirmed subscription to SNS topic", "topic", msg.TopicArn)
+		logger.Info("confirmed subscription to SNS topic", "topic", msg.TopicArn)
 		return nil
 	}
 }
 
-func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient) error {
+func handleNotification(ctx context.Context, logger *slog.Logger, msg SNSMessage, sesclient SESClient) error {
 	var a CloudWatchAlarm
 	err := json.Unmarshal([]byte(msg.Message), &a)
 	if err != nil {
@@ -101,7 +100,7 @@ func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient
 	}
 
 	cset := a.Trigger.Dimensions[0].Value
-	slog.Info("pausing sending on SES identity via Configuration Set", "configuration-set", cset)
+	logger.Info("pausing sending on SES identity via Configuration Set", "configuration-set", cset)
 	_, err = sesclient.UpdateConfigurationSetSendingEnabled(ctx, &ses.UpdateConfigurationSetSendingEnabledInput{
 		ConfigurationSetName: aws.String(cset),
 		Enabled:              false,
@@ -113,19 +112,19 @@ func handleNotification(ctx context.Context, msg SNSMessage, sesclient SESClient
 }
 
 // HandleSNSRequest handles requests from the platform notifications SNS topic subscription.
-func HandleSNSRequest(sesclient SESClient, snsclient SNSClient, topicarn string, snsdomain string) http.Handler {
+func HandleSNSRequest(logger *slog.Logger, sesclient SESClient, snsclient SNSClient, topicarn string, snsdomain string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer r.Body.Close() // todo, can return an error
 			msg, err := UnmarshalMessage(r.Body)
 			if err != nil {
-				slog.Error("error processing CloudWatch alarm SNS request", "err", err)
+				logger.Error("error processing CloudWatch alarm SNS request", "err", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 
 			if err = VerifySNSMessage(msg, snsdomain, topicarn); err != nil {
-				slog.Error("failed to verify SNS message signature", "err", err)
+				logger.Error("failed to verify SNS message signature", "err", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -133,20 +132,20 @@ func HandleSNSRequest(sesclient SESClient, snsclient SNSClient, topicarn string,
 			// once verified, switch on request type
 			mtype := r.Header.Get(snsMessageTypeHeader)
 			if mtype == "" {
-				slog.Error("SNS message passed verification but type header was empty -- this should never happen")
+				logger.Error("SNS message passed verification but type header was empty -- this should never happen")
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			switch mtype {
 			case snsMessageTypeSubscriptionConfirmation:
-				if err = handleSubscriptionConfirmation(r.Context(), msg, snsclient); err != nil {
-					slog.Error("error confirming SNS subscription", "err", err)
+				if err = handleSubscriptionConfirmation(r.Context(), logger, msg, snsclient); err != nil {
+					logger.Error("error confirming SNS subscription", "err", err)
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
 			case snsMessageTypeNotification:
-				if err = handleNotification(r.Context(), msg, sesclient); err != nil {
-					slog.Error("error handling SNS notification", "err", err)
+				if err = handleNotification(r.Context(), logger, msg, sesclient); err != nil {
+					logger.Error("error handling SNS notification", "err", err)
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}

@@ -13,13 +13,13 @@ import (
 	"github.com/cloud-gov/csb/helper/internal/config"
 )
 
-func serveAsset(w http.ResponseWriter, path string, assets embed.FS) {
+func serveAsset(logger *slog.Logger, w http.ResponseWriter, path string, assets embed.FS) {
 	errBody := "An error in Cloud.gov occurred while serving this asset."
 
 	asset, err := assets.ReadFile(path)
 	if err != nil {
 		http.Error(w, errBody, http.StatusInternalServerError)
-		slog.Error("failed to read asset from embedded fs", "path", path, "err", err)
+		logger.Error("failed to read asset from embedded fs", "path", path, "err", err)
 		return
 	}
 
@@ -35,7 +35,7 @@ func serveAsset(w http.ResponseWriter, path string, assets embed.FS) {
 	case ".css":
 		contentType = "text/css; charset=utf-8"
 	default:
-		slog.Error("tried serving asset with unknown file extension, and therefore no mapped content-type", "path", path)
+		logger.Error("tried serving asset with unknown file extension, and therefore no mapped content-type", "path", path)
 		http.Error(w, errBody, http.StatusInternalServerError)
 		return
 	}
@@ -44,11 +44,11 @@ func serveAsset(w http.ResponseWriter, path string, assets embed.FS) {
 	w.Write(asset)
 }
 
-func HandleAssets(assets embed.FS) http.Handler {
+func HandleAssets(logger *slog.Logger, assets embed.FS) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			fpath := strings.Join(strings.Split(r.URL.Path, "/")[1:], "/")
-			serveAsset(w, fpath, assets)
+			serveAsset(logger, w, fpath, assets)
 		},
 	)
 }
@@ -171,18 +171,18 @@ func modifyDocument(n *html.Node) {
 	})
 }
 
-func HandleDocs(c config.Config) http.Handler {
+func HandleDocs(logger *slog.Logger, c config.Config) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			resp, err := http.Get(c.BrokerURL.String())
 			if err != nil {
-				slog.Error("Getting CSB site", "error", err)
+				logger.Error("Getting CSB site", "error", err)
 				w.WriteHeader(http.StatusBadGateway)
 			}
 			defer resp.Body.Close() // todo can return error
 			doc, err := html.Parse(resp.Body)
 			if err != nil {
-				slog.Error("Parsing CSB response body", "error", err)
+				logger.Error("Parsing CSB response body", "error", err)
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 
@@ -190,7 +190,7 @@ func HandleDocs(c config.Config) http.Handler {
 
 			err = html.Render(w, doc)
 			if err != nil {
-				slog.Error("Rendering HTML", "error", err)
+				logger.Error("Rendering HTML", "error", err)
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 		},

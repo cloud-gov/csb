@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -23,11 +24,11 @@ import (
 //go:embed assets
 var assets embed.FS
 
-func routes(c config.Config, sesclient *ses.Client, snsclient *sns.Client, snsdomain string) http.Handler {
+func routes(c config.Config, logger *slog.Logger, sesclient *ses.Client, snsclient *sns.Client, snsdomain string) http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/", docproxy.HandleDocs(c))
-	mux.Handle("/assets/", docproxy.HandleAssets(assets))
-	mux.Handle("/brokerpaks/", brokerpaks.Handle(sesclient, snsclient, c.PlatformNotificationsTopicARN, snsdomain))
+	mux.Handle("/", docproxy.HandleDocs(logger, c))
+	mux.Handle("/assets/", docproxy.HandleAssets(logger, assets))
+	mux.Handle("/brokerpaks/", brokerpaks.Handle(logger, sesclient, snsclient, c.PlatformNotificationsTopicARN, snsdomain))
 
 	// The CSB path /docs is routed to this app by Cloud Foundry, but the Host
 	// header is still the CSB's host. Redirect it.
@@ -37,11 +38,13 @@ func routes(c config.Config, sesclient *ses.Client, snsclient *sns.Client, snsdo
 // run sets up dependencies, calls route registration, and starts the server.
 // It is separate from main so it can return errors conventionally and main
 // can handle them all in one place.
-func run(ctx context.Context) error {
+func run(ctx context.Context, out io.Writer) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	slog.SetLogLoggerLevel(slog.LevelInfo)
+	logger := slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
 	config, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("loading CSB Helper config: %w", err)
@@ -64,7 +67,7 @@ func run(ctx context.Context) error {
 	}
 	slog.Info("resolved SNS endpoint", "endpoint", fmt.Sprintf("%+v", snsendpoint))
 
-	mux := routes(config, sesclient, snsclient, snsendpoint.URI.Host)
+	mux := routes(config, logger, sesclient, snsclient, snsendpoint.URI.Host)
 	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
 	slog.Info("Starting server...")
 	return http.ListenAndServe(addr, mux)
@@ -72,7 +75,7 @@ func run(ctx context.Context) error {
 
 func main() {
 	ctx := context.Background()
-	err := run(ctx)
+	err := run(ctx, os.Stdout)
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

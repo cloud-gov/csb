@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -261,7 +262,7 @@ func TestHandleSNSRequest(t *testing.T) {
 		}
 		req.Header.Add("x-amz-sns-message-type", "SubscriptionConfirmation")
 
-		ses.HandleSNSRequest(&sesclient, &snsclient, arn, hostPort).ServeHTTP(rec, req)
+		ses.HandleSNSRequest(slog.Default(), &sesclient, &snsclient, arn, hostPort).ServeHTTP(rec, req)
 		if code := rec.Result().StatusCode; code != http.StatusOK {
 			t.Fatalf("expected HTTP status %v, got %v", http.StatusOK, code)
 		}

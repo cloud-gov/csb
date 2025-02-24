@@ -49,7 +49,8 @@ Timestamp
 TopicArn
 arn:aws:sns:us-east-1:123456789012:MyTopic
 Type
-Notification`
+Notification
+`
 
 // newSignedMessage creates a new signed SNSMessage and an httptest.Server that serves the signing certificate. The TopicARN will be populated with arn. The caller is responsible for calling Close on the test server.
 func newSignedMessage(t *testing.T, arn string) (ses.SNSMessage, *httptest.Server) {
