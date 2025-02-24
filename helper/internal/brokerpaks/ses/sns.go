@@ -47,7 +47,6 @@ type SNSMessage struct {
 //
 // [AWS documentation]: https://docs.aws.amazon.com/sns/latest/dg/sns-verify-signature-of-message-verify-message-signature.html
 func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
-	slog.Info(fmt.Sprintf("Verifying signature of message: %+v", msg))
 	if msg.SignatureVersion != "1" {
 		return ErrSNSUnsupportedSignatureVersion
 	}
@@ -94,7 +93,7 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 	}
 
 	toSign := buildStringToSign(msg)
-	slog.Info(fmt.Sprintf("string to sign: \n%v", toSign))
+
 	// Check the decoded signature
 	err = cert.CheckSignature(x509.SHA1WithRSA, []byte(toSign), signature)
 	if err != nil {
@@ -111,6 +110,7 @@ func VerifySNSMessage(msg SNSMessage, snsdomain string, arn string) error {
 
 // buildStringToSign constructs the correct string to sign based on the message type.
 // AWS docs: https://docs.aws.amazon.com/sns/latest/dg/sns-verify-signature-of-message-verify-message-signature.html
+// Note that the above docs are NOT entirely correct: In practice, you must add a trailing newline, or verification will fail. Also, the parent page is not correct: As of this commit, there are no functions to help with signature validation in the SDK.
 func buildStringToSign(msg SNSMessage) string {
 	// Notification
 	if msg.Type == "Notification" {
@@ -129,6 +129,7 @@ func buildStringToSign(msg SNSMessage) string {
 		sb.WriteString(msg.TopicArn)
 		sb.WriteString("\nType\n")
 		sb.WriteString(msg.Type)
+		sb.WriteString("\n")
 		return sb.String()
 	}
 
@@ -149,6 +150,7 @@ func buildStringToSign(msg SNSMessage) string {
 		sb.WriteString(msg.TopicArn)
 		sb.WriteString("\nType\n")
 		sb.WriteString(msg.Type)
+		sb.WriteString("\n")
 		return sb.String()
 	}
 
