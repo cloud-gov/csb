@@ -65,11 +65,11 @@ func run(ctx context.Context, out io.Writer) error {
 	if err != nil {
 		slog.Error("failed to resolve SNS endpoint")
 	}
-	slog.Info("resolved SNS endpoint", "endpoint", fmt.Sprintf("%+v", snsendpoint))
+	logger.Info(fmt.Sprintf("resolved SNS endpoint %v", snsendpoint.URI))
 
 	mux := routes(config, logger, sesclient, snsclient, snsendpoint.URI.Host)
 	addr := fmt.Sprintf("%v:%v", config.ListenAddr, config.Port)
-	slog.Info("Starting server...")
+	logger.Info("Starting server...")
 	return http.ListenAndServe(addr, mux)
 }
 
