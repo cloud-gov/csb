@@ -39,10 +39,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
   - CF space name: ${local.space_name}
   EOT
 
-  dimensions = {
-    "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
-  }
-
   metric_query {
     id = "m1"
     metric {
@@ -50,6 +46,9 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
       namespace   = "AWS/SES"
       period      = 300
       stat        = "Average"
+      dimensions = {
+        "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
+      }
     }
     return_data = false
   }
@@ -86,10 +85,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
   - CF space name: ${local.space_name}
   EOT
 
-  dimensions = {
-    "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
-  }
-
   metric_query {
     id = "m1"
     metric {
@@ -97,6 +92,9 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
       namespace   = "AWS/SES"
       period      = 300
       stat        = "Average"
+      dimensions = {
+        "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
+      }
     }
     return_data = false
   }
@@ -140,10 +138,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
   - CF space name: ${local.space_name}
   EOT
 
-  dimensions = {
-    "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
-  }
-
   metric_query {
     id = "m1"
     metric {
@@ -151,6 +145,9 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
       namespace   = "AWS/SES"
       period      = 300
       stat        = "Average"
+      dimensions = {
+        "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
+      }
     }
     return_data = false
   }
@@ -187,10 +184,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
   - CF space name: ${local.space_name}
   EOT
 
-  dimensions = {
-    "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
-  }
-
   metric_query {
     id = "m1"
     metric {
@@ -198,6 +191,9 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
       namespace   = "AWS/SES"
       period      = 300
       stat        = "Average"
+      dimensions = {
+        "ConfigurationSetName" = aws_sesv2_configuration_set.config.configuration_set_name
+      }
     }
     return_data = false
   }
