@@ -27,9 +27,12 @@ https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reput
 
 # 5% * 40% = 2%. 5% * 80% = 4%.
 resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
-  alarm_name        = "SES-BounceRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "SES-BounceRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
-  Warning: The bounce rate for this SES identity has exceeded 2%. To protect our organizational reputation metrics, at 4%, Cloud.gov will pause your ability to send mail from this identity. For information about specific email bounces, check this identity's bounce notification topic. (Create one by updating the service instance if you have not already.) See https://services.cloud.gov for more information about the SES service offering, and see AWS documentation for more information about reputation metrics: https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reputationdashboard-bounce. You can reach Cloud.gov support at support@cloud.gov.
+  Warning: The bounce rate for this SES identity has exceeded 2%. To protect our organizational reputation metrics, at 4%, Cloud.gov will pause your ability to send mail from this identity.
+
+  For more information, see: https://cloud.gov/docs/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
   - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
   - CF service instance GUID: ${var.instance_id}
@@ -73,9 +76,12 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
-  alarm_name        = "SES-BounceRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "SES-BounceRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
-  Critical: The bounce rate for this SES identity has exceeded 4%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity. For information about specific email bounces, check this identity's bounce notification topic. (Create one by updating the service instance if you have not already.) See https://services.cloud.gov for more information about the SES service offering, and see AWS documentation for more information about reputation metrics: https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reputationdashboard-bounce. You can reach Cloud.gov support at support@cloud.gov.
+  Critical: The bounce rate for this SES identity has exceeded 4%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity.
+
+  For more information, see: https://cloud.gov/docs/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
   - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
   - CF service instance GUID: ${var.instance_id}
@@ -126,9 +132,12 @@ https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reput
 
 # 0.1% * 40% = 0.04%. 0.01% * 80% = 0.08%.
 resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
-  alarm_name        = "SES-ComplaintRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "SES-ComplaintRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
-  Warning: The complaint rate for this SES identity has exceeded 0.04%. To protect our organizational reputation metrics, at 0.08%, Cloud.gov will pause your ability to send mail from this identity. For information about specific email complaints, check this identity's complaint notification topic. (Create one by updating the service instance if you have not already.) See https://services.cloud.gov for more information about the SES service offering, and see AWS documentation for more information about reputation metrics: https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reputationdashboard-complaint. You can reach Cloud.gov support at support@cloud.gov.
+  Warning: The complaint rate for this SES identity has exceeded 0.04%. To protect our organizational reputation metrics, at 0.08%, Cloud.gov will pause your ability to send mail from this identity.
+
+  For more information, see: https://cloud.gov/docs/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
   - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
   - CF service instance GUID: ${var.instance_id}
@@ -172,9 +181,12 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
-  alarm_name        = "SES-ComplaintRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "SES-ComplaintRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
-  Critical: The complaint rate for this SES identity has exceeded 0.08%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity. For information about specific email complaints, check this identity's complaint notification topic. (Create one by updating the service instance if you have not already.) See https://services.cloud.gov for more information about the SES service offering, and see AWS documentation for more information about reputation metrics: https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reputationdashboard-complaint. You can reach Cloud.gov support at support@cloud.gov.
+  Critical: The complaint rate for this SES identity has exceeded 0.08%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity.
+
+  For more information, see: https://cloud.gov/docs/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
   - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
   - CF service instance GUID: ${var.instance_id}
