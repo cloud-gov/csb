@@ -19,6 +19,7 @@ provision:
     - field_name: domain
       type: string
       required: false
+      default: ""
       prohibit_update: true
       details: Domain from which mail will be sent. For example, `agency.gov`. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
@@ -36,6 +37,7 @@ provision:
     - field_name: mail_from_subdomain
       type: string
       required: false
+      default: ""
       details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
   computed_inputs:
     - name: aws_access_key_id_govcloud

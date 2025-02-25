@@ -29,7 +29,6 @@ variable "aws_region_commercial" {
 variable "domain" {
   type        = string
   description = "Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated."
-  default     = ""
 }
 
 variable "default_domain" {
@@ -39,7 +38,6 @@ variable "default_domain" {
 
 variable "instance_id" {
   type        = string
-  default     = ""
   description = "The identifier for the instance, which together with the Plan ID and Service ID is unique. When CAPI sends the provision request, this is a GUID."
 }
 
@@ -54,20 +52,17 @@ variable "dmarc_report_uri_failure" {
 }
 
 variable "labels" {
-  type    = map(any)
-  default = {}
+  type = map(any)
 }
 
 variable "enable_feedback_notifications" {
   type        = bool
   description = "Toggle whether to create SNS topics for feedback notifications"
-  default     = false
 }
 
 variable "mail_from_subdomain" {
   type        = string
-  description = "Subdomain to set as the mail-from value"
-  default     = ""
+  description = "Subdomain to set as the mail-from value."
 }
 
 variable "context" {
