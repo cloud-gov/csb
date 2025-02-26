@@ -27,7 +27,7 @@ output "domain_arn" {
 }
 
 output "reputation_topic_arn" {
-  value = aws_sns_topic.ses_reputation_notifications
+  value = aws_sns_topic.ses_reputation_notifications.arn
 }
 
 output "bounce_topic_arn" {
