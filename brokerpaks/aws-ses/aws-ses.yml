@@ -167,6 +167,10 @@ bind:
       default: csb-${instance.name}-${request.binding_id}
       overwrite: true
       type: string
+    - name: binding_id
+      default: ${request.binding_id}
+      overwrite: true
+      type: string
     - name: instance_id
       type: string
       default: ${request.instance_id}

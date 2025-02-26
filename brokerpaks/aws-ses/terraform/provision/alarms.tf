@@ -1,6 +1,6 @@
 # Create SNS topic for reputation alarms. Always create, regardless of var.enable_feedback_notifications.
 resource "aws_sns_topic" "ses_reputation_notifications" {
-  name = "${var.instance_id}-ses-reputation-notifications"
+  name = "${local.base_name}-reputation-notifications"
 
   # Use an AWS-managed key for topic encryption.
   kms_master_key_id = "alias/aws/sns"
@@ -27,7 +27,7 @@ https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reput
 
 # 5% * 40% = 2%. 5% * 80% = 4%.
 resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
-  alarm_name = "SES-BounceRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "${local.base_name}-BounceRate-Warning"
   # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
   Warning: The bounce rate for this SES identity has exceeded 2%. To protect our organizational reputation metrics, at 4%, Cloud.gov will pause your ability to send mail from this identity.
@@ -76,7 +76,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
-  alarm_name = "SES-BounceRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "${local.base_name}-BounceRate-Critical"
   # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
   Critical: The bounce rate for this SES identity has exceeded 4%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity.
@@ -132,7 +132,7 @@ https://docs.aws.amazon.com/ses/latest/dg/reputationdashboardmessages.html#reput
 
 # 0.1% * 40% = 0.04%. 0.01% * 80% = 0.08%.
 resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
-  alarm_name = "SES-ComplaintRate-Warning-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "${local.base_name}-ComplaintRate-Warning"
   # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
   Warning: The complaint rate for this SES identity has exceeded 0.04%. To protect our organizational reputation metrics, at 0.08%, Cloud.gov will pause your ability to send mail from this identity.
@@ -181,7 +181,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
-  alarm_name = "SES-ComplaintRate-Critical-Identity-${aws_sesv2_email_identity.identity.email_identity}"
+  alarm_name = "${local.base_name}-ComplaintRate-Critical"
   # Note that alarm_description must be <=1024 chars
   alarm_description = <<EOT
   Critical: The complaint rate for this SES identity has exceeded 0.08%. To protect our organizational reputation metrics, Cloud.gov will pause your ability to send mail from this identity.

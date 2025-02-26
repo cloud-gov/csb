@@ -1,9 +1,12 @@
 locals {
   instance_sha = "ses-${substr(sha256(var.instance_id), 0, 16)}"
+  # Base name for all resources produced by a single instance of this service.
+  base_name = "csb-aws-ses-${var.instance_id}"
 
   # If no domain was provided, we create and manage one instead.
   manage_domain = (var.domain == "")
-  domain        = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
+  # Domain is exposed to the outside world, so avoid exposing the instance_id by using its SHA in the domain instead
+  domain = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
 
   // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
   dmarc_rua = join(",", ["mailto:reports@dmarc.cyber.dhs.gov", var.dmarc_report_uri_aggregate])
@@ -112,7 +115,7 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
 }
 
 resource "aws_sesv2_configuration_set" "config" {
-  configuration_set_name = "${var.instance_id}-config"
+  configuration_set_name = local.base_name
 
   delivery_options {
     tls_policy = "REQUIRE"
