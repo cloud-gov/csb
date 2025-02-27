@@ -1,0 +1,35 @@
+# Copyright 2025 Pivotal Software, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+dependencies:
+    - name: terraform-provider-azurerm
+      version: 3.117.0
+      source: https://github.com/terraform-providers/terraform-provider-azurerm/archive/v3.117.0.zip
+      source_sha256: 7aa695abc62728c6ff9ff449f42c4a9f89d71b7d26616c90ebb896f00a038dc2
+    - name: terraform-provider-csbpg
+      version: 1.2.49
+      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.49.zip
+      source_sha256: 3f2fe1b571b68add69231d35ebc88e5a446bf9f03e9980f55b6d8eeecdc2777d
+    - name: terraform-provider-csbsqlserver
+      version: 1.0.41
+      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.41.zip
+      source_sha256: 0c37b29b06042caf42c0e384c900dc81126572cecbaf6dfbf18111fda717422f
+    - name: terraform-provider-random
+      version: 3.6.3
+      source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.3.zip
+      source_sha256: 073025c3b7a2d64d60523da8b5ea29c42ffc0da752377ac5e74c8a9a4c4bb71e
+    - name: tofu
+      version: 1.9.0
+      source: https://github.com/opentofu/opentofu/archive/v1.9.0.zip
+      source_sha256: 166a6cb6638247dc5419c479a3093cdf6b7cea0ba6a6b10471ede171e800bb7d
