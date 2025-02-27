@@ -50,6 +50,12 @@ resource "cloudfoundry_app" "csb" {
     AWS_SECRET_ACCESS_KEY_COMMERCIAL = var.aws_secret_access_key_commercial
     AWS_REGION_COMMERCIAL            = var.aws_region_commercial
 
+    # Credentials for Azure access
+    ARM_SUBSCRIPTION_ID = var.az_subscription_id
+    ARM_TENANT_ID       = var.az_tenant_id
+    ARM_CLIENT_ID       = var.az_client_id
+    ARM_CLIENT_SECRET   = var.az_client_secret
+
     # Other values that are used by convention by all brokerpaks
     CLOUD_GOV_ENVIRONMENT                  = var.stack_name
     CLOUD_GOV_EMAIL_NOTIFICATION_TOPIC_ARN = var.email_notification_topic_arn

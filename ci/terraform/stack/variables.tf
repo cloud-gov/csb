@@ -81,3 +81,20 @@ variable "csb_helper_instances" {
   type    = number
   default = 1
 }
+
+variable "az_subscription_id" {
+  type = string
+
+}
+variable "az_tenant_id" {
+  type = string
+
+}
+variable "az_client_id" {
+  type = string
+
+}
+variable "az_client_secret" {
+  type      = string
+  sensitive = true
+}

@@ -50,6 +50,10 @@ jobs:
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
+          TF_VAR_az_subscription_id: ((az-subscription-id))
+          TF_VAR_az_tenant_id: ((az-tenant-id))
+          TF_VAR_az_client_id: ((az-client-id))
+          TF_VAR_az_client_secret: ((az-client-secret))
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.dev.us-gov-west-1.aws-us-gov.cloud.gov

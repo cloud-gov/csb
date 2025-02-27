@@ -150,3 +150,20 @@ variable "helper_aws_secret_access_key" {
   type      = string
   sensitive = true
 }
+
+variable "az_subscription_id" {
+  type = string
+
+}
+variable "az_tenant_id" {
+  type = string
+
+}
+variable "az_client_id" {
+  type = string
+
+}
+variable "az_client_secret" {
+  type      = string
+  sensitive = true
+}

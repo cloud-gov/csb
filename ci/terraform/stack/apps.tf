@@ -38,4 +38,9 @@ module "csb" {
   helper_instances            = var.csb_helper_instances
   helper_docker_image_name    = var.csb_helper_docker_image_name
   helper_docker_image_version = var.csb_helper_docker_image_version
+
+  az_subscription_id = var.az_subscription_id
+  az_tenant_id       = var.az_tenant_id
+  az_client_id       = var.az_client_id
+  az_client_secret   = var.az_client_secret
 }
