@@ -1,7 +1,7 @@
 module "csb" {
   source = "../module"
 
-  count = var.stack_name == "development" ? 1 : 0
+  count = var.stack_name == "production" ? 0 : 1
 
   stack_name = var.stack_name
 
