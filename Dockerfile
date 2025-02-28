@@ -14,13 +14,14 @@ ARG BUILD_ENV=development
 # `cp $(brew --prefix)/etc/ca-certificates/cert.pem ./zscaler.crt`.
 # See: https://help.zscaler.com/zia/adding-custom-certificate-application-specific-trust-store
 RUN set -e; if [ "$BUILD_ENV" = "production" ] ; then echo "production env"; else echo \
-"non-production env: $BUILD_ENV"; CERT_DIR=$(openssl version -d | cut -f2 -d \")/certs ; \
-cp /app/zscaler.crt $CERT_DIR ; update-ca-certificates ; \
-fi
+	"non-production env: $BUILD_ENV"; CERT_DIR=$(openssl version -d | cut -f2 -d \")/certs ; \
+	cp /app/zscaler.crt $CERT_DIR ; update-ca-certificates ; \
+	fi
 
 RUN /app/csb pak build brokerpaks/aws-ses
+RUN /app/csb pak build brokerpaks/tts-brokerpak-azure
 
 FROM ${base_image}
 
 # Copy brokerpaks to final image
-COPY --from=build /app/aws-ses-0.1.0.brokerpak /app/
+COPY --from=build /app/*.brokerpak /app/

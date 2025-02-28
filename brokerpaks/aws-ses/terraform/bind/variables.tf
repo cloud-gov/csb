@@ -17,6 +17,10 @@ variable "user_name" {
   type = string
 }
 
+variable "binding_id" {
+  type = string
+}
+
 variable "instance_id" {
   type        = string
   description = "The identifier for the instance, which together with the Plan ID and Service ID is unique. When CAPI sends the provision request, this is a GUID."

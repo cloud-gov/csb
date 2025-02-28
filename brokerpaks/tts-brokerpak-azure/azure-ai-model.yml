@@ -1,0 +1,123 @@
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+version: 1
+name: csb-azure-ai-model
+id: 2b89aa85-00c8-4507-a74b-c8f7ce95bf27
+description: Manage Azure AI Models
+display_name: Azure AI Model
+image_url: file://service-images/csb.png
+documentation_url: https://docs.microsoft.com/en-us/azure/cognitive-services/
+support_url: https://support.microsoft.com/en-us/azure
+tags: [azure, ai, model, preview]
+plan_updateable: true
+plans:
+  - name: basic
+    id: d9575f01-1d5b-4196-bea8-e0d59b6ccfd9
+    description: "Basic plan for Azure AI Model"
+    display_name: "Basic"
+    properties:
+      model_name: "default-model"
+      model_version: "latest"
+provision:
+  plan_inputs:
+  user_inputs:
+    - field_name: location
+      type: string
+      default: eastus
+      details: The region to create the service in
+      constraints:
+        pattern: "^[a-zA-Z0-9-]+$"
+    - field_name: model_name
+      type: string
+      details: The name of the AI model. Valid options are `o1-preview`, `o1-mini`, `gpt-4o`, `gpt-4o-mini`. The full list of models that are supported by Azure (but not necessarily supported yet by this brokerpak) is found in the [Azure Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models).
+      required: true
+    - field_name: model_version
+      type: string
+      default: latest
+      details: |
+        The version of the AI model. Valid versions for each model are:
+
+        - `o1-preview`: `2024-09-12`
+        - `o1-mini`: `2024-09-12`
+        - `gpt-4o`: `2024-11-20`, `2024-08-06`, `2024-05-13`
+        - `gpt-4o-mini`: `2024-07-18`
+  computed_inputs:
+    - name: labels
+      default: ${json.marshal(request.default_labels)}
+      overwrite: true
+      type: object
+    - name: azure_tenant_id
+      type: string
+      details: Azure Tenant to create resource in
+      default: ${config("azure.tenant_id")}
+    - name: azure_subscription_id
+      type: string
+      details: Azure Subscription to create resource in
+      default: ${config("azure.subscription_id")}
+    - name: azure_client_id
+      type: string
+      details: Client ID of Azure principal
+      default: ${config("azure.client_id")}
+    - name: azure_client_secret
+      type: string
+      details: Client secret for Azure principal
+      default: ${config("azure.client_secret")}
+  outputs:
+    - field_name: service_name
+      type: string
+      details: The name of the Azure AI service
+    - field_name: model_name
+      type: string
+      details: The name of the AI model
+    - field_name: model_version
+      type: string
+      details: The version of the AI model
+    - field_name: api_key
+      type: string
+      details: The API key for accessing the AI model
+    - field_name: endpoint_url
+      type: string
+      details: The constructed endpoint URL for the AI model
+  template_refs:
+    outputs: terraform/azure-ai-model/provision/outputs.tf
+    provider: terraform/azure-ai-model/provision/provider.tf
+    versions: terraform/azure-ai-model/provision/versions.tf
+    variables: terraform/azure-ai-model/provision/variables.tf
+    main: terraform/azure-ai-model/provision/main.tf
+bind:
+  plan_inputs:
+  user_inputs:
+  computed_inputs:
+    - name: endpoint_url
+      type: string
+      default: ${instance.details["endpoint_url"]}
+      overwrite: true
+    - name: model_name
+      type: string
+      default: ${instance.details["model_name"]}
+      overwrite: true
+    - name: model_version
+      type: string
+      default: ${instance.details["model_version"]}
+      overwrite: true
+    - name: api_key
+      type: string
+      default: ${instance.details["api_key"]}
+      overwrite: true
+  outputs:
+    - field_name: model_name
+      type: string
+      details: The name of the AI model
+    - field_name: model_version
+      type: string
+      details: The version of the AI model
+    - field_name: api_key
+      type: string
+      details: The API key for accessing the AI model
+    - field_name: endpoint_url
+      type: string
+      details: The constructed endpoint URL for the AI model
+  template_refs:
+    outputs: terraform/azure-ai-model/bind/outputs.tf
+    variables: terraform/azure-ai-model/bind/variables.tf

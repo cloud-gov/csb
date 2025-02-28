@@ -19,6 +19,7 @@ provision:
     - field_name: domain
       type: string
       required: false
+      default: ""
       prohibit_update: true
       details: Domain from which mail will be sent. For example, `agency.gov`. If left empty, a temporary cloud.gov subdomain will be generated.
     - field_name: dmarc_report_uri_aggregate
@@ -36,6 +37,7 @@ provision:
     - field_name: mail_from_subdomain
       type: string
       required: false
+      default: ""
       details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
   computed_inputs:
     - name: aws_access_key_id_govcloud
@@ -79,6 +81,12 @@ provision:
     - name: cloud_gov_environment
       type: string
       default: ${config("cloud_gov.environment")}
+    - name: cloud_gov_email_notification_topic_arn
+      type: string
+      default: ${config("cloud_gov.email_notification_topic_arn")}
+    - name: cloud_gov_slack_notification_topic_arn
+      type: string
+      default: ${config("cloud_gov.slack_notification_topic_arn")}
   outputs:
     - field_name: region
       type: string
@@ -101,6 +109,9 @@ provision:
     - field_name: domain_arn
       type: string
       details: Instance SES domain identity. Used to create bindings.
+    - field_name: reputation_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving alarms related to reputation metrics.
     - field_name: bounce_topic_arn
       type: string
       details: ARN of the SNS topic receiving bounce feedback notifications.
@@ -111,6 +122,7 @@ provision:
       type: string
       details: ARN of the SNS topic receiving delivery feedback notifications.
   template_refs:
+    alarms: terraform/provision/alarms.tf
     main: terraform/provision/main.tf
     notification: terraform/provision/notification.tf
     outputs: terraform/provision/outputs.tf
@@ -153,6 +165,10 @@ bind:
       type: string
     - name: user_name
       default: csb-${instance.name}-${request.binding_id}
+      overwrite: true
+      type: string
+    - name: binding_id
+      default: ${request.binding_id}
       overwrite: true
       type: string
     - name: instance_id

@@ -69,15 +69,32 @@ variable "csb_docproxy_domain" {
   type = string
 }
 
-variable "csb_docproxy_docker_image_name" {
+variable "csb_helper_docker_image_name" {
   type = string
 }
 
-variable "csb_docproxy_docker_image_version" {
+variable "csb_helper_docker_image_version" {
   type = string
 }
 
-variable "csb_docproxy_instances" {
+variable "csb_helper_instances" {
   type    = number
   default = 1
+}
+
+variable "az_subscription_id" {
+  type = string
+
+}
+variable "az_tenant_id" {
+  type = string
+
+}
+variable "az_client_id" {
+  type = string
+
+}
+variable "az_client_secret" {
+  type      = string
+  sensitive = true
 }

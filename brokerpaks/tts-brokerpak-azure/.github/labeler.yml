@@ -1,0 +1,12 @@
+# Add 'breaking-change' label to any PR where the head branch name starts with `!feat` 
+breaking-change:
+ - head-branch: ['^feat!']
+
+new-feature:
+ - head-branch: ['^feat']
+
+bug-fix:
+- head-branch: ['^fix']
+
+chore:
+- head-branch: ['^chore']

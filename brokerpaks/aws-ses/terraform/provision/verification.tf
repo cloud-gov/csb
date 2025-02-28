@@ -9,14 +9,10 @@ data "aws_route53_zone" "parent_zone" {
 resource "aws_route53_zone" "instance_zone" {
   provider = aws.commercial
   count    = (local.manage_domain ? 1 : 0)
-  comment  = "Created for a customer using the Cloud Service Broker and SMTP Brokerpak."
+  comment  = "Created for a customer using the Cloud Service Broker and AWS SES brokerpak."
 
   name          = local.domain
   force_destroy = true
-  tags = merge(var.labels, {
-    environment = var.instance_id
-    domain      = local.domain
-  })
 }
 
 # Create the NS record in the parent zone for the instance zone
@@ -25,7 +21,7 @@ resource "aws_route53_record" "instance_ns" {
   count    = (local.manage_domain ? 1 : 0)
 
   zone_id = data.aws_route53_zone.parent_zone[0].zone_id
-  name    = local.instance_sha
+  name    = var.instance_id
   type    = "NS"
   ttl     = "30"
   records = aws_route53_zone.instance_zone[0].name_servers
