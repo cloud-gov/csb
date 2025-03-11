@@ -106,6 +106,16 @@ jobs:
           <<: *tf-apps-development
           TERRAFORM_ACTION: apply
 
+  - name: terraform-cleanup-apps-development
+    plan:
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-development))
+          CF_CLIENT_ID: ((cf-client-id-development))
+          CF_CLIENT_SECRET: ((cf-client-secret-development))
+
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
