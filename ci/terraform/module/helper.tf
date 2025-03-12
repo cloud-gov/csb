@@ -28,7 +28,7 @@ resource "cloudfoundry_app" "helper" {
     "HOST"                               = local.helper_route
   }
 
-  routes = [{
+  routes = var.no_route ? [] : [{
     route = local.helper_route
   }]
 

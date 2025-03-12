@@ -62,11 +62,11 @@ resource "cloudfoundry_app" "csb" {
   readiness_health_check_type          = "http"
   readiness_health_check_http_endpoint = "/ready"
 
-  routes = [{
+  routes = var.no_route ? [] : [{
     route = local.csb_route
   }]
 
-  no_route = false
+  no_route = var.no_route
 }
 
 resource "cloudfoundry_service_broker" "csb" {
