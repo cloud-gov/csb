@@ -65,6 +65,8 @@ resource "cloudfoundry_app" "csb" {
   routes = [{
     route = local.csb_route
   }]
+
+  no_route = false
 }
 
 resource "cloudfoundry_service_broker" "csb" {

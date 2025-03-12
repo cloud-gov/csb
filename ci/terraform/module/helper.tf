@@ -31,6 +31,8 @@ resource "cloudfoundry_app" "helper" {
   routes = [{
     route = local.helper_route
   }]
+
+  no_route = var.no_route
 }
 
 data "cloudfoundry_service_plans" "external_domain" {
@@ -40,8 +42,6 @@ data "cloudfoundry_service_plans" "external_domain" {
 }
 
 resource "cloudfoundry_service_instance" "docproxy_external_domain" {
-  count = var.stack_name == "development" ? 0 : 1
-
   name  = "docproxy-domain"
   space = data.cloudfoundry_space.brokers.id
   type  = "managed"

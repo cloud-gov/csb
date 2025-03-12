@@ -1,8 +1,6 @@
 module "csb" {
   source = "../module"
 
-  count = var.stack_name == "production" ? 0 : 1
-
   stack_name = var.stack_name
 
   rds_host     = data.terraform_remote_state.iaas.outputs.csb.rds.host
@@ -38,4 +36,6 @@ module "csb" {
   helper_instances            = var.csb_helper_instances
   helper_docker_image_name    = var.csb_helper_docker_image_name
   helper_docker_image_version = var.csb_helper_docker_image_version
+
+  no_route = var.no_route
 }

@@ -108,6 +108,10 @@ jobs:
 
   - name: terraform-cleanup-apps-development
     plan:
+      - get: terraform-templates
+        resource: terraform-config
+        passed: [terraform-apply-apps-development]
+        trigger: true
       - task: terraform-cleanup
         image: general-task
         file: terraform-templates/ci/terraform/terraform-cleanup.yml
@@ -122,7 +126,7 @@ jobs:
           - get: terraform-templates
             resource: terraform-config
             trigger: true
-            passed: [terraform-apply-apps-development]
+            passed: [terraform-cleanup-apps-development]
           # Changes to the iaas state file trigger a build. This is not a step
           # input because the state is accessed separately using a
           # terraform_remote_state data source.
@@ -260,9 +264,9 @@ jobs:
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-production))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
+          TF_VAR_csb_docproxy_domain: fr.cloud.gov
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
-          TF_VAR_csb_docproxy_domain: fr.cloud.gov
           TF_VAR_csb_helper_instances: 2
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
@@ -270,6 +274,7 @@ jobs:
           TF_VAR_external_remote_state_reader_region: ((production-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((production-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-production
+          TF_VAR_no_route: true
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: production

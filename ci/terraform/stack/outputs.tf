@@ -17,3 +17,8 @@ output "helper_app_name" {
   value       = module.csb.helper_app_name
   description = "Used by the terraform-cleanup step."
 }
+
+output "no_route" {
+  value       = var.no_route
+  description = "Feature flag. If true, the CSB and CSB Helper have been configured to be unroutable. This exists so the CSB can be deployed to production but not made available to users. Default false."
+}

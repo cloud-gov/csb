@@ -150,3 +150,8 @@ variable "helper_aws_secret_access_key" {
   type      = string
   sensitive = true
 }
+
+variable "no_route" {
+  type        = bool
+  description = "Feature flag. Set to true to make the CSB and CSB Helper unroutable. This exists so the CSB can be deployed to production but not made available to users. Default false."
+}
