@@ -28,11 +28,11 @@ resource "cloudfoundry_app" "helper" {
     "HOST"                               = local.helper_route
   }
 
-  routes = var.no_route ? [] : [{
+  routes = var.no_route ? null : [{
     route = local.helper_route
   }]
 
-  no_route = var.no_route
+  no_route = var.no_route ? var.no_route : null
 }
 
 data "cloudfoundry_service_plans" "external_domain" {
