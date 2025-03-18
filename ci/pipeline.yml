@@ -112,6 +112,7 @@ jobs:
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
+          NO_ROUTE: false
 
   - name: terraform-plan-apps-staging
     plan:
@@ -216,6 +217,7 @@ jobs:
           CF_API_URL: ((cf-api-url-staging))
           CF_CLIENT_ID: ((cf-client-id-staging))
           CF_CLIENT_SECRET: ((cf-client-secret-staging))
+          NO_ROUTE: false
 
   - name: terraform-plan-apps-production
     plan:
@@ -321,6 +323,7 @@ jobs:
           CF_API_URL: ((cf-api-url-production))
           CF_CLIENT_ID: ((cf-client-id-production))
           CF_CLIENT_SECRET: ((cf-client-secret-production))
+          NO_ROUTE: true
           REGISTER_ORGS: ((register-orgs-production))
 
 resources:
