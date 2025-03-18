@@ -11,6 +11,7 @@ SPACE=$(jq  -r '.outputs.space_name.value' terraform-state/terraform.tfstate)
 CSB=$(jq  -r '.outputs.app_name.value' terraform-state/terraform.tfstate)
 CSB_HELPER=$(jq  -r '.outputs.helper_app_name.value' terraform-state/terraform.tfstate)
 
+cf api $CF_API_URL
 (set +x; cf auth $CF_CLIENT_ID $CF_CLIENT_SECRET --client-credentials)
 
 cf target $ORG $SPACE
