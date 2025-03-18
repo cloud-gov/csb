@@ -6,10 +6,10 @@ set -euxo pipefail
 # Issue for service plan visibility: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/issues/96
 
 # Load values from state file
-ORG=$(jq -f terraform-state/terraform.json -r '.outputs.org_name.value')
-SPACE=$(jq -f terraform-state/terraform.json -r '.outputs.space_name.value')
-CSB=$(jq -f terraform-state/terraform.json -r '.outputs.app_name.value')
-CSB_HELPER=$(jq -f terraform-state/terraform.json -r '.outputs.helper_app_name.value')
+ORG=$(jq -f terraform-state/terraform.tfstate -r '.outputs.org_name.value')
+SPACE=$(jq -f terraform-state/terraform.tfstate -r '.outputs.space_name.value')
+CSB=$(jq -f terraform-state/terraform.tfstate -r '.outputs.app_name.value')
+CSB_HELPER=$(jq -f terraform-state/terraform.tfstate -r '.outputs.helper_app_name.value')
 
 (set +x; cf auth $CF_CLIENT_ID $CF_CLIENT_SECRET --client-credentials)
 
