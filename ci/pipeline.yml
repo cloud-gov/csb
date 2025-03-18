@@ -119,7 +119,7 @@ jobs:
           - get: terraform-templates
             resource: terraform-config
             trigger: true
-            passed: [terraform-cleanup-apps-development]
+            passed: [terraform-apply-apps-development]
           # Changes to the iaas state file trigger a build. This is not a step
           # input because the state is accessed separately using a
           # terraform_remote_state data source.
