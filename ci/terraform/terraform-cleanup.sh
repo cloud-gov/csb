@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -exo pipefail
 
 # The CloudFoundry terraform provider has two issues that affect this repo: First, CloudFoundry applications that are updated do not always fully restage, and second, it has no resource for enabling service plan visibility. This script restages the applications manually and enables service plan visibility.
 # Issue for app restaging: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/issues/127
