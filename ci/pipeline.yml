@@ -105,16 +105,6 @@ jobs:
         params:
           <<: *tf-apps-development
           TERRAFORM_ACTION: apply
-
-  - name: terraform-cleanup-apps-development
-    plan:
-      - in_parallel:
-          - get: general-task
-          - get: terraform-templates
-            resource: terraform-config
-            passed: [terraform-apply-apps-development]
-            trigger: true
-          - get: terraform-state
       - task: terraform-cleanup
         image: general-task
         file: terraform-templates/ci/terraform/terraform-cleanup.yml
