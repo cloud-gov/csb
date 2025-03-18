@@ -64,4 +64,5 @@ resource "aws_sns_topic_subscription" "platform_ses_notifications" {
     ]
   })
   filter_policy_scope = "MessageBody"
+  depends_on          = [cloudfoundry_service_instance.docproxy_external_domain]
 }

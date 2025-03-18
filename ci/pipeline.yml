@@ -108,10 +108,12 @@ jobs:
 
   - name: terraform-cleanup-apps-development
     plan:
-      - get: terraform-templates
-        resource: terraform-config
-        passed: [terraform-apply-apps-development]
-        trigger: true
+      - in_parallel:
+          - get: general-task
+          - get: terraform-templates
+            resource: terraform-config
+            passed: [terraform-apply-apps-development]
+            trigger: true
       - task: terraform-cleanup
         image: general-task
         file: terraform-templates/ci/terraform/terraform-cleanup.yml
