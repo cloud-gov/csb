@@ -209,6 +209,13 @@ jobs:
         params:
           <<: *tf-apps-staging
           TERRAFORM_ACTION: apply
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-staging))
+          CF_CLIENT_ID: ((cf-client-id-staging))
+          CF_CLIENT_SECRET: ((cf-client-secret-staging))
 
   - name: terraform-plan-apps-production
     plan:
@@ -307,6 +314,13 @@ jobs:
         params:
           <<: *tf-apps-production
           TERRAFORM_ACTION: apply
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-production))
+          CF_CLIENT_ID: ((cf-client-id-production))
+          CF_CLIENT_SECRET: ((cf-client-secret-production))
 
 resources:
   - name: pipeline-tasks
