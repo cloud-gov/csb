@@ -114,6 +114,7 @@ jobs:
             resource: terraform-config
             passed: [terraform-apply-apps-development]
             trigger: true
+          - get: terraform-state
       - task: terraform-cleanup
         image: general-task
         file: terraform-templates/ci/terraform/terraform-cleanup.yml
