@@ -14,7 +14,7 @@ CSB_HELPER=$(jq  -r '.outputs.helper_app_name.value' terraform-state/terraform.t
 cf api $CF_API_URL
 (set +x; cf auth $CF_CLIENT_ID $CF_CLIENT_SECRET --client-credentials)
 
-cf target $ORG $SPACE
+cf target -o $ORG -s $SPACE
 cf restage $CSB --strategy rolling
 cf restage $CSB_HELPER --strategy rolling
 cf enable-service-access aws-ses -b $CSB -o $ORG # TODO xargs this
