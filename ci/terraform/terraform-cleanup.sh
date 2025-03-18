@@ -17,4 +17,18 @@ cf api $CF_API_URL
 cf target -o $ORG -s $SPACE
 cf restage $CSB --strategy rolling
 cf restage $CSB_HELPER --strategy rolling
-cf enable-service-access aws-ses -b $CSB -o $ORG # TODO xargs this
+
+if $NO_ROUTE; then
+	echo "NO_ROUTE was specified. Service access will not be enabled."
+	exit 0
+fi
+
+# If list of orgs is empty, register cluster-wide.
+# If the list has contents, register in each org.
+if [[ -z "$REGISTER_ORGS" ]]; then
+	# If no orgs are specified, register cluster-wide.
+	cf enable-service-access aws-ses -b $CSB
+else
+	# If orgs are specified, enable service access for each one.
+	echo "$REGISTER_ORGS" | xargs -I% cf enable-service-access aws-ses -b $CSB -o %
+fi
