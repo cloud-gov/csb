@@ -9,7 +9,8 @@ jobs:
   - name: terraform-plan-apps-development
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true # Changes to the terraform deployment code trigger a rebuild
@@ -83,7 +84,8 @@ jobs:
   - name: terraform-apply-apps-development
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-development]
@@ -120,7 +122,8 @@ jobs:
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -191,7 +194,8 @@ jobs:
   - name: terraform-apply-apps-staging
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -228,7 +232,8 @@ jobs:
   - name: terraform-plan-apps-production
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-apply-apps-staging]
@@ -301,7 +306,8 @@ jobs:
   - name: terraform-apply-apps-production
     plan:
       - in_parallel:
-          - get: terraform-plugin-cache
+          - try:
+              - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-production]

@@ -2,7 +2,7 @@
 
 set -eu
 
-exit 1 # crash the container so I can debug the plugin cache
+mkdir -p terraform-plugin-cache
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
@@ -27,3 +27,4 @@ fi
 
 # Execute the terraform action, the cloudfoundry provider will use CF_API and CF_TOKEN to authenticate
 ./pipeline-tasks/terraform-apply.sh
+exit 1 # crash the container so I can debug the plugin cache
