@@ -9,6 +9,7 @@ jobs:
   - name: terraform-plan-apps-development
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true # Changes to the terraform deployment code trigger a rebuild
@@ -43,6 +44,7 @@ jobs:
         params: &tf-apps-development
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
+          TF_PLUGIN_CACHE_DIR: terraform-plugin-cache
           STACK_NAME: cf-apps-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -81,6 +83,7 @@ jobs:
   - name: terraform-apply-apps-development
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-development]
@@ -117,6 +120,7 @@ jobs:
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -148,6 +152,7 @@ jobs:
         params: &tf-apps-staging
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
+          TF_PLUGIN_CACHE_DIR: terraform-plugin-cache
           STACK_NAME: cf-apps-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -186,6 +191,7 @@ jobs:
   - name: terraform-apply-apps-staging
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -222,6 +228,7 @@ jobs:
   - name: terraform-plan-apps-production
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-apply-apps-staging]
@@ -253,6 +260,7 @@ jobs:
         params: &tf-apps-production
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
+          TF_PLUGIN_CACHE_DIR: terraform-plugin-cache
           STACK_NAME: cf-apps-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -293,6 +301,7 @@ jobs:
   - name: terraform-apply-apps-production
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-production]
@@ -404,6 +413,13 @@ resources:
       branch: ses-topic
       paths:
         - ci/*
+
+  - name: terraform-plugin-cache
+    type: s3-iam
+    source:
+      bucket: ((terraform-cache-bucket))
+      versioned_file: csb/terraform-plugin-cache.tar.gz
+      region_name: ((aws-region))
 
 resource_types:
   - name: registry-image
