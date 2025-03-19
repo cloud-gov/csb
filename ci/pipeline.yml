@@ -72,15 +72,15 @@ jobs:
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: development
-      - put: slack
-        params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-development
     plan:
@@ -184,15 +184,15 @@ jobs:
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: staging
-      - put: slack
-        params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-staging
     plan:
@@ -298,15 +298,15 @@ jobs:
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: production
-      - put: slack
-        params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-production
     plan:
