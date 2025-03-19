@@ -426,6 +426,8 @@ resources:
       bucket: ((terraform-cache-bucket))
       versioned_file: csb/terraform-plugin-cache.tar.gz
       region_name: ((aws-region))
+      initial_version: 1
+      initial_content_binary: H4sIALUh22cAA0vNLSip1NfTZ6AhMDAwMDc1VQDTZhDawMgEQkOBgqGJuZmZmZGBGVDCwNDE1MCEQcGUlo6CgdLiksQioFOyEnNTi0sy8pMzElNSczDVAZWlpeExB+oPOD0KRsEoGAWDHAAADP/pAQAGAAA=
 
 resource_types:
   - name: registry-image
