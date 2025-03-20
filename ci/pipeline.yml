@@ -73,7 +73,7 @@ jobs:
           TF_VAR_stack_name: development
       - put: terraform-plugin-cache
         params:
-          file: terraform-plugin-cache/cache.tar.gz
+          file: cache.tar.gz
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt
