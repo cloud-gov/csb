@@ -430,7 +430,8 @@ resources:
       versioned_file: csb/cache.tar.gz
       region_name: ((aws-region))
       initial_version: "0"
-      initial_content_binary: H4sIALUh22cAA0vNLSip1NfTZ6AhMDAwMDc1VQDTZhDawMgEQkOBgqGJuZmZmZGBGVDCwNDE1MCEQcGUlo6CgdLiksQioFOyEnNTi0sy8pMzElNSczDVAZWlpeExB+oPOD0KRsEoGAWDHAAADP/pAQAGAAA=
+      # Initial contents: An empty directory named 'plugin-cache'.
+      initial_content_binary: H4sIAHqo3GcAAyvIKU3PzNNNTkzOSNVnoA0wMDAwNzVVANNmENrAyARCQ4GCoYm5mbmhkYmhibGCgaGpqYkJg4IpjdyDAkqLSxKLgE7JSsxNLS7JyE/OSExJzcFUB1SWlobHHKg/4PQoGAWjYBQMcgAA4m+yIwAGAAA=
 
 resource_types:
   - name: registry-image
