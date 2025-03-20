@@ -46,7 +46,7 @@ jobs:
         params: &tf-apps-development
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TF_PLUGIN_CACHE_DIR: ./terraform-plugin-cache
+          TF_PLUGIN_CACHE_DIR: ../../../../terraform-plugin-cache
           STACK_NAME: cf-apps-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -158,7 +158,7 @@ jobs:
         params: &tf-apps-staging
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TF_PLUGIN_CACHE_DIR: terraform-plugin-cache
+          TF_PLUGIN_CACHE_DIR: ../../../../terraform-plugin-cache
           STACK_NAME: cf-apps-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -270,7 +270,7 @@ jobs:
         params: &tf-apps-production
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TF_PLUGIN_CACHE_DIR: terraform-plugin-cache
+          TF_PLUGIN_CACHE_DIR: ../../../../terraform-plugin-cache
           STACK_NAME: cf-apps-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))

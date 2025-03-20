@@ -2,7 +2,11 @@
 
 set -eu
 
-mkdir -p terraform-plugin-cache
+# untar the contents of the resource; delete the tarball; remove the version file
+cd terraform-plugin-cache
+# todo get the actual name so I can re-compress it later
+tar xzf terraform-plugin-cache/*.tar.gz
+cd ..
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
@@ -28,3 +32,5 @@ fi
 # Execute the terraform action, the cloudfoundry provider will use CF_API and CF_TOKEN to authenticate
 ./pipeline-tasks/terraform-apply.sh
 exit 1 # crash the container so I can debug the plugin cache
+
+# re-zip the tarball; delete the rest of the files
