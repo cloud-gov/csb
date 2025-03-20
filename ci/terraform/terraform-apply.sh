@@ -2,14 +2,11 @@
 
 set -eu
 
-export TF_LOG=debug
-
 mkdir plugin-cache
 export TF_PLUGIN_CACHE_DIR="${PWD}/plugin-cache"
 
-# untar the contents of the resource
-# todo get the actual name so I can re-compress it later
-tar xzf ${TERRAFORM_PLUGIN_CACHE}/*.tar.gz -C plugin-cache/.
+# Decompress the cache to a separate directory so we can cleanly re-archive the updated files later
+tar xzf ${TERRAFORM_PLUGIN_CACHE}/cache.tar.gz -C plugin-cache/.
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
@@ -34,6 +31,6 @@ fi
 
 # Execute the terraform action, the cloudfoundry provider will use CF_API and CF_TOKEN to authenticate
 ./pipeline-tasks/terraform-apply.sh
-exit 1 # crash the container so I can debug the plugin cache
 
-# re-zip the tarball; delete the rest of the files
+# Update the cache resource
+tar czf ${TERRAFORM_PLUGIN_CACHE}/cache.tar.gz plugin-cache/*

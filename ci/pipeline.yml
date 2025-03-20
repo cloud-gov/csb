@@ -9,9 +9,8 @@ jobs:
   - name: terraform-plan-apps-development
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             trigger: true # Changes to the terraform deployment code trigger a rebuild
@@ -72,6 +71,8 @@ jobs:
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: development
+      - put: terraform-plugin-cache
+        file: terraform-plugin-cache/cache.tar.gz
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt
@@ -85,9 +86,8 @@ jobs:
   - name: terraform-apply-apps-development
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-development]
@@ -124,9 +124,8 @@ jobs:
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -197,9 +196,8 @@ jobs:
   - name: terraform-apply-apps-staging
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -236,9 +234,8 @@ jobs:
   - name: terraform-plan-apps-production
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-apply-apps-staging]
@@ -311,9 +308,8 @@ jobs:
   - name: terraform-apply-apps-production
     plan:
       - in_parallel:
-          - try:
-              get: terraform-plugin-cache
-              trigger: false
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-production]
@@ -430,7 +426,7 @@ resources:
     type: s3-iam
     source:
       bucket: ((terraform-cache-bucket))
-      versioned_file: csb/terraform-plugin-cache.tar.gz
+      versioned_file: csb/cache.tar.gz
       region_name: ((aws-region))
       initial_version: "0"
       initial_content_binary: H4sIALUh22cAA0vNLSip1NfTZ6AhMDAwMDc1VQDTZhDawMgEQkOBgqGJuZmZmZGBGVDCwNDE1MCEQcGUlo6CgdLiksQioFOyEnNTi0sy8pMzElNSczDVAZWlpeExB+oPOD0KRsEoGAWDHAAADP/pAQAGAAA=
