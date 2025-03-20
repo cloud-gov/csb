@@ -2,6 +2,8 @@
 
 set -eu
 
+TF_LOG=debug
+
 # untar the contents of the resource; delete the tarball; remove the version file
 cd terraform-plugin-cache
 # todo get the actual name so I can re-compress it later
