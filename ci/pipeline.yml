@@ -72,7 +72,8 @@ jobs:
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
           TF_VAR_stack_name: development
       - put: terraform-plugin-cache
-        file: terraform-plugin-cache/cache.tar.gz
+        params:
+          file: terraform-plugin-cache/cache.tar.gz
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt
