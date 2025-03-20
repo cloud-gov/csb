@@ -5,12 +5,11 @@ set -eu
 export TF_LOG=debug
 
 mkdir plugin-cache
+export TF_PLUGIN_CACHE_DIR="${PWD}/plugin-cache"
 
-# untar the contents of the resource; delete the tarball; remove the version file
-cd terraform-plugin-cache
+# untar the contents of the resource
 # todo get the actual name so I can re-compress it later
-tar xzf *.tar.gz
-cd ..
+tar xzf ${TERRAFORM_PLUGIN_CACHE}/*.tar.gz -C plugin-cache/.
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
