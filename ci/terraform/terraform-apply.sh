@@ -2,7 +2,9 @@
 
 set -eu
 
-TF_LOG=debug
+export TF_LOG=debug
+
+mkdir plugin-cache
 
 # untar the contents of the resource; delete the tarball; remove the version file
 cd terraform-plugin-cache
