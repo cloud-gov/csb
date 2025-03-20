@@ -3,10 +3,8 @@
 set -eu
 
 # untar the contents of the resource; delete the tarball; remove the version file
-cd terraform-plugin-cache
 # todo get the actual name so I can re-compress it later
 tar xzf terraform-plugin-cache/*.tar.gz
-cd ..
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
