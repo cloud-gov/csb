@@ -5,7 +5,7 @@ set -eu
 # Decompress the cache to a separate directory so we can cleanly re-archive the updated files later
 export TF_PLUGIN_CACHE_DIR="$(pwd)/plugin-cache"
 tar xzf terraform-plugin-cache/cache.tar.gz
-
+exit 1
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
 TOKEN_ENDPOINT=$(echo ${API_RESPONSE} | jq -r '.token_endpoint // empty')
@@ -31,5 +31,7 @@ fi
 ./pipeline-tasks/terraform-apply.sh
 
 # Update the cache resource
+echo "Archiving terraform plugin cache..."
 tar czf cache.tar.gz plugin-cache
 mv cache.tar.gz updated-terraform-plugin-cache/cache.tar.gz
+echo "Done."
