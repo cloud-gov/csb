@@ -431,6 +431,7 @@ resources:
       region_name: ((aws-region))
       initial_version: "0"
       # Initial contents: An empty directory named 'plugin-cache'.
+      # Terraform requires the cache directory to exist, even if empty.
       initial_content_binary: H4sIAHqo3GcAAyvIKU3PzNNNTkzOSNVnoA0wMDAwNzVVANNmENrAyARCQ4GCoYm5mbmhkYmhibGCgaGpqYkJg4IpjdyDAkqLSxKLgE7JSsxNLS7JyE/OSExJzcFUB1SWlobHHKg/4PQoGAWjYBQMcgAA4m+yIwAGAAA=
 
 resource_types:

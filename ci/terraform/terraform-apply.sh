@@ -32,4 +32,3 @@ fi
 
 # Update the cache resource
 tar czf cache.tar.gz plugin-cache
-exit 1
