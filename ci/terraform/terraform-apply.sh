@@ -1,10 +1,13 @@
 #!/bin/bash
 
 set -eu
-
+export TF_LOG=trace
 # Decompress the cache to a separate directory so we can cleanly re-archive the updated files later
 export TF_PLUGIN_CACHE_DIR="$(pwd)/plugin-cache"
+echo $TF_PLUGIN_CACHE_DIR
 tar xzf terraform-plugin-cache/cache.tar.gz
+ls
+ls $TF_PLUGIN_CACHE_DIR
 exit 1
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
