@@ -95,8 +95,10 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-development]
             trigger: true
           - get: csb-helper-image
+            passed: [terraform-plan-apps-development]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
@@ -135,12 +137,15 @@ jobs:
           # terraform_remote_state data source.
           - get: terraform-yaml
             resource: terraform-yaml-staging
+            passed: [terraform-apply-apps-development]
             trigger: true
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-apply-apps-development]
             trigger: true
           - get: csb-helper-image
+            passed: [terraform-apply-apps-development]
             trigger: true
       - in_parallel:
           - load_var: csb-image-repository
@@ -157,7 +162,6 @@ jobs:
         params: &tf-apps-staging
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TF_PLUGIN_CACHE_DIR: ../../../../terraform-plugin-cache
           STACK_NAME: cf-apps-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -205,8 +209,10 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-staging]
             trigger: true
           - get: csb-helper-image
+            passed: [terraform-plan-apps-staging]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
@@ -245,12 +251,15 @@ jobs:
           # terraform_remote_state data source.
           - get: terraform-yaml
             resource: terraform-yaml-production
+            passed: [terraform-apply-apps-staging]
             trigger: true
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-apply-apps-staging]
             trigger: true
           - get: csb-helper-image
+            passed: [terraform-apply-apps-staging]
             trigger: true
       - in_parallel:
           - load_var: csb-image-repository
@@ -267,7 +276,6 @@ jobs:
         params: &tf-apps-production
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TF_PLUGIN_CACHE_DIR: ../../../../terraform-plugin-cache
           STACK_NAME: cf-apps-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -316,8 +324,10 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-production]
             trigger: true
           - get: csb-helper-image
+            passed: [terraform-plan-apps-production]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
