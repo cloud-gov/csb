@@ -45,7 +45,6 @@ jobs:
         params: &tf-apps-development
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          TERRAFORM_PLUGIN_CACHE: terraform-plugin-cache
           STACK_NAME: cf-apps-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
@@ -73,7 +72,7 @@ jobs:
           TF_VAR_stack_name: development
       - put: terraform-plugin-cache
         params:
-          file: cache.tar.gz
+          file: updated-terraform-plugin-cache/cache.tar.gz
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt

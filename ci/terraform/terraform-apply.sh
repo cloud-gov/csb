@@ -4,7 +4,7 @@ set -eu
 
 # Decompress the cache to a separate directory so we can cleanly re-archive the updated files later
 export TF_PLUGIN_CACHE_DIR="$(pwd)/plugin-cache"
-tar xzf ${TERRAFORM_PLUGIN_CACHE}/cache.tar.gz
+tar xzf terraform-plugin-cache/cache.tar.gz
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
 API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
@@ -32,3 +32,4 @@ fi
 
 # Update the cache resource
 tar czf cache.tar.gz plugin-cache
+mv cache.tar.gz updated-terraform-plugin-cache/cache.tar.gz
