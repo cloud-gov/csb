@@ -137,7 +137,6 @@ jobs:
           # terraform_remote_state data source.
           - get: terraform-yaml
             resource: terraform-yaml-staging
-            passed: [terraform-apply-apps-development]
             trigger: true
           - get: pipeline-tasks
           - get: general-task
@@ -251,7 +250,6 @@ jobs:
           # terraform_remote_state data source.
           - get: terraform-yaml
             resource: terraform-yaml-production
-            passed: [terraform-apply-apps-staging]
             trigger: true
           - get: pipeline-tasks
           - get: general-task
