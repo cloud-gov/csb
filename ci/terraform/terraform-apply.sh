@@ -31,7 +31,9 @@ fi
 ./pipeline-tasks/terraform-apply.sh
 
 # Update the cache resource
-echo "Archiving terraform plugin cache..."
-tar czf cache.tar.gz plugin-cache
-mv cache.tar.gz updated-terraform-plugin-cache/cache.tar.gz
-echo "Done."
+if $TF_UPDATE_PLUGIN_CACHE; then
+  echo "Archiving terraform plugin cache..."
+  tar czf cache.tar.gz plugin-cache
+  mv cache.tar.gz updated-terraform-plugin-cache/cache.tar.gz
+  echo "Done."
+fi

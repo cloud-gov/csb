@@ -52,6 +52,7 @@ jobs:
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
+          TF_UPDATE_PLUGIN_CACHE: true
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.dev.us-gov-west-1.aws-us-gov.cloud.gov
@@ -168,6 +169,7 @@ jobs:
           CF_API_URL: ((cf-api-url-staging))
           CF_CLIENT_ID: ((cf-client-id-staging))
           CF_CLIENT_SECRET: ((cf-client-secret-staging))
+          TF_UPDATE_PLUGIN_CACHE: false
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.fr-stage.cloud.gov
@@ -281,6 +283,7 @@ jobs:
           CF_API_URL: ((cf-api-url-production))
           CF_CLIENT_ID: ((cf-client-id-production))
           CF_CLIENT_SECRET: ((cf-client-secret-production))
+          TF_UPDATE_PLUGIN_CACHE: false
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.cloud.gov
