@@ -1,4 +1,4 @@
-variable "stack_name" {
+variable "cloud_gov_environment" {
   type        = string
   description = "Like development, staging, or production."
 }

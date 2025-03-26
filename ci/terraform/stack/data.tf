@@ -2,7 +2,7 @@ data "terraform_remote_state" "iaas" {
   backend = "s3"
   config = {
     bucket = var.remote_state_bucket_iaas
-    key    = "${var.stack_name}/terraform.tfstate"
+    key    = "${var.iaas_stack_name}/terraform.tfstate"
   }
 }
 

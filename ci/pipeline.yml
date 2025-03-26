@@ -45,7 +45,7 @@ jobs:
         params: &tf-apps-development
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-development
+          STACK_NAME: csb-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
           AWS_USE_FIPS_ENDPOINT: true
@@ -59,18 +59,18 @@ jobs:
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-development))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
+          TF_VAR_csb_docproxy_domain: dev.us-gov-west-1.aws-us-gov.cloud.gov
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
-          TF_VAR_csb_docproxy_domain: dev.us-gov-west-1.aws-us-gov.cloud.gov
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
           TF_VAR_external_remote_state_reader_access_key_id: ((development-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((development-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((development-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-development
+          TF_VAR_iaas_stack_name: development
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: development
       - put: terraform-plugin-cache
         params:
           file: updated-terraform-plugin-cache/cache.tar.gz
@@ -162,7 +162,7 @@ jobs:
         params: &tf-apps-staging
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-staging
+          STACK_NAME: csb-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
           AWS_USE_FIPS_ENDPOINT: true
@@ -176,18 +176,18 @@ jobs:
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-staging))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
+          TF_VAR_csb_docproxy_domain: fr-stage.cloud.gov
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
-          TF_VAR_csb_docproxy_domain: fr-stage.cloud.gov
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
           TF_VAR_external_remote_state_reader_access_key_id: ((staging-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((staging-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((staging-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-staging
+          TF_VAR_iaas_stack_name: staging
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: staging
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt
@@ -276,7 +276,7 @@ jobs:
         params: &tf-apps-production
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-production
+          STACK_NAME: csb-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
           AWS_USE_FIPS_ENDPOINT: true
@@ -300,10 +300,10 @@ jobs:
           TF_VAR_external_remote_state_reader_region: ((production-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((production-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-production
+          TF_VAR_iaas_stack_name: production
           TF_VAR_no_route: true
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: production
       # - put: slack
       #   params:
       #     text_file: terraform-state/message.txt

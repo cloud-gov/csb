@@ -1,4 +1,4 @@
-variable "stack_name" {
+variable "iaas_stack_name" {
   type        = string
   description = "One of development, staging, production."
 }

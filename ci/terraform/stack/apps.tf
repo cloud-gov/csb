@@ -1,7 +1,7 @@
 module "csb" {
   source = "../module"
 
-  stack_name = var.stack_name
+  cloud_gov_environment = var.iaas_stack_name
 
   rds_host     = data.terraform_remote_state.iaas.outputs.csb.rds.host
   rds_port     = data.terraform_remote_state.iaas.outputs.csb.rds.port
