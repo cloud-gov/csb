@@ -86,8 +86,8 @@ locals {
 }
 
 resource "cloudfoundry_service_plan_visibility" "csb_enable_service_access_global" {
-  count        = var.enable_service_access_global ? 1 : 0
-  for_each     = local.plans
+  # If NOT enabling globally, pass [] to make this a no-op.
+  for_each     = var.enable_service_access_global ? local.plans : []
   service_plan = each.key
 
   type = "public"
@@ -96,8 +96,8 @@ resource "cloudfoundry_service_plan_visibility" "csb_enable_service_access_globa
 }
 
 resource "cloudfoundry_service_plan_visibility" "csb_enable_service_access_orgs" {
-  count        = var.enable_service_access_global ? 0 : 1
-  for_each     = local.plans
+  # If we ARE enabling globally, pass [] to make this a no-op.
+  for_each     = var.enable_service_access_global ? [] : local.plans
   service_plan = each.key
 
   type          = "organization"
