@@ -178,7 +178,8 @@ jobs:
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
           TF_VAR_csb_docproxy_domain: fr-stage.cloud.gov
-          TF_VAR_csb_enable_service_access_global: true
+          TF_VAR_csb_enable_service_access_global: false
+          TF_VAR_csb_enable_service_access_orgs: ((enable-service-access-orgs-production)) # temporary to test if it works as expected
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
