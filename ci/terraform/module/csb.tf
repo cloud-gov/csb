@@ -82,8 +82,12 @@ data "cloudfoundry_service_plans" "csb" {
   service_broker_name = cloudfoundry_app.csb.name
 }
 
+locals {
+  plans = toset(data.cloudfoundry_service_plans.csb.service_plans[*].id)
+}
+
 resource "cloudfoundry_service_plan_visibility" "csb" {
-  for_each     = data.cloudfoundry_service_plans.csb.service_plans[*].id
+  for_each     = local.plans
   service_plan = each.key
 
   type          = "organization"
