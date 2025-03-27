@@ -115,6 +115,7 @@ jobs:
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params:
           <<: *tf-apps-development
+          TF_UPDATE_PLUGIN_CACHE: false
           TERRAFORM_ACTION: apply
       - task: terraform-cleanup
         image: general-task
@@ -123,7 +124,6 @@ jobs:
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
-          TF_UPDATE_PLUGIN_CACHE: false
 
   - name: terraform-plan-apps-staging
     plan:
