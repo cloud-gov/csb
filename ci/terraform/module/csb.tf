@@ -84,7 +84,7 @@ data "cloudfoundry_service_plans" "csb" {
 data "cloudfoundry_orgs" "enable_service_access_orgs" {
   # The data source will fail if no orgs are found. If no orgs were passed, default to the org the broker is deployed in to avoid the failure.
   # If var.enable_service_access_global is true, it will be ignored anyway.
-  name = join(",", len(var.enable_service_access_orgs) > 0 ? var.enable_service_access_orgs : [var.org_name])
+  name = join(",", length(var.enable_service_access_orgs) > 0 ? var.enable_service_access_orgs : [var.org_name])
 }
 
 locals {
