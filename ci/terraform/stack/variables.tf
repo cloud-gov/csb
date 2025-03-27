@@ -71,7 +71,8 @@ variable "csb_enable_service_access_global" {
 }
 
 variable "csb_enable_service_access_orgs" {
-  type = list(string)
+  type    = list(string)
+  default = []
 }
 
 variable "csb_docproxy_domain" {
