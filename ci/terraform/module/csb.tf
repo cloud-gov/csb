@@ -74,4 +74,20 @@ resource "cloudfoundry_service_broker" "csb" {
   password = random_password.csb_app_password.result
   url      = "https://${local.csb_route}"
   username = "broker"
+
+  depends_on = [cloudfoundry_app.csb]
+}
+
+data "cloudfoundry_service_plans" "csb" {
+  service_broker_name = cloudfoundry_app.csb.name
+}
+
+resource "cloudfoundry_service_plan_visibility" "csb" {
+  for_each     = data.cloudfoundry_service_plans.csb.service_plans[*].id
+  service_plan = each.key
+
+  type          = "organization"
+  organizations = [var.org_name]
+
+  depends_on = [cloudfoundry_service_broker.csb]
 }
