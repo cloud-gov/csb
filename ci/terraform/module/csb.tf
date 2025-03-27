@@ -91,7 +91,7 @@ resource "cloudfoundry_service_plan_visibility" "csb" {
   service_plan = each.key
 
   type          = "organization"
-  organizations = [var.org_name]
+  organizations = [data.cloudfoundry_org.platform.id]
 
   depends_on = [cloudfoundry_service_broker.csb]
 }
