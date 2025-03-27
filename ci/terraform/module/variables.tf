@@ -55,7 +55,7 @@ variable "enable_service_access_global" {
 
 variable "enable_service_access_orgs" {
   type        = list(string)
-  description = "The list of organizations in which service access will be enabled for CSB service offerings. Only used if service_access_global is set to false."
+  description = "The names of organizations in which service access will be enabled for CSB service offerings. Only used if service_access_global is set to false."
 }
 
 # Database credentials

@@ -81,6 +81,10 @@ data "cloudfoundry_service_plans" "csb" {
   service_broker_name = "csb"
 }
 
+data "cloudfoundry_orgs" "enable_service_access_orgs" {
+  name = join(",", var.enable_service_access_orgs)
+}
+
 locals {
   plans = toset(data.cloudfoundry_service_plans.csb.service_plans[*].id)
 }
@@ -101,7 +105,7 @@ resource "cloudfoundry_service_plan_visibility" "csb_enable_service_access_orgs"
   service_plan = each.key
 
   type          = "organization"
-  organizations = var.enable_service_access_orgs
+  organizations = data.cloudfoundry_orgs[*].orgs.id
 
   depends_on = [cloudfoundry_service_broker.csb]
 }
