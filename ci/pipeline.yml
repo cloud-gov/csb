@@ -64,6 +64,7 @@ jobs:
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
+          TF_VAR_enable_service_access_global: true
           TF_VAR_external_remote_state_reader_access_key_id: ((development-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((development-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((development-tf-state-secret-access-key))
@@ -122,7 +123,7 @@ jobs:
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
-          NO_ROUTE: false
+          TF_UPDATE_PLUGIN_CACHE: false
 
   - name: terraform-plan-apps-staging
     plan:
@@ -181,6 +182,7 @@ jobs:
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
+          TF_VAR_enable_service_access_global: true
           TF_VAR_external_remote_state_reader_access_key_id: ((staging-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((staging-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((staging-tf-state-secret-access-key))
@@ -236,7 +238,6 @@ jobs:
           CF_API_URL: ((cf-api-url-staging))
           CF_CLIENT_ID: ((cf-client-id-staging))
           CF_CLIENT_SECRET: ((cf-client-secret-staging))
-          NO_ROUTE: false
 
   - name: terraform-plan-apps-production
     plan:
@@ -296,12 +297,12 @@ jobs:
           TF_VAR_csb_helper_instances: 2
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
+          TF_VAR_enable_service_access_orgs: ((enable-service-access-orgs-production))
           TF_VAR_external_remote_state_reader_access_key_id: ((production-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((production-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((production-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-production
           TF_VAR_iaas_stack_name: production
-          TF_VAR_no_route: true
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
       # - put: slack
@@ -351,7 +352,6 @@ jobs:
           CF_API_URL: ((cf-api-url-production))
           CF_CLIENT_ID: ((cf-client-id-production))
           CF_CLIENT_SECRET: ((cf-client-secret-production))
-          NO_ROUTE: true
           REGISTER_ORGS: ((register-orgs-production))
 
 resources:

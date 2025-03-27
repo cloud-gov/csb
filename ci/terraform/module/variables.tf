@@ -47,6 +47,17 @@ variable "broker_route_domain" {
   description = "The domain under which the broker's route will be created. For example, 'fr.cloud.gov'."
 }
 
+variable "enable_service_access_global" {
+  type        = bool
+  default     = false
+  description = "Set this to true to enable service access for all CSB service offerings globally in the Foundation. If true, service_access_orgs will be ignored."
+}
+
+variable "enable_service_access_orgs" {
+  type        = list(string)
+  description = "The list of organizations in which service access will be enabled for CSB service offerings. Only used if service_access_global is set to false."
+}
+
 # Database credentials
 
 variable "rds_host" {
