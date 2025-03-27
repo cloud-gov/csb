@@ -79,7 +79,9 @@ resource "cloudfoundry_service_broker" "csb" {
 }
 
 data "cloudfoundry_service_plans" "csb" {
-  service_broker_name = cloudfoundry_app.csb.name
+  service_broker_name = "csb"
+
+  depends_on = [cloudfoundry_app.csb]
 }
 
 locals {
