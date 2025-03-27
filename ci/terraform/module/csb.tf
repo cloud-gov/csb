@@ -105,7 +105,7 @@ resource "cloudfoundry_service_plan_visibility" "csb_enable_service_access_orgs"
   service_plan = each.key
 
   type          = "organization"
-  organizations = data.cloudfoundry_orgs[*].orgs.id
+  organizations = data.cloudfoundry_orgs.enable_service_access_orgs.orgs[*].id
 
   depends_on = [cloudfoundry_service_broker.csb]
 }
