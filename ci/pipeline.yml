@@ -60,11 +60,11 @@ jobs:
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
           TF_VAR_csb_docproxy_domain: dev.us-gov-west-1.aws-us-gov.cloud.gov
+          TF_VAR_csb_enable_service_access_global: true
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
-          TF_VAR_enable_service_access_global: true
           TF_VAR_external_remote_state_reader_access_key_id: ((development-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((development-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((development-tf-state-secret-access-key))
@@ -178,11 +178,11 @@ jobs:
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
           TF_VAR_csb_docproxy_domain: fr-stage.cloud.gov
+          TF_VAR_csb_enable_service_access_global: true
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
-          TF_VAR_enable_service_access_global: true
           TF_VAR_external_remote_state_reader_access_key_id: ((staging-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((staging-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((staging-tf-state-secret-access-key))
@@ -292,12 +292,12 @@ jobs:
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
           TF_VAR_csb_docproxy_domain: cloud.gov
+          TF_VAR_csb_enable_service_access_orgs: ((enable-service-access-orgs-production))
           TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
           TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_helper_instances: 2
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
-          TF_VAR_enable_service_access_orgs: ((enable-service-access-orgs-production))
           TF_VAR_external_remote_state_reader_access_key_id: ((production-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((production-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((production-tf-state-secret-access-key))

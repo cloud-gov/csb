@@ -65,6 +65,15 @@ variable "csb_broker_route_domain" {
   type = string
 }
 
+variable "csb_enable_service_access_global" {
+  type    = bool
+  default = false
+}
+
+variable "csb_enable_service_access_orgs" {
+  type = list(string)
+}
+
 variable "csb_docproxy_domain" {
   type = string
 }
@@ -80,10 +89,4 @@ variable "csb_helper_docker_image_version" {
 variable "csb_helper_instances" {
   type    = number
   default = 1
-}
-
-variable "no_route" {
-  type        = bool
-  default     = false
-  description = "Feature flag. Set to true to make the CSB and CSB Helper unroutable. Created so the CSB could be deployed to production but not made available to users. Default false."
 }
