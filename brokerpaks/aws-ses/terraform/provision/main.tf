@@ -8,14 +8,22 @@ locals {
   # Domain is exposed to the outside world, so avoid exposing the instance_id by using its SHA in the domain instead
   domain = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
 
-  // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
-  dmarc_rua = join(",", ["mailto:reports@dmarc.cyber.dhs.gov", var.dmarc_report_uri_aggregate])
+  # rua=mailto:reports@dmarc.cyber.dhs.gov is required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
+  dmarc_rua = join(
+    ",",
+    [
+      "mailto:reports@dmarc.cyber.dhs.gov",
+      length(var.dmarc_report_aggregate_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_aggregate_recipients)) : "mailto:" + var.admin_email
+    ]
+  )
+  dmarc_ruf = length(var.dmarc_report_failure_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_failure_recipients)) : "mailto:" + var.admin_email
 
+  # p=reject is required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
   dmarc_verification_record = {
     name    = "_dmarc.${local.domain}"
     type    = "TXT"
     ttl     = "600"
-    records = ["v=DMARC1; p=reject; rua=${local.dmarc_rua}; ruf=${var.dmarc_report_uri_failure}"]
+    records = ["v=DMARC1; p=reject; rua=${local.dmarc_rua}; ruf=${local.dmarc_ruf}"]
   }
 
   setting_mail_from = (var.mail_from_subdomain != "")

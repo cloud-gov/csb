@@ -16,7 +16,7 @@ instanceid=$(uuidgen | tr "[A-Z]" "[a-z]")
 echo "Instance ID: $instanceid"
 
 # Start provisioning
-$csb client provision --config clientconfig.yml --planid 35ffb84b-a898-442e-b5f9-0a6a5229827d --serviceid 260f2ead-b9e9-48b5-9a01-6e3097208ad7 --instanceid $instanceid --params "{\"dmarc_report_uri_aggregate\": \"mailto:${recipient}\", \"dmarc_report_uri_failure\": \"${recipient}\"}"
+$csb client provision --config clientconfig.yml --planid 35ffb84b-a898-442e-b5f9-0a6a5229827d --serviceid 260f2ead-b9e9-48b5-9a01-6e3097208ad7 --instanceid $instanceid --params "{\"dmarc_report_aggregate_recipients\": \"mailto:${recipient}\", \"dmarc_report_failure_recipients\": \"${recipient}\"}"
 
 # Wait on provisioning to finish
 state=""

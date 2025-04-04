@@ -10,6 +10,12 @@ resource "aws_sns_topic" "ses_reputation_notifications" {
   }
 }
 
+resource "aws_sns_topic_subscription" "customer_reputation_notifications" {
+  endpoint  = var.admin_email
+  protocol  = "email"
+  topic_arn = aws_sns_topic.ses_reputation_notifications.arn
+}
+
 locals {
   # Notify the Cloud.gov Platform team and the customer.
   reputation_notification_topics = [

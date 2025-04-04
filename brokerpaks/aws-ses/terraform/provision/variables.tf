@@ -41,14 +41,18 @@ variable "instance_id" {
   description = "The identifier for the instance, which together with the Plan ID and Service ID is unique. When CAPI sends the provision request, this is a GUID."
 }
 
-variable "dmarc_report_uri_aggregate" {
-  type        = string
-  description = "One or more comma-separated mailto URIs to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov,mailto:another@example.gov'."
+variable "admin_email" {
+  type = string
 }
 
-variable "dmarc_report_uri_failure" {
-  type        = string
-  description = "One or more comma-separated mailto URIs to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov,mailto:another@example.gov'."
+variable "dmarc_report_aggregate_recipients" {
+  type        = list(string)
+  description = "Zero or more email addresses to which DMARC aggregate reports should be sent."
+}
+
+variable "dmarc_report_failure_recipients" {
+  type        = list(string)
+  description = "Zero or more email addresses to which DMARC individual message failure reports should be sent."
 }
 
 variable "labels" {
