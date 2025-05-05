@@ -9,12 +9,14 @@ jobs:
   - name: terraform-plan-apps-development
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
-            trigger: true
+            trigger: true # Changes to the terraform deployment code trigger a rebuild
           - get: src
             resource: src
-            trigger: true # rebuild when pipeline changes
+            trigger: false # Pipeline changes do not automatically trigger a rebuild
             passed: [set-self]
           # Changes to the iaas state file trigger a build. This is not a step
           # input because the state is accessed separately using a
@@ -26,60 +28,68 @@ jobs:
           - get: general-task
           - get: csb-image
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
             trigger: true
       - in_parallel:
           - load_var: csb-image-repository
             file: csb-image/repository
           - load_var: csb-image-digest
             file: csb-image/digest
-          - load_var: csb-docproxy-image-repository
-            file: csb-docproxy-image/repository
-          - load_var: csb-docproxy-image-digest
-            file: csb-docproxy-image/digest
+          - load_var: csb-helper-image-repository
+            file: csb-helper-image/repository
+          - load_var: csb-helper-image-digest
+            file: csb-helper-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params: &tf-apps-development
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-development
+          STACK_NAME: csb-development
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-development))
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
+          TF_UPDATE_PLUGIN_CACHE: true
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.dev.us-gov-west-1.aws-us-gov.cloud.gov
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-development))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
-          TF_VAR_csb_docproxy_docker_image_name: "((.:csb-docproxy-image-repository))"
-          TF_VAR_csb_docproxy_docker_image_version: "@((.:csb-docproxy-image-digest))"
           TF_VAR_csb_docproxy_domain: dev.us-gov-west-1.aws-us-gov.cloud.gov
+          TF_VAR_csb_enable_service_access_global: true
+          TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
+          TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
           TF_VAR_external_remote_state_reader_access_key_id: ((development-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((development-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((development-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-development
+          TF_VAR_iaas_stack_name: development
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: development
-      - put: slack
+      - put: terraform-plugin-cache
         params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+          file: updated-terraform-plugin-cache/cache.tar.gz
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-development
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-development]
@@ -87,27 +97,39 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-development]
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
+            passed: [terraform-plan-apps-development]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
       - load_var: csb-image-digest
         file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - load_var: csb-helper-image-repository
+        file: csb-helper-image/repository
+      - load_var: csb-helper-image-digest
+        file: csb-helper-image/digest
       - task: terraform-apply
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params:
           <<: *tf-apps-development
+          TF_UPDATE_PLUGIN_CACHE: false
           TERRAFORM_ACTION: apply
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-development))
+          CF_CLIENT_ID: ((cf-client-id-development))
+          CF_CLIENT_SECRET: ((cf-client-secret-development))
 
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -121,61 +143,69 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-apply-apps-development]
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
+            passed: [terraform-apply-apps-development]
             trigger: true
       - in_parallel:
           - load_var: csb-image-repository
             file: csb-image/repository
           - load_var: csb-image-digest
             file: csb-image/digest
-          - load_var: csb-docproxy-image-repository
-            file: csb-docproxy-image/repository
-          - load_var: csb-docproxy-image-digest
-            file: csb-docproxy-image/digest
+          - load_var: csb-helper-image-repository
+            file: csb-helper-image/repository
+          - load_var: csb-helper-image-digest
+            file: csb-helper-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params: &tf-apps-staging
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-staging
+          STACK_NAME: csb-staging
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-staging))
           CF_CLIENT_ID: ((cf-client-id-staging))
           CF_CLIENT_SECRET: ((cf-client-secret-staging))
+          TF_UPDATE_PLUGIN_CACHE: false
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.fr-stage.cloud.gov
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-staging))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
-          TF_VAR_csb_docproxy_docker_image_name: "((.:csb-docproxy-image-repository))"
-          TF_VAR_csb_docproxy_docker_image_version: "@((.:csb-docproxy-image-digest))"
           TF_VAR_csb_docproxy_domain: fr-stage.cloud.gov
+          TF_VAR_csb_enable_service_access_global: false
+          TF_VAR_csb_enable_service_access_orgs: ((enable-service-access-orgs-production)) # temporary to test if it works as expected
+          TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
+          TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
           TF_VAR_external_remote_state_reader_access_key_id: ((staging-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((staging-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((staging-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-staging
+          TF_VAR_iaas_stack_name: staging
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: staging
-      - put: slack
-        params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-staging
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             trigger: true
@@ -183,27 +213,38 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-staging]
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
+            passed: [terraform-plan-apps-staging]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
       - load_var: csb-image-digest
         file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - load_var: csb-helper-image-repository
+        file: csb-helper-image/repository
+      - load_var: csb-helper-image-digest
+        file: csb-helper-image/digest
       - task: terraform-apply
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params:
           <<: *tf-apps-staging
           TERRAFORM_ACTION: apply
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-staging))
+          CF_CLIENT_ID: ((cf-client-id-staging))
+          CF_CLIENT_SECRET: ((cf-client-secret-staging))
 
   - name: terraform-plan-apps-production
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-apply-apps-staging]
@@ -217,85 +258,102 @@ jobs:
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-apply-apps-staging]
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
+            passed: [terraform-apply-apps-staging]
             trigger: true
       - in_parallel:
           - load_var: csb-image-repository
             file: csb-image/repository
           - load_var: csb-image-digest
             file: csb-image/digest
-          - load_var: csb-docproxy-image-repository
-            file: csb-docproxy-image/repository
-          - load_var: csb-docproxy-image-digest
-            file: csb-docproxy-image/digest
+          - load_var: csb-helper-image-repository
+            file: csb-helper-image/repository
+          - load_var: csb-helper-image-digest
+            file: csb-helper-image/digest
       - task: terraform-plan
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params: &tf-apps-production
           TERRAFORM_ACTION: plan
           TEMPLATE_SUBDIR: ci/terraform/stack
-          STACK_NAME: cf-apps-production
+          STACK_NAME: csb-production
           S3_TFSTATE_BUCKET: ((tf-state-bucket))
           AWS_DEFAULT_REGION: ((aws-region))
+          AWS_USE_FIPS_ENDPOINT: true
           CF_API_URL: ((cf-api-url-production))
           CF_CLIENT_ID: ((cf-client-id-production))
           CF_CLIENT_SECRET: ((cf-client-secret-production))
+          TF_UPDATE_PLUGIN_CACHE: false
           TF_VAR_csb_aws_region_commercial: ((csb-aws-region-commercial))
           TF_VAR_csb_aws_region_govcloud: ((aws-region))
           TF_VAR_csb_aws_ses_default_zone: appmail.cloud.gov
           TF_VAR_csb_broker_route_domain: ((csb-broker-route-domain-production))
           TF_VAR_csb_docker_image_name: "((.:csb-image-repository))"
           TF_VAR_csb_docker_image_version: "@((.:csb-image-digest))"
-          TF_VAR_csb_docproxy_docker_image_name: "((.:csb-docproxy-image-repository))"
-          TF_VAR_csb_docproxy_docker_image_version: "@((.:csb-docproxy-image-digest))"
-          TF_VAR_csb_docproxy_domain: fr.cloud.gov
-          TF_VAR_csb_docproxy_instances: 2
+          TF_VAR_csb_docproxy_domain: cloud.gov
+          TF_VAR_csb_enable_service_access_orgs: ((enable-service-access-orgs-production))
+          TF_VAR_csb_helper_docker_image_name: "((.:csb-helper-image-repository))"
+          TF_VAR_csb_helper_docker_image_version: "@((.:csb-helper-image-digest))"
+          TF_VAR_csb_helper_instances: 2
           TF_VAR_csb_org_name: ((csb-org-name))
           TF_VAR_csb_space_name: ((csb-space-name))
           TF_VAR_external_remote_state_reader_access_key_id: ((production-tf-state-access-key-id))
           TF_VAR_external_remote_state_reader_region: ((production-tf-state-region))
           TF_VAR_external_remote_state_reader_secret_access_key: ((production-tf-state-secret-access-key))
           TF_VAR_external_stack_name: external-production
+          TF_VAR_iaas_stack_name: production
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-          TF_VAR_stack_name: production
-      - put: slack
-        params:
-          text_file: terraform-state/message.txt
-          text: |
-            :terraform: $BUILD_JOB_NAME needs review
-            <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-          channel: "#cg-customer-success"
-          username: ((slack-username))
-          icon_url: ((slack-icon-url))
+      # - put: slack
+      #   params:
+      #     text_file: terraform-state/message.txt
+      #     text: |
+      #       :terraform: $BUILD_JOB_NAME needs review
+      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+      #     channel: "#cg-customer-success"
+      #     username: ((slack-username))
+      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-production
     plan:
       - in_parallel:
+          - get: terraform-plugin-cache
+            trigger: false
           - get: terraform-templates
             resource: terraform-config
             passed: [terraform-plan-apps-production]
           - get: pipeline-tasks
           - get: general-task
           - get: csb-image
+            passed: [terraform-plan-apps-production]
             trigger: true
-          - get: csb-docproxy-image
+          - get: csb-helper-image
+            passed: [terraform-plan-apps-production]
             trigger: true
       - load_var: csb-image-repository
         file: csb-image/repository
       - load_var: csb-image-digest
         file: csb-image/digest
-      - load_var: csb-docproxy-image-repository
-        file: csb-docproxy-image/repository
-      - load_var: csb-docproxy-image-digest
-        file: csb-docproxy-image/digest
+      - load_var: csb-helper-image-repository
+        file: csb-helper-image/repository
+      - load_var: csb-helper-image-digest
+        file: csb-helper-image/digest
       - task: terraform-apply
         image: general-task
         file: terraform-templates/ci/terraform/terraform-apply.yml
         params:
           <<: *tf-apps-production
           TERRAFORM_ACTION: apply
+      - task: terraform-cleanup
+        image: general-task
+        file: terraform-templates/ci/terraform/terraform-cleanup.yml
+        params:
+          CF_API_URL: ((cf-api-url-production))
+          CF_CLIENT_ID: ((cf-client-id-production))
+          CF_CLIENT_SECRET: ((cf-client-secret-production))
+          REGISTER_ORGS: ((register-orgs-production))
 
 resources:
   - name: pipeline-tasks
@@ -305,17 +363,17 @@ resources:
       uri: https://github.com/cloud-gov/cg-pipeline-tasks.git
       branch: main
 
-  - name: slack
-    type: slack-notification
-    source:
-      url: ((slack-webhook-url))
+  # - name: slack
+  #   type: slack-notification
+  #   source:
+  #     url: ((slack-webhook-url))
 
   - name: terraform-config
     type: git
     source:
       commit_verification_keys: ((cloud-gov-pgp-keys))
       uri: https://github.com/cloud-gov/csb.git
-      branch: brokerpak-topic
+      branch: main
       paths:
         - ci/terraform/*
 
@@ -354,16 +412,16 @@ resources:
     source:
       aws_access_key_id: ((ecr_aws_key))
       aws_secret_access_key: ((ecr_aws_secret))
-      repository: csb
+      repository: cg-csb
       aws_region: us-gov-west-1
       tag: latest
 
-  - name: csb-docproxy-image
+  - name: csb-helper-image
     type: registry-image
     source:
       aws_access_key_id: ((ecr_aws_key))
       aws_secret_access_key: ((ecr_aws_secret))
-      repository: csb-docproxy
+      repository: csb-helper
       aws_region: us-gov-west-1
       tag: latest
 
@@ -372,9 +430,20 @@ resources:
     source:
       commit_verification_keys: ((cloud-gov-pgp-keys))
       uri: https://github.com/cloud-gov/csb.git
-      branch: brokerpak-topic
+      branch: main
       paths:
         - ci/*
+
+  - name: terraform-plugin-cache
+    type: s3-iam
+    source:
+      bucket: ((terraform-cache-bucket))
+      versioned_file: csb/cache.tar.gz
+      region_name: ((aws-region))
+      initial_version: "0"
+      # Initial contents: An empty directory named 'plugin-cache'.
+      # Terraform requires the cache directory to exist, even if empty.
+      initial_content_binary: H4sIAHqo3GcAAyvIKU3PzNNNTkzOSNVnoA0wMDAwNzVVANNmENrAyARCQ4GCoYm5mbmhkYmhibGCgaGpqYkJg4IpjdyDAkqLSxKLgE7JSsxNLS7JyE/OSExJzcFUB1SWlobHHKg/4PQoGAWjYBQMcgAA4m+yIwAGAAA=
 
 resource_types:
   - name: registry-image
@@ -386,14 +455,14 @@ resource_types:
       aws_region: us-gov-west-1
       tag: latest
 
-  - name: slack-notification
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr_aws_key))
-      aws_secret_access_key: ((ecr_aws_secret))
-      repository: slack-notification-resource
-      aws_region: us-gov-west-1
-      tag: latest
+  # - name: slack-notification
+  #   type: registry-image
+  #   source:
+  #     aws_access_key_id: ((ecr_aws_key))
+  #     aws_secret_access_key: ((ecr_aws_secret))
+  #     repository: slack-notification-resource
+  #     aws_region: us-gov-west-1
+  #     tag: latest
 
   - name: git
     type: registry-image

@@ -6,12 +6,12 @@ output "required_records" {
   value = local.manage_domain ? null : local.required_records_as_string
 }
 
-output "dmarc_report_uri_aggregate" {
-  value = var.dmarc_report_uri_aggregate
+output "dmarc_report_aggregate_recipients" {
+  value = var.dmarc_report_aggregate_recipients
 }
 
-output "dmarc_report_uri_failure" {
-  value = var.dmarc_report_uri_failure
+output "dmarc_report_failure_recipients" {
+  value = var.dmarc_report_failure_recipients
 }
 
 output "instructions" {
@@ -24,6 +24,10 @@ output "configuration_set_arn" {
 
 output "domain_arn" {
   value = aws_sesv2_email_identity.identity.arn
+}
+
+output "reputation_topic_arn" {
+  value = aws_sns_topic.ses_reputation_notifications.arn
 }
 
 output "bounce_topic_arn" {

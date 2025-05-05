@@ -1,4 +1,4 @@
-variable "stack_name" {
+variable "iaas_stack_name" {
   type        = string
   description = "One of development, staging, production."
 }
@@ -65,19 +65,29 @@ variable "csb_broker_route_domain" {
   type = string
 }
 
+variable "csb_enable_service_access_global" {
+  type    = bool
+  default = false
+}
+
+variable "csb_enable_service_access_orgs" {
+  type    = list(string)
+  default = []
+}
+
 variable "csb_docproxy_domain" {
   type = string
 }
 
-variable "csb_docproxy_docker_image_name" {
+variable "csb_helper_docker_image_name" {
   type = string
 }
 
-variable "csb_docproxy_docker_image_version" {
+variable "csb_helper_docker_image_version" {
   type = string
 }
 
-variable "csb_docproxy_instances" {
+variable "csb_helper_instances" {
   type    = number
   default = 1
 }
