@@ -1,4 +1,6 @@
 # Create SNS topic for bounce messages
+# Trivy: It is best practice to encrypt with customer-managed keys so permissions can be managed more granularly, but we have not implemented a system for doing so yet at CG.
+#trivy:ignore:AVD-AWS-0136
 resource "aws_sns_topic" "bounce_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-bounce"
@@ -27,6 +29,8 @@ resource "aws_sesv2_configuration_set_event_destination" "bounce" {
 }
 
 # Create SNS topic for complaint messages
+# Trivy: It is best practice to encrypt with customer-managed keys so permissions can be managed more granularly, but we have not implemented a system for doing so yet at CG.
+#trivy:ignore:AVD-AWS-0136
 resource "aws_sns_topic" "complaint_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-complaint"
@@ -53,6 +57,8 @@ resource "aws_sesv2_configuration_set_event_destination" "name" {
 }
 
 # Create SNS topic for delivery messages
+# Trivy: It is best practice to encrypt with customer-managed keys so permissions can be managed more granularly, but we have not implemented a system for doing so yet at CG.
+#trivy:ignore:AVD-AWS-0136
 resource "aws_sns_topic" "delivery_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-delivery"

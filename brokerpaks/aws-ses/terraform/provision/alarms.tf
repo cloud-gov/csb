@@ -1,4 +1,6 @@
 # Create SNS topic for reputation alarms. Always create, regardless of var.enable_feedback_notifications.
+# Trivy: It is best practice to encrypt with customer-managed keys so permissions can be managed more granularly, but we have not implemented a system for doing so yet at CG.
+#trivy:ignore:AVD-AWS-0136
 resource "aws_sns_topic" "ses_reputation_notifications" {
   name = "${local.base_name}-reputation-notifications"
 
