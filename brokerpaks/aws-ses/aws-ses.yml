@@ -43,11 +43,6 @@ provision:
       required: false
       default: ""
       details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
-    - field_name: allow_delete
-      type: bool
-      required: false
-      default: false
-      details: Allow deletion of this service instance. By default, all resources are protected from deletion to avoid accidental data loss. To delete this instance, set this parameter to `true`.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
