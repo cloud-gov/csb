@@ -107,7 +107,7 @@ resource "aws_sesv2_email_identity" "identity" {
   email_identity         = local.domain
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -118,7 +118,7 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
   mail_from_domain = local.mail_from_domain
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -136,7 +136,7 @@ resource "aws_sesv2_configuration_set" "config" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
 
     # The csb-helper will disable sending on an identity if its reputation
     # metrics exceed a certain threshold. To avoid the CSB accidentally

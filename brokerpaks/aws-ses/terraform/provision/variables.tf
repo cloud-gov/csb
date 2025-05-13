@@ -98,3 +98,8 @@ variable "cloud_gov_slack_notification_topic_arn" {
   type        = string
   description = "SNS topic ARN. Reputation notifications are sent to the Cloud.gov team for awareness."
 }
+
+variable "allow_delete" {
+  default     = false
+  description = "Allow deletion of this service instance. By default, all resources are protected from deletion to avoid accidental data loss. To delete this instance, set this parameter to `true`."
+}

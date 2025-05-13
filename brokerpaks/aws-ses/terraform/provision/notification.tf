@@ -9,7 +9,7 @@ resource "aws_sns_topic" "bounce_topic" {
   kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_sns_topic" "complaint_topic" {
   kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -67,7 +67,7 @@ resource "aws_sns_topic" "delivery_topic" {
   kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 

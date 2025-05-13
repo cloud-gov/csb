@@ -8,7 +8,7 @@ resource "aws_sns_topic" "ses_reputation_notifications" {
   kms_master_key_id = "alias/aws/sns"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
   insufficient_data_actions = []
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -128,7 +128,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
   insufficient_data_actions = []
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -184,7 +184,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
   insufficient_data_actions = []
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
 
@@ -233,6 +233,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
   insufficient_data_actions = []
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = !var.allow_delete
   }
 }
