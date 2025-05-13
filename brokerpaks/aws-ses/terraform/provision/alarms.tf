@@ -6,10 +6,6 @@ resource "aws_sns_topic" "ses_reputation_notifications" {
 
   # Use an AWS-managed key for topic encryption.
   kms_master_key_id = "alias/aws/sns"
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_sns_topic_subscription" "customer_reputation_notifications" {
@@ -77,10 +73,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
   alarm_actions             = local.reputation_notification_topics
   ok_actions                = local.reputation_notification_topics
   insufficient_data_actions = []
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
@@ -126,10 +118,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
   alarm_actions             = local.reputation_notification_topics
   ok_actions                = local.reputation_notification_topics
   insufficient_data_actions = []
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 /*
@@ -182,10 +170,6 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
   alarm_actions             = local.reputation_notification_topics
   ok_actions                = local.reputation_notification_topics
   insufficient_data_actions = []
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
@@ -231,8 +215,4 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
   alarm_actions             = local.reputation_notification_topics
   ok_actions                = local.reputation_notification_topics
   insufficient_data_actions = []
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }

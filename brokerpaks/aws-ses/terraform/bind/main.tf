@@ -14,16 +14,10 @@ locals {
 resource "aws_iam_user" "user" {
   name = local.base_name
   path = "/cf/"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_iam_access_key" "access_key" {
   user = aws_iam_user.user.name
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_iam_user_policy" "user_policy" {
@@ -45,10 +39,6 @@ resource "aws_iam_user_policy" "user_policy" {
       ]
     }]
   })
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_sns_topic_subscription" "bounce_subscription" {

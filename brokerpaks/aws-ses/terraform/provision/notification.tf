@@ -7,10 +7,6 @@ resource "aws_sns_topic" "bounce_topic" {
 
   # Use an AWS-managed key for topic encryption.
   kms_master_key_id = "alias/aws/sns"
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "bounce" {
@@ -37,10 +33,6 @@ resource "aws_sns_topic" "complaint_topic" {
 
   # Use an AWS-managed key for topic encryption.
   kms_master_key_id = "alias/aws/sns"
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "name" {
@@ -65,10 +57,6 @@ resource "aws_sns_topic" "delivery_topic" {
 
   # Use an AWS-managed key for topic encryption.
   kms_master_key_id = "alias/aws/sns"
-
-  lifecycle {
-    prevent_destroy = !var.allow_delete
-  }
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "delivery" {
