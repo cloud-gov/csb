@@ -13,10 +13,10 @@ locals {
     ",",
     [
       "mailto:reports@dmarc.cyber.dhs.gov",
-      length(var.dmarc_report_aggregate_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_aggregate_recipients)) : "mailto:" + var.admin_email
+      length(var.dmarc_report_aggregate_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_aggregate_recipients)) : format("mailto:%s", var.admin_email)
     ]
   )
-  dmarc_ruf = length(var.dmarc_report_failure_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_failure_recipients)) : "mailto:" + var.admin_email
+  dmarc_ruf = length(var.dmarc_report_failure_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_failure_recipients)) : format("mailto:%s", var.admin_email)
 
   # p=reject is required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
   dmarc_verification_record = {
