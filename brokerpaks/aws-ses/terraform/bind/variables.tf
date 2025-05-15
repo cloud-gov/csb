@@ -13,10 +13,6 @@ variable "aws_region_govcloud" {
 }
 
 // Brokerpak configuration
-variable "user_name" {
-  type = string
-}
-
 variable "binding_id" {
   type = string
 }
