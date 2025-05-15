@@ -1,4 +1,4 @@
-variable "stack_name" {
+variable "cloud_gov_environment" {
   type        = string
   description = "Like development, staging, or production."
 }
@@ -47,6 +47,17 @@ variable "broker_route_domain" {
   description = "The domain under which the broker's route will be created. For example, 'fr.cloud.gov'."
 }
 
+variable "enable_service_access_global" {
+  type        = bool
+  default     = false
+  description = "Set this to true to enable service access for all CSB service offerings globally in the Foundation. If true, service_access_orgs will be ignored."
+}
+
+variable "enable_service_access_orgs" {
+  type        = list(string)
+  description = "The names of organizations in which service access will be enabled for CSB service offerings. Only used if service_access_global is set to false."
+}
+
 # Database credentials
 
 variable "rds_host" {
@@ -76,6 +87,16 @@ variable "rds_password" {
 }
 
 # CSB Configuration
+
+variable "email_notification_topic_arn" {
+  type        = string
+  description = "ARN of an SNS topic. The CSB will send email alarms to the Cloud.gov team via this topic."
+}
+
+variable "slack_notification_topic_arn" {
+  type        = string
+  description = "ARN of an SNS topic. The CSB will send slack alarms to the Cloud.gov team via this topic."
+}
 
 variable "aws_ses_default_zone" {
   type        = string
@@ -108,26 +129,35 @@ variable "aws_region_commercial" {
   type = string
 }
 
-# Docproxy configuration
+# CSB helper service configuration
 
 variable "docproxy_domain" {
   type        = string
   description = "The parent domain in CF under which the docproxy will be routed. For example, to serve it on services.fr.cloud.gov, set this to fr.cloud.gov. The subdomain is always 'services'."
 }
 
-variable "docproxy_docker_image_name" {
+variable "helper_docker_image_name" {
   type        = string
   description = "Full name (but not tag or SHA) of the Docker image the broker will use."
 }
 
-variable "docproxy_docker_image_version" {
+variable "helper_docker_image_version" {
   type        = string
   description = "Tag or SHA of the Docker image the broker will use. For example, ':latest' or '@sha256:abc123...'."
   default     = ":latest"
 
 }
 
-variable "docproxy_instances" {
+variable "helper_instances" {
   type        = number
-  description = "Number of instances of the docproxy app to run."
+  description = "Number of instances of the helper app to run."
+}
+
+variable "helper_aws_access_key_id" {
+  type = string
+}
+
+variable "helper_aws_secret_access_key" {
+  type      = string
+  sensitive = true
 }
