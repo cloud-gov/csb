@@ -25,7 +25,7 @@ provision:
     - field_name: admin_email
       type: string
       required: true
-      details: An administrative email address that Cloud.gov will use to contact you if your identity is in danger of having its ability to send emails paused. For example, `email-admin@agency.gov`. See [Cloud.gov AWS SES - Reputation Protection](https://cloud.gov/docs/services/aws-ses#reputation-protection) for details. By default, this address will also be used as the DMARC report and error email address. If you provide alternate DMARC addresses by setting the `dmarc_report_aggregate_recipients` and `dmarc_report_failure_recipients` parameters, those will be used instead. If you update this parameter and neither `dmarc_report_uri` parameter is specified, remember to update your DNS with the new records in the `required_records` output.
+      details: An administrative email address that Cloud.gov will use to contact you if your identity is at risk of having its ability to send emails paused. For example, `email-admin@agency.gov`. See [Cloud.gov AWS SES - Reputation Protection](https://cloud.gov/docs/services/aws-ses#reputation-protection) for details. By default, this address will also be used as the DMARC report and error email address. If you provide alternate DMARC addresses by setting the `dmarc_report_aggregate_recipients` and `dmarc_report_failure_recipients` parameters, those will be used instead. If you update this parameter and neither `dmarc_report_uri` parameter is specified, remember to update your DNS with the new records in the `required_records` output.
     - field_name: dmarc_report_aggregate_recipients
       type: array
       required: false
