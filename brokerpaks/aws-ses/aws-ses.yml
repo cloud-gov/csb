@@ -101,10 +101,10 @@ provision:
       type: object
       details: If a domain was supplied, you must create these records in that zone in your DNS system.
     - field_name: dmarc_report_aggregate_recipients
-      type: string
+      type: array
       details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`.
     - field_name: dmarc_report_failure_recipients
-      type: string
+      type: array
       details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`.
     - field_name: instructions
       type: string
@@ -245,7 +245,7 @@ examples:
       dmarc_report_failure_recipients: ["dmarc@agency.gov", "another-address@agency.gov"]
     bind_params: {}
   - name: External domain
-    description: Specify the `domain` parameter to send mail from a agency-managed domain. Binding or creating a service key will show instructions for creating the required DNS records.
+    description: Specify the `domain` parameter to send mail from an agency-managed domain. Binding or creating a service key will show instructions for creating the required DNS records.
     plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
     provision_params:
       admin_email: "email-admin@agency.gov"
