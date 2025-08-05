@@ -100,12 +100,6 @@ provision:
     - field_name: required_records
       type: object
       details: If a domain was supplied, you must create these records in that zone in your DNS system.
-    - field_name: dmarc_report_aggregate_recipients
-      type: array
-      details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`.
-    - field_name: dmarc_report_failure_recipients
-      type: array
-      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`.
     - field_name: instructions
       type: string
       details: Any further steps that you must take before using the service.
