@@ -6,14 +6,6 @@ output "required_records" {
   value = local.manage_domain ? null : local.required_records_as_string
 }
 
-output "dmarc_report_aggregate_recipients" {
-  value = var.dmarc_report_aggregate_recipients
-}
-
-output "dmarc_report_failure_recipients" {
-  value = var.dmarc_report_failure_recipients
-}
-
 output "instructions" {
   value = local.instructions
 }
