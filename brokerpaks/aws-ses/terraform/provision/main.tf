@@ -1,6 +1,7 @@
 locals {
+  # instance_sha is used as the subdomain on the configured var.default_domain if the user did not provide a domain. Otherwise, it is unused.
   instance_sha = "ses-${substr(sha256(var.instance_id), 0, 16)}"
-  # Base name for all resources produced by a single instance of this service.
+  # Base name for all resources related to this instance, EXCEPT records generated when no domain is provided. Those use local.instance_sha.
   base_name = "csb-aws-ses-${var.instance_id}"
 
   # If no domain was provided, we create and manage one instead.

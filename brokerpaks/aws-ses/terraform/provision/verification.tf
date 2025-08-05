@@ -21,7 +21,7 @@ resource "aws_route53_record" "instance_ns" {
   count    = (local.manage_domain ? 1 : 0)
 
   zone_id = data.aws_route53_zone.parent_zone[0].zone_id
-  name    = var.instance_id
+  name    = local.instance_sha
   type    = "NS"
   ttl     = "30"
   records = aws_route53_zone.instance_zone[0].name_servers
