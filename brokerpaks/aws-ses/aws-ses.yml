@@ -9,7 +9,7 @@ provider_display_name: "Cloud.gov"
 support_url: https://cloud.gov/contact/
 tags: [aws, csb]
 plans:
-  - name: base
+  - name: domain
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
     description: Provision credentials for sending email from any user at a domain, like `agency.gov`.
     display_name: Send-only service
@@ -83,7 +83,7 @@ provision:
       default: aws-ses
     - name: service_plan_name
       type: string
-      default: base
+      default: domain
     - name: cloud_gov_environment
       type: string
       default: ${config("cloud_gov.environment")}
@@ -194,7 +194,7 @@ bind:
       default: aws-ses
     - name: service_plan_name
       type: string
-      default: base
+      default: domain
     - name: cloud_gov_environment
       type: string
       default: ${config("cloud_gov.environment")}
