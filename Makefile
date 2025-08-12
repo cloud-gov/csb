@@ -11,6 +11,3 @@ watch:
 clean:
 	rm -r /tmp/pak-build-cache
 	rm *.brokerpak
-
-watch-docproxy:
-	find docproxy | entr -r go run ./docproxy/.

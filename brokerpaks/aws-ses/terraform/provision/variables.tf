@@ -29,7 +29,6 @@ variable "aws_region_commercial" {
 variable "domain" {
   type        = string
   description = "Domain from mail will be sent. For example, agency.gov. If left empty, a temporary cloud.gov subdomain will be generated."
-  default     = ""
 }
 
 variable "default_domain" {
@@ -39,35 +38,35 @@ variable "default_domain" {
 
 variable "instance_id" {
   type        = string
-  default     = ""
   description = "The identifier for the instance, which together with the Plan ID and Service ID is unique. When CAPI sends the provision request, this is a GUID."
 }
 
-variable "dmarc_report_uri_aggregate" {
-  type        = string
-  description = "The mailto URI to which DMARC aggregate reports should be sent. For example, 'mailto:dmarc@example.gov'."
+variable "admin_email" {
+  type = string
 }
 
-variable "dmarc_report_uri_failure" {
-  type        = string
-  description = "To mailto URI to which to which DMARC individual message failure reports should be sent. For example, 'mailto:dmarc@example.gov'."
+variable "dmarc_report_aggregate_recipients" {
+  type        = list(string)
+  description = "Zero or more email addresses to which DMARC aggregate reports should be sent."
+}
+
+variable "dmarc_report_failure_recipients" {
+  type        = list(string)
+  description = "Zero or more email addresses to which DMARC individual message failure reports should be sent."
 }
 
 variable "labels" {
-  type    = map(any)
-  default = {}
+  type = map(any)
 }
 
 variable "enable_feedback_notifications" {
   type        = bool
   description = "Toggle whether to create SNS topics for feedback notifications"
-  default     = false
 }
 
 variable "mail_from_subdomain" {
   type        = string
-  description = "Subdomain to set as the mail-from value"
-  default     = ""
+  description = "Subdomain to set as the mail-from value."
 }
 
 variable "context" {
@@ -88,4 +87,14 @@ variable "service_plan_name" {
 variable "cloud_gov_environment" {
   type        = string
   description = "The cloud.gov environment the broker is deployed in. For example: local, development, staging, or production."
+}
+
+variable "cloud_gov_email_notification_topic_arn" {
+  type        = string
+  description = "SNS topic ARN. Reputation notifications are sent to the Cloud.gov team for awareness."
+}
+
+variable "cloud_gov_slack_notification_topic_arn" {
+  type        = string
+  description = "SNS topic ARN. Reputation notifications are sent to the Cloud.gov team for awareness."
 }

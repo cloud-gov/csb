@@ -1,16 +1,30 @@
 locals {
+  # instance_sha is used as the subdomain on the configured var.default_domain if the user did not provide a domain. Otherwise, it is unused.
   instance_sha = "ses-${substr(sha256(var.instance_id), 0, 16)}"
+  # Base name for all resources related to this instance, EXCEPT records generated when no domain is provided. Those use local.instance_sha.
+  base_name = "csb-aws-ses-${var.instance_id}"
 
   # If no domain was provided, we create and manage one instead.
   manage_domain = (var.domain == "")
-  domain        = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
+  # Domain is exposed to the outside world, so avoid exposing the instance_id by using its SHA in the domain instead
+  domain = (local.manage_domain ? "${local.instance_sha}.${var.default_domain}" : var.domain)
 
+  # rua=mailto:reports@dmarc.cyber.dhs.gov is required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
+  dmarc_rua = join(
+    ",",
+    [
+      "mailto:reports@dmarc.cyber.dhs.gov",
+      length(var.dmarc_report_aggregate_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_aggregate_recipients)) : format("mailto:%s", var.admin_email)
+    ]
+  )
+  dmarc_ruf = length(var.dmarc_report_failure_recipients) > 0 ? join(",", formatlist("mailto:%s", var.dmarc_report_failure_recipients)) : format("mailto:%s", var.admin_email)
+
+  # p=reject is required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
   dmarc_verification_record = {
-    name = "_dmarc.${local.domain}"
-    type = "TXT"
-    ttl  = "600"
-    // rua=mailto:reports@dmarc.cyber.dhs.gov and p=reject are required by BOD-18-01: https://cyber.dhs.gov/assets/report/bod-18-01.pdf
-    records = ["v=DMARC1; p=reject; rua=mailto:reports@dmarc.cyber.dhs.gov, ${var.dmarc_report_uri_aggregate}; ruf=mailto:${var.dmarc_report_uri_failure}"]
+    name    = "_dmarc.${local.domain}"
+    type    = "TXT"
+    ttl     = "600"
+    records = ["v=DMARC1; p=reject; rua=${local.dmarc_rua}; ruf=${local.dmarc_ruf}"]
   }
 
   setting_mail_from = (var.mail_from_subdomain != "")
@@ -92,10 +106,6 @@ locals {
 resource "aws_sesv2_email_identity" "identity" {
   configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
   email_identity         = local.domain
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
@@ -103,8 +113,25 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
 
   email_identity   = aws_sesv2_email_identity.identity.email_identity
   mail_from_domain = local.mail_from_domain
+}
+
+resource "aws_sesv2_configuration_set" "config" {
+  configuration_set_name = local.base_name
+
+  delivery_options {
+    tls_policy = "REQUIRE"
+  }
+  reputation_options {
+    reputation_metrics_enabled = true
+  }
+  suppression_options {
+    suppressed_reasons = ["BOUNCE", "COMPLAINT"]
+  }
 
   lifecycle {
-    prevent_destroy = true
+    # The csb-helper will disable sending on an identity if its reputation
+    # metrics exceed a certain threshold. To avoid the CSB accidentally
+    # overwriting this change, ignore changes to the sending_enabled field.
+    ignore_changes = [sending_options["sending_enabled"]]
   }
 }

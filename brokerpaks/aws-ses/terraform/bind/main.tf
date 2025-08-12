@@ -1,6 +1,6 @@
 locals {
   instance_sha                     = "ses-${substr(sha256(var.instance_id), 0, 16)}"
-  user_name                        = "${local.instance_sha}-${var.user_name}"
+  base_name                        = "csb-aws-ses-${var.binding_id}"
   subscribe_bounce_notification    = (var.bounce_topic_arn != "" && var.notification_webhook != "")
   subscribe_complaint_notification = (var.complaint_topic_arn != "" && var.notification_webhook != "")
   subscribe_delivery_notification  = (var.delivery_topic_arn != "" && var.notification_webhook != "")
@@ -12,22 +12,16 @@ locals {
 # on sending, so we cannot use a group with a single policy for all users.
 #trivy:ignore:AVD-AWS-0143
 resource "aws_iam_user" "user" {
-  name = local.user_name
+  name = local.base_name
   path = "/cf/"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_iam_access_key" "access_key" {
   user = aws_iam_user.user.name
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_iam_user_policy" "user_policy" {
-  name = format("%s-p", local.user_name)
+  name = local.base_name
 
   user = aws_iam_user.user.name
 
@@ -45,10 +39,6 @@ resource "aws_iam_user_policy" "user_policy" {
       ]
     }]
   })
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_sns_topic_subscription" "bounce_subscription" {

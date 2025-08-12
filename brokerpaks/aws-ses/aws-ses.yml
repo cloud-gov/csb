@@ -4,14 +4,14 @@ id: 260f2ead-b9e9-48b5-9a01-6e3097208ad7
 description: Send email from verified domains using Amazon Simple Email Service (SES). Supports SMTP and the SES HTTP API.
 display_name: AWS Simple Email Service
 image_url: https://services.cloud.gov/images/amazon-ses.svg
-documentation_url: https://aws.amazon.com/ses/ # todo
+documentation_url: https://cloud.gov/docs/services/aws-ses/
 provider_display_name: "Cloud.gov"
 support_url: https://cloud.gov/contact/
 tags: [aws, csb]
 plans:
-  - name: base
+  - name: domain
     id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
-    description: Provision SMTP credentials for sending email from any user at a domain, like `agency.gov`.
+    description: Provision credentials for sending email from any user at a domain, like `agency.gov`.
     display_name: Send-only service
 provision:
   plan_inputs:
@@ -19,16 +19,23 @@ provision:
     - field_name: domain
       type: string
       required: false
+      default: ""
       prohibit_update: true
       details: Domain from which mail will be sent. For example, `agency.gov`. If left empty, a temporary cloud.gov subdomain will be generated.
-    - field_name: dmarc_report_uri_aggregate
+    - field_name: admin_email
       type: string
       required: true
-      details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
-    - field_name: dmarc_report_uri_failure
-      type: string
-      required: true
-      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
+      details: An administrative email address that Cloud.gov will use to contact you if your identity is at risk of having its ability to send emails paused. For example, `email-admin@agency.gov`. See [Cloud.gov AWS SES - Reputation Protection](https://cloud.gov/docs/services/aws-ses#reputation-protection) for details. By default, this address will also be used as the DMARC report and error email address. If you provide alternate DMARC addresses by setting the `dmarc_report_aggregate_recipients` and `dmarc_report_failure_recipients` parameters, those will be used instead. If you update this parameter and neither `dmarc_report_uri` parameter is specified, remember to update your DNS with the new records in the `required_records` output.
+    - field_name: dmarc_report_aggregate_recipients
+      type: array
+      required: false
+      default: []
+      details: The email addresses to which DMARC aggregate reports should be sent. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
+    - field_name: dmarc_report_failure_recipients
+      type: array
+      required: false
+      default: []
+      details: The email addresses to which DMARC individual message failure reports should be sent. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
     - field_name: enable_feedback_notifications
       type: boolean
       details: Flag to toggle creation of SNS topics for feedback notifications.
@@ -36,6 +43,7 @@ provision:
     - field_name: mail_from_subdomain
       type: string
       required: false
+      default: ""
       details: The custom MAIL FROM domain that you want the verified identity to use. See the [SES v2 API reference](https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_PutEmailIdentityMailFromAttributes.html) for requirements.
   computed_inputs:
     - name: aws_access_key_id_govcloud
@@ -75,10 +83,16 @@ provision:
       default: aws-ses
     - name: service_plan_name
       type: string
-      default: base
+      default: domain
     - name: cloud_gov_environment
       type: string
       default: ${config("cloud_gov.environment")}
+    - name: cloud_gov_email_notification_topic_arn
+      type: string
+      default: ${config("cloud_gov.email_notification_topic_arn")}
+    - name: cloud_gov_slack_notification_topic_arn
+      type: string
+      default: ${config("cloud_gov.slack_notification_topic_arn")}
   outputs:
     - field_name: region
       type: string
@@ -86,12 +100,6 @@ provision:
     - field_name: required_records
       type: object
       details: If a domain was supplied, you must create these records in that zone in your DNS system.
-    - field_name: dmarc_report_uri_aggregate
-      type: string
-      details: The mailto URI to which DMARC aggregate reports should be sent. For example, `mailto:dmarc@example.gov`. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`.
-    - field_name: dmarc_report_uri_failure
-      type: string
-      details: The mailto URI to which DMARC individual message failure reports should be sent. For example, `mailto:dmarc@example.gov`.
     - field_name: instructions
       type: string
       details: Any further steps that you must take before using the service.
@@ -101,6 +109,9 @@ provision:
     - field_name: domain_arn
       type: string
       details: Instance SES domain identity. Used to create bindings.
+    - field_name: reputation_topic_arn
+      type: string
+      details: ARN of the SNS topic receiving alarms related to reputation metrics.
     - field_name: bounce_topic_arn
       type: string
       details: ARN of the SNS topic receiving bounce feedback notifications.
@@ -111,6 +122,7 @@ provision:
       type: string
       details: ARN of the SNS topic receiving delivery feedback notifications.
   template_refs:
+    alarms: terraform/provision/alarms.tf
     main: terraform/provision/main.tf
     notification: terraform/provision/notification.tf
     outputs: terraform/provision/outputs.tf
@@ -155,6 +167,10 @@ bind:
       default: csb-${instance.name}-${request.binding_id}
       overwrite: true
       type: string
+    - name: binding_id
+      default: ${request.binding_id}
+      overwrite: true
+      type: string
     - name: instance_id
       type: string
       default: ${request.instance_id}
@@ -178,7 +194,7 @@ bind:
       default: aws-ses
     - name: service_plan_name
       type: string
-      default: base
+      default: domain
     - name: cloud_gov_environment
       type: string
       default: ${config("cloud_gov.environment")}
@@ -208,12 +224,26 @@ bind:
     variables: terraform/bind/variables.tf
     versions: terraform/bind/versions.tf
 examples:
-  - name: smtp
-    description: SMTP base
+  - name: Quickstart
+    description: Omit the `domain` parameter and Cloud.gov will generate a domain for you. This is useful for development and testing.
     plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
     provision_params:
-      dmarc_report_uri_aggregate: "mailto:dmarc@agency.gov"
-      dmarc_report_uri_failure: "mailto:dmarc@agency.gov"
+      admin_email: "email-admin@agency.gov"
+    bind_params: {}
+  - name: Separate DMARC recipients
+    description: Manually specify the `dmarc_report_uri` parameters and DMARC reports will be sent to their URIs instead of `admin_email`.
+    plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
+    provision_params:
+      admin_email: "email-admin@agency.gov"
+      dmarc_report_aggregate_recipients: ["dmarc@agency.gov"]
+      dmarc_report_failure_recipients: ["dmarc@agency.gov", "another-address@agency.gov"]
+    bind_params: {}
+  - name: External domain
+    description: Specify the `domain` parameter to send mail from an agency-managed domain. Binding or creating a service key will show instructions for creating the required DNS records.
+    plan_id: 35ffb84b-a898-442e-b5f9-0a6a5229827d
+    provision_params:
+      admin_email: "email-admin@agency.gov"
+      domain: "agency.gov"
     bind_params: {}
 plan_updateable: false
 requiredenvvars: []

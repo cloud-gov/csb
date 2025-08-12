@@ -1,6 +1,5 @@
 go 1.23.2
 
 use (
-	./docproxy
-	./service-updater
+	./helper
 )
