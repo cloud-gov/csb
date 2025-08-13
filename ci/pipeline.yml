@@ -75,15 +75,6 @@ jobs:
       - put: terraform-plugin-cache
         params:
           file: updated-terraform-plugin-cache/cache.tar.gz
-      # - put: slack
-      #   params:
-      #     text_file: terraform-state/message.txt
-      #     text: |
-      #       :terraform: $BUILD_JOB_NAME needs review
-      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-      #     channel: "#cg-customer-success"
-      #     username: ((slack-username))
-      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-development
     plan:
@@ -191,15 +182,6 @@ jobs:
           TF_VAR_iaas_stack_name: staging
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-      # - put: slack
-      #   params:
-      #     text_file: terraform-state/message.txt
-      #     text: |
-      #       :terraform: $BUILD_JOB_NAME needs review
-      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-      #     channel: "#cg-customer-success"
-      #     username: ((slack-username))
-      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-staging
     plan:
@@ -306,15 +288,6 @@ jobs:
           TF_VAR_iaas_stack_name: production
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
-      # - put: slack
-      #   params:
-      #     text_file: terraform-state/message.txt
-      #     text: |
-      #       :terraform: $BUILD_JOB_NAME needs review
-      #       <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
-      #     channel: "#cg-customer-success"
-      #     username: ((slack-username))
-      #     icon_url: ((slack-icon-url))
 
   - name: terraform-apply-apps-production
     plan:
@@ -323,6 +296,7 @@ jobs:
             trigger: false
           - get: terraform-templates
             resource: terraform-config
+            trigger: true
             passed: [terraform-plan-apps-production]
           - get: pipeline-tasks
           - get: general-task

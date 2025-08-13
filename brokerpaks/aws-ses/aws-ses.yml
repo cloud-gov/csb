@@ -30,12 +30,12 @@ provision:
       type: array
       required: false
       default: []
-      details: The email addresses to which DMARC aggregate reports should be sent. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
+      details: The email addresses to which DMARC aggregate reports should be sent. Reports are automatically sent to `reports@dmarc.cyber.dhs.gov`. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output. If you do not provide this input, `admin_email` will be used instead.
     - field_name: dmarc_report_failure_recipients
       type: array
       required: false
       default: []
-      details: The email addresses to which DMARC individual message failure reports should be sent. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output.
+      details: The email addresses to which DMARC individual message failure reports should be sent. If you specify a domain and later update this parameter, remember to update your DNS with the new records in the `required_records` output. If you do not provide this input, `admin_email` will be used instead.
     - field_name: enable_feedback_notifications
       type: boolean
       details: Flag to toggle creation of SNS topics for feedback notifications.
