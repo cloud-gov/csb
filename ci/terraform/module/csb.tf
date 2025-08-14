@@ -74,6 +74,9 @@ resource "cloudfoundry_service_broker" "csb" {
   username = "broker"
 
   depends_on = [cloudfoundry_app.csb]
+  labels = {
+    "last_updated" = timestamp() # We need the broker to update every time in case the catalog has changed. Terraform will only update the resource if it thinks it has changed. timestamp() will be different on every apply, causing an update.
+  }
 }
 
 # This data source is used in the for_each block of cloudfoundry_service_plan_visibility.csb to enable access to all plans the broker offers. Those plans are not available until the broker is created and registered. It would be best to establish a dependency on cloudfoundry_service_broker.csb so this data is only fetched after the broker is created and registered. However, terraform does not allow values that are known only after apply to be used in a for_each block. Adding the dependency causes the plan to fail with this error. As a result, we cannot establish a dependency in terraform. If you have created a new plan, you may need to run apply twice -- once to create the app and broker, during which this data block will populate without the new plan, and again, when it will populate with the new plan.
