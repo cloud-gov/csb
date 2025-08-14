@@ -31,8 +31,6 @@ resource "cloudfoundry_app" "helper" {
   routes = [{
     route = local.helper_route
   }]
-
-  depends_on = [cloudfoundry_domain.docs_domain]
 }
 
 data "cloudfoundry_service_plans" "external_domain" {
