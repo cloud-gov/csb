@@ -31,6 +31,8 @@ resource "cloudfoundry_app" "helper" {
   routes = [{
     route = local.helper_route
   }]
+
+  depends_on = [cloudfoundry_domain.docs_domain]
 }
 
 data "cloudfoundry_service_plans" "external_domain" {
@@ -63,4 +65,11 @@ resource "aws_sns_topic_subscription" "platform_ses_notifications" {
   })
   filter_policy_scope = "MessageBody"
   depends_on          = [cloudfoundry_service_instance.docproxy_external_domain]
+}
+
+resource "cloudfoundry_domain" "docs_domain" {
+  # We host the csb-helper on a nonstandard domain in production.
+  count = var.cloud_gov_environment == "production" ? 1 : 0
+  name  = local.helper_route
+  org   = data.cloudfoundry_org.platform.id
 }
