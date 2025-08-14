@@ -75,7 +75,7 @@ resource "cloudfoundry_service_broker" "csb" {
 
   depends_on = [cloudfoundry_app.csb]
   labels = {
-    "last_updated" = timestamp() # We need the broker to update every time in case the catalog has changed. Terraform will only update the resource if it thinks it has changed. timestamp() will be different on every apply, causing an update.
+    "last_updated" = formatdate("YYYY-MM-DD'T'hhmmss", timestamp()) # We need the broker to update every time in case the catalog has changed. Terraform will only update the resource if it thinks it has changed. timestamp() will be different on every apply, causing an update.
   }
 }
 
