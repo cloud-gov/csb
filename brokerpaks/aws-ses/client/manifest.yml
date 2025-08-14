@@ -3,7 +3,5 @@ applications:
   - name: smtp-client
     buildpacks:
       - "go_buildpack"
-    env:
-      GOVERSION: "1.22"
     services:
       - name: email
