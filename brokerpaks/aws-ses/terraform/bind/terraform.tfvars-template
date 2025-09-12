@@ -1,6 +1,6 @@
 region               = "us-west-2"          # Region to host SMTP server in
-instance_id        = "instance-yourname"  # Avoids collisions with others
-domain_arn           = ""                   # ARN from provisioning output
+instance_id          = "instance-yourname"  # Avoids collisions with others
+identity_arn         = ""                   # ARN from provisioning output
 bounce_topic_arn     = ""                   # SNS bounce topic ARN from provisioning output
 complaint_topic_arn  = ""                   # SNS complaint topic ARN from provisioning output
 delivery_topic_arn   = ""                   # SNS delivery topic ARN from provisioning output
