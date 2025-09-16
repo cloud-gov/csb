@@ -34,7 +34,7 @@ resource "aws_iam_user_policy" "user_policy" {
         "ses:SendRawEmail"
       ]
       Resource = [
-        var.domain_arn,
+        var.identity_arn,
         var.configuration_set_arn
       ]
     }]

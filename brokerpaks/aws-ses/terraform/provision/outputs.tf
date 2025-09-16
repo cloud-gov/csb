@@ -14,7 +14,15 @@ output "configuration_set_arn" {
   value = aws_sesv2_configuration_set.config.arn
 }
 
+output "domain" {
+  value = local.setting_mail_from ? local.mail_from_domain : aws_sesv2_email_identity.identity.email_identity
+}
+
 output "domain_arn" {
+  value = aws_sesv2_email_identity.identity.arn
+}
+
+output "identity_arn" {
   value = aws_sesv2_email_identity.identity.arn
 }
 

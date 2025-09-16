@@ -32,7 +32,7 @@ variable "configuration_set_arn" {
   description = "ARN of the SES Configuration Set associated with the identity."
 }
 
-variable "domain_arn" {
+variable "identity_arn" {
   type        = string
   description = "ARN of the SES identity."
 }

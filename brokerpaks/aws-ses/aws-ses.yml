@@ -106,9 +106,15 @@ provision:
     - field_name: configuration_set_arn
       type: string
       details: ARN of the SES Configuration Set associated with the identity. Used to create bindings.
+    - field_name: domain
+      type: string
+      details: The domain from which mail can be sent. Matches the `domain` parameter if provided. If `domain` was left empty, a temporary cloud.gov subdomain is provided instead.
     - field_name: domain_arn
       type: string
-      details: Instance SES domain identity. Used to create bindings.
+      details: DEPRECATED. Will be removed in a future release. Use identity_arn instead.
+    - field_name: identity_arn
+      type: string
+      details: ARN of the SES identity created for this domain. Used to create bindings.
     - field_name: reputation_topic_arn
       type: string
       details: ARN of the SNS topic receiving alarms related to reputation metrics.
@@ -159,8 +165,12 @@ bind:
       default: ${instance.details["configuration_set_arn"]}
       overwrite: true
       type: string
-    - name: domain_arn
-      default: ${instance.details["domain_arn"]}
+    - name: domain
+      default: ${instance.details["domain"]}
+      overwrite: true
+      type: string
+    - name: identity_arn
+      default: ${instance.details["identity_arn"]}
       overwrite: true
       type: string
     - name: user_name
