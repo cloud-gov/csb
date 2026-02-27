@@ -132,6 +132,25 @@ jobs:
           CF_CLIENT_ID: ((cf-client-id-development))
           CF_CLIENT_SECRET: ((cf-client-secret-development))
 
+  - name: acceptance-tests-development
+    plan:
+      - get: csb-source
+        resource: terraform-config
+      - in_parallel:
+          steps:
+            - task: acceptance-test-create
+              file: csb-source/ci/run-acceptance-test.yml
+              image: general-task
+              params:
+                TEST_NAME: default
+                CF_API_URL: ((development-cf-api-url))
+                CF_USERNAME: ((development-cf-deploy-username))
+                CF_PASSWORD: ((development-cf-deploy-password))
+                CF_ORGANIZATION: ((development-cf-organization))
+                CF_SPACE: ((development-cf-space))
+                SERVICE_PLAN: domain
+                REGION: ((development-aws-default-region))
+
   - name: terraform-plan-apps-staging
     plan:
       - in_parallel:
