@@ -144,13 +144,12 @@ jobs:
               image: general-task
               params:
                 TEST_NAME: default
-                CF_API_URL: ((development-cf-api-url))
-                CF_USERNAME: ((development-cf-deploy-username))
-                CF_PASSWORD: ((development-cf-deploy-password))
-                CF_ORGANIZATION: ((development-cf-organization))
-                CF_SPACE: ((development-cf-space))
+                CF_API_URL: ((dev-cf-api-url))
+                CF_USERNAME: ((development-tests-cf-username))
+                CF_PASSWORD: ((development-tests-cf-password))
+                CF_ORGANIZATION: ((development-tests-cf-organization))
+                CF_SPACE: ((development-tests-cf-space))
                 SERVICE_PLAN: domain
-                REGION: ((development-aws-default-region))
                 ADMIN_EMAIL: ((development-tests-admin-email))
 
             - task: acceptance-test-feedback-notifications
@@ -158,13 +157,12 @@ jobs:
               image: general-task
               params:
                 TEST_NAME: feedback-notifications
-                CF_API_URL: ((development-cf-api-url))
-                CF_USERNAME: ((development-cf-deploy-username))
-                CF_PASSWORD: ((development-cf-deploy-password))
-                CF_ORGANIZATION: ((development-cf-organization))
-                CF_SPACE: ((development-cf-space))
+                CF_API_URL: ((dev-cf-api-url))
+                CF_USERNAME: ((development-tests-cf-username))
+                CF_PASSWORD: ((development-tests-cf-password))
+                CF_ORGANIZATION: ((development-tests-cf-organization))
+                CF_SPACE: ((development-tests-cf-space))
                 SERVICE_PLAN: domain
-                REGION: ((development-aws-default-region))
                 ADMIN_EMAIL: ((development-tests-admin-email))
                 ENABLE_FEEDBACK_NOTIFICATIONS: "true"
 
