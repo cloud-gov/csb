@@ -16,7 +16,12 @@ if cf service "$SERVICE_NAME"; then
 fi
 
 # Create service
-cf create-service aws-ses "$SERVICE_PLAN" "$SERVICE_NAME"
+if [[ "$ENABLE_FEEDBACK_NOTIFICATIONS" == "true" ]]; then
+  cf create-service aws-ses "$SERVICE_PLAN" "$SERVICE_NAME" -c '{"admin_email": "'"$ADMIN_EMAIL"'", "enable_feedback_notifications": true}'
+else
+  cf create-service aws-ses "$SERVICE_PLAN" "$SERVICE_NAME" -c '{"admin_email": "'"$ADMIN_EMAIL"'"}'
+fi
+
 
 # Clean up app and service
 cf delete-service -f "$SERVICE_NAME"
