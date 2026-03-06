@@ -21,7 +21,7 @@ admin_email         = "youraddress@yourdomain"
 cloud_gov_email_notification_topic_arn = "<sns-topic-arn>"
 cloud_gov_slack_notification_topic_arn = "<sns-topic-arn>"
 
-cloud_gov_environment = "development"
+cloud_gov_environment = "local"
 service_offering_name = "aws-ses"
 service_plan_name     = "domain"
 
