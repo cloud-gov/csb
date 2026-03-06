@@ -3,7 +3,7 @@ resource "aws_sns_topic" "bounce_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-bounce"
 
-  kms_master_key_id = aws_kms_key.bounce_topic_kms.key_id
+  kms_master_key_id = local.bounce_topic_kms_key_alias
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "bounce" {
@@ -26,7 +26,7 @@ resource "aws_sns_topic" "complaint_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-complaint"
 
-  kms_master_key_id = aws_kms_key.complaint_topic_kms_key.key_id
+  kms_master_key_id = local.complaint_topic_kms_key_alias
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "name" {
@@ -47,7 +47,7 @@ resource "aws_sns_topic" "delivery_topic" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   name  = "${local.base_name}-delivery"
 
-  kms_master_key_id = aws_kms_key.delivery_topic_kms_key.key_id
+  kms_master_key_id = local.delivery_topic_kms_key_alias
 }
 
 resource "aws_sesv2_configuration_set_event_destination" "delivery" {
