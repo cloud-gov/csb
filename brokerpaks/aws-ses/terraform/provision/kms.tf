@@ -10,11 +10,11 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
 
   statement {
-    sid = "Enable IAM User Permissions"
+    sid = "Enable admin permissions"
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws-us-gov:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [var.kms_admin_iam_principal]
     }
 
     actions = [
@@ -97,11 +97,11 @@ resource "aws_kms_alias" "bounce_topic_kms_alias" {
 data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   statement {
-    sid = "Enable IAM User Permissions"
+    sid = "Enable admin permissions"
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws-us-gov:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [var.kms_admin_iam_principal]
     }
 
     actions = [
@@ -184,11 +184,11 @@ resource "aws_kms_alias" "complaint_topic_kms_alias" {
 data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   statement {
-    sid = "Enable IAM User Permissions"
+    sid = "Enable admin permissions"
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws-us-gov:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [var.kms_admin_iam_principal]
     }
 
     actions = [

@@ -98,3 +98,8 @@ variable "cloud_gov_slack_notification_topic_arn" {
   type        = string
   description = "SNS topic ARN. Reputation notifications are sent to the Cloud.gov team for awareness."
 }
+
+variable "kms_admin_iam_principal" {
+  type        = string
+  description = "IAM principal that should have admin access to KMS keys provisioned by this brokerpak"
+}
