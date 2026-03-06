@@ -7,3 +7,7 @@ secrets.env
 zscaler.crt
 # Sqlite database for local development.
 .csb.db
+
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
