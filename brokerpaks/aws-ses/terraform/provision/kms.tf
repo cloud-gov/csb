@@ -4,8 +4,6 @@ locals {
   delivery_topic_kms_key_alias  = "alias/${local.base_name}-delivery"
 }
 
-data "aws_caller_identity" "current" {}
-
 data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
 
@@ -13,8 +11,11 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
     sid = "Enable admin permissions"
 
     principals {
-      type        = "AWS"
-      identifiers = [var.kms_admin_iam_principal]
+      type = "AWS"
+      identifiers = [
+        data.aws_caller_identity.current.arn,
+        var.kms_admin_iam_principal
+      ]
     }
 
     actions = [
@@ -82,10 +83,11 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
 }
 
 resource "aws_kms_key" "bounce_topic_kms_key" {
-  count               = (var.enable_feedback_notifications ? 1 : 0)
-  description         = "KMS key for SNS topic handling bounce notifications from SES"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.bounce_topic_kms_key_policy[0].json
+  count                   = (var.enable_feedback_notifications ? 1 : 0)
+  description             = "KMS key for SNS topic handling bounce notifications from SES"
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.bounce_topic_kms_key_policy[0].json
+  deletion_window_in_days = 7
 }
 
 resource "aws_kms_alias" "bounce_topic_kms_alias" {
@@ -100,8 +102,11 @@ data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
     sid = "Enable admin permissions"
 
     principals {
-      type        = "AWS"
-      identifiers = [var.kms_admin_iam_principal]
+      type = "AWS"
+      identifiers = [
+        data.aws_caller_identity.current.arn,
+        var.kms_admin_iam_principal
+      ]
     }
 
     actions = [
@@ -169,10 +174,11 @@ data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
 }
 
 resource "aws_kms_key" "complaint_topic_kms_key" {
-  count               = (var.enable_feedback_notifications ? 1 : 0)
-  description         = "KMS key for SNS topic handling complaint notifications from SES"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.complaint_topic_kms_key_policy[0].json
+  count                   = (var.enable_feedback_notifications ? 1 : 0)
+  description             = "KMS key for SNS topic handling complaint notifications from SES"
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.complaint_topic_kms_key_policy[0].json
+  deletion_window_in_days = 7
 }
 
 resource "aws_kms_alias" "complaint_topic_kms_alias" {
@@ -187,8 +193,11 @@ data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
     sid = "Enable admin permissions"
 
     principals {
-      type        = "AWS"
-      identifiers = [var.kms_admin_iam_principal]
+      type = "AWS"
+      identifiers = [
+        data.aws_caller_identity.current.arn,
+        var.kms_admin_iam_principal
+      ]
     }
 
     actions = [
@@ -257,10 +266,11 @@ data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
 
 
 resource "aws_kms_key" "delivery_topic_kms_key" {
-  count               = (var.enable_feedback_notifications ? 1 : 0)
-  description         = "KMS key for SNS topic handling delivery notifications from SES"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.delivery_topic_kms_key_policy[0].json
+  count                   = (var.enable_feedback_notifications ? 1 : 0)
+  description             = "KMS key for SNS topic handling delivery notifications from SES"
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.delivery_topic_kms_key_policy[0].json
+  deletion_window_in_days = 7
 }
 
 resource "aws_kms_alias" "delivery_topic_kms_alias" {
