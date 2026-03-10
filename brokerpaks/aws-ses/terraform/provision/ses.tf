@@ -40,6 +40,7 @@ resource "aws_sesv2_configuration_set_event_destination" "bounce" {
   event_destination {
     # Valid types: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sesv2_configuration_set_event_destination#matching_event_types
     matching_event_types = ["BOUNCE"]
+    enabled              = true
     sns_destination {
       topic_arn = aws_sns_topic.bounce_topic[0].arn
     }
@@ -53,6 +54,7 @@ resource "aws_sesv2_configuration_set_event_destination" "complaint" {
   event_destination_name = "${local.base_name}-complaint"
   event_destination {
     matching_event_types = ["COMPLAINT"]
+    enabled              = true
     sns_destination {
       topic_arn = aws_sns_topic.complaint_topic[0].arn
     }
@@ -66,6 +68,7 @@ resource "aws_sesv2_configuration_set_event_destination" "delivery" {
   event_destination_name = "${local.base_name}-delivery"
   event_destination {
     matching_event_types = ["DELIVERY"]
+    enabled              = true
     sns_destination {
       topic_arn = aws_sns_topic.delivery_topic[0].arn
     }
