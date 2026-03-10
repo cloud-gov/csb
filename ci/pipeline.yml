@@ -6,6 +6,20 @@ jobs:
       - set_pipeline: self
         file: src/ci/pipeline.yml
 
+#  ## Add a job to regenerate the credhub credentials on a regular basis to ensure they do not expire. This job is not triggered by changes to the pipeline or terraform code because it does not make any infrastructure changes and does not need to be run on every change. It is scheduled to run once a day.
+#  - name: regenerate-credhub-password
+#    plan:
+#      - task: regenerate-password
+#        image: general-task
+#        params:
+#          CF_API_URL: ((cf-api-url-development))
+#          CF_CLIENT_ID: ((cf-client-id-development))
+#          CF_CLIENT_SECRET: ((cf-client-secret-development))
+#          CREDHUB_CREDENTIAL_NAME: ((credhub-credential-name))
+#          CREDHUB_PASSWORD_LENGTH: "32"
+#          CREDHUB_PASSWORD_CHAR_CLASSES: "lower,upper,digits,special"
+#
+
   - name: terraform-plan-apps-development
     plan:
       - in_parallel:
@@ -448,7 +462,7 @@ resources:
     source:
       commit_verification_keys: ((cloud-gov-pgp-keys))
       uri: https://github.com/cloud-gov/csb.git
-      branch: main
+      branch: pb/rotate-credentials
       paths:
         - ci/*
 
