@@ -18,29 +18,19 @@ jobs:
         config:
           platform: linux
           params:
-            CF_API_URL: ((cf-api-url-development))
-            CF_CLIENT_ID: ((cf-client-id-development))
-            CF_CLIENT_SECRET: ((cf-client-secret-development))
-            CREDHUB_CREDENTIAL_NAME: ((credhub-credential-name))
-            CREDHUB_PASSWORD_LENGTH: "32"
-            CREDHUB_PASSWORD_CHAR_CLASSES: "lower,upper,digits,special"
+            CREDHUB_API_SERVER: ((credhub-api-server))
+            CREDHUB_CREDENTIAL_NAME: "/concourse/main/terraform-provision/development_csb_rds_password"
           run:
             path: bash
             args:
               - -euc
               - |
-                echo "Logging in to CredHub via CF API..."
-#                cf api "$CF_API_URL"
-#                cf auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
-#
+                echo "Logging in to CredHub at $CREDHUB_API_SERVER and regenerating password credential: $CREDHUB_CREDENTIAL_NAME"
+
+## How do I authenticate to CredHub in order to regenerate this credential?
 #                echo "Regenerating CredHub password: $CREDHUB_CREDENTIAL_NAME"
-#                credhub login --sso-passcode "$(cf oauth-token | cut -d' ' -f2)"
-#                credhub set \
-#                  --name  "$CREDHUB_CREDENTIAL_NAME" \
-#                  --type  password \
-#                  --length "$CREDHUB_PASSWORD_LENGTH" \
-#                  --include-special
-#
+#                credhub login .... ?
+#                credhub regenerate --name  "$CREDHUB_CREDENTIAL_NAME"
 #                echo "Done. Credential regenerated successfully."
 #        on_failure:
 #          put: slack
