@@ -30,25 +30,25 @@ jobs:
               - -euc
               - |
                 echo "Logging in to CredHub via CF API..."
-                cf api "$CF_API_URL"
-                cf auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
-
-                echo "Regenerating CredHub password: $CREDHUB_CREDENTIAL_NAME"
-                credhub login --sso-passcode "$(cf oauth-token | cut -d' ' -f2)"
-                credhub set \
-                  --name  "$CREDHUB_CREDENTIAL_NAME" \
-                  --type  password \
-                  --length "$CREDHUB_PASSWORD_LENGTH" \
-                  --include-special
-
-                echo "Done. Credential regenerated successfully."
-        on_failure:
-          put: slack
-          params:
-            <<: *slack-failure-config
-            text: |
-              :x: FAILED to regenerate CredHub password credential. Please rotate manually if the credential is near expiry.
-              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+#                cf api "$CF_API_URL"
+#                cf auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
+#
+#                echo "Regenerating CredHub password: $CREDHUB_CREDENTIAL_NAME"
+#                credhub login --sso-passcode "$(cf oauth-token | cut -d' ' -f2)"
+#                credhub set \
+#                  --name  "$CREDHUB_CREDENTIAL_NAME" \
+#                  --type  password \
+#                  --length "$CREDHUB_PASSWORD_LENGTH" \
+#                  --include-special
+#
+#                echo "Done. Credential regenerated successfully."
+#        on_failure:
+#          put: slack
+#          params:
+#            <<: *slack-failure-config
+#            text: |
+#              :x: FAILED to regenerate CredHub password credential. Please rotate manually if the credential is near expiry.
+#              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
 
 
