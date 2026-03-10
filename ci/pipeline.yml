@@ -6,19 +6,51 @@ jobs:
       - set_pipeline: self
         file: src/ci/pipeline.yml
 
-#  ## Add a job to regenerate the credhub credentials on a regular basis to ensure they do not expire. This job is not triggered by changes to the pipeline or terraform code because it does not make any infrastructure changes and does not need to be run on every change. It is scheduled to run once a day.
-#  - name: regenerate-credhub-password
-#    plan:
-#      - task: regenerate-password
-#        image: general-task
-#        params:
-#          CF_API_URL: ((cf-api-url-development))
-#          CF_CLIENT_ID: ((cf-client-id-development))
-#          CF_CLIENT_SECRET: ((cf-client-secret-development))
-#          CREDHUB_CREDENTIAL_NAME: ((credhub-credential-name))
-#          CREDHUB_PASSWORD_LENGTH: "32"
-#          CREDHUB_PASSWORD_CHAR_CLASSES: "lower,upper,digits,special"
-#
+  ## Regenerates a CredHub password credential on a daily schedule or when triggered manually.
+  ## This job is intentionally decoupled from the terraform pipeline — it makes no infrastructure
+  ## changes and does not need to run on every code change.
+  - name: regenerate-credhub-password
+    plan:
+      - get: daily
+        trigger: true
+      - task: regenerate-password
+        image: general-task
+        config:
+          platform: linux
+          params:
+            CF_API_URL: ((cf-api-url-development))
+            CF_CLIENT_ID: ((cf-client-id-development))
+            CF_CLIENT_SECRET: ((cf-client-secret-development))
+            CREDHUB_CREDENTIAL_NAME: ((credhub-credential-name))
+            CREDHUB_PASSWORD_LENGTH: "32"
+            CREDHUB_PASSWORD_CHAR_CLASSES: "lower,upper,digits,special"
+          run:
+            path: bash
+            args:
+              - -euc
+              - |
+                echo "Logging in to CredHub via CF API..."
+                cf api "$CF_API_URL"
+                cf auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
+
+                echo "Regenerating CredHub password: $CREDHUB_CREDENTIAL_NAME"
+                credhub login --sso-passcode "$(cf oauth-token | cut -d' ' -f2)"
+                credhub set \
+                  --name  "$CREDHUB_CREDENTIAL_NAME" \
+                  --type  password \
+                  --length "$CREDHUB_PASSWORD_LENGTH" \
+                  --include-special
+
+                echo "Done. Credential regenerated successfully."
+        on_failure:
+          put: slack
+          params:
+            <<: *slack-failure-config
+            text: |
+              :x: FAILED to regenerate CredHub password credential. Please rotate manually if the credential is near expiry.
+              <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+
+
 
   - name: terraform-plan-apps-development
     plan:
@@ -388,6 +420,11 @@ jobs:
           REGISTER_ORGS: ((register-orgs-production))
 
 resources:
+  - name: monthly
+    type: time
+    source:
+      interval: 720h
+
   - name: pipeline-tasks
     type: git
     source:
