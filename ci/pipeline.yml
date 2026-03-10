@@ -11,8 +11,10 @@ jobs:
   ## changes and does not need to run on every code change.
   - name: regenerate-credhub-password
     plan:
-      - get: monthly
-        trigger: true
+      - in_parallel:
+          - get: monthly
+            trigger: true
+          - get: general-task
       - task: regenerate-password
         image: general-task
         config:
