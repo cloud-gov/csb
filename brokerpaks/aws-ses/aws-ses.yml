@@ -93,6 +93,9 @@ provision:
     - name: cloud_gov_slack_notification_topic_arn
       type: string
       default: ${config("cloud_gov.slack_notification_topic_arn")}
+    - name: kms_admin_iam_principal
+      type: string
+      default: ${config("cloud_gov.kms_admin_arn")}
   outputs:
     - field_name: region
       type: string
