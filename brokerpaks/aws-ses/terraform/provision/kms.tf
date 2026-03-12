@@ -53,7 +53,9 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "kms:EncryptionContext:aws:sns:topicArn"
-      values   = [aws_sns_topic.bounce_topic[0].arn]
+      values = [
+        "arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.bounce_topic_name}"
+      ]
     }
   }
 
@@ -77,7 +79,7 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_sns_topic.bounce_topic[0].arn]
+      values   = ["arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.bounce_topic_name}"]
     }
   }
 }
@@ -92,7 +94,7 @@ resource "aws_kms_key" "bounce_topic_kms_key" {
 
 resource "aws_kms_alias" "bounce_topic_kms_alias" {
   count         = (var.enable_feedback_notifications ? 1 : 0)
-  name          = "alias/${local.base_name}-bounce"
+  name          = local.bounce_topic_kms_key_alias
   target_key_id = aws_kms_key.bounce_topic_kms_key[0].key_id
 }
 
@@ -144,7 +146,7 @@ data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "kms:EncryptionContext:aws:sns:topicArn"
-      values   = [aws_sns_topic.complaint_topic[0].arn]
+      values   = ["arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.complaint_topic_name}"]
     }
   }
 
@@ -168,7 +170,7 @@ data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_sns_topic.complaint_topic[0].arn]
+      values   = ["arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.complaint_topic_name}"]
     }
   }
 }
@@ -183,7 +185,7 @@ resource "aws_kms_key" "complaint_topic_kms_key" {
 
 resource "aws_kms_alias" "complaint_topic_kms_alias" {
   count         = (var.enable_feedback_notifications ? 1 : 0)
-  name          = "alias/${local.base_name}-complaint"
+  name          = local.complaint_topic_kms_key_alias
   target_key_id = aws_kms_key.complaint_topic_kms_key[0].key_id
 }
 
@@ -235,7 +237,7 @@ data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "kms:EncryptionContext:aws:sns:topicArn"
-      values   = [aws_sns_topic.delivery_topic[0].arn]
+      values   = ["arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.delivery_topic_name}"]
     }
   }
 
@@ -259,7 +261,7 @@ data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_sns_topic.delivery_topic[0].arn]
+      values   = ["arn:${data.aws_partition.current.partition}:sns:${var.aws_region_govcloud}:${data.aws_caller_identity.current.account_id}:${local.delivery_topic_name}"]
     }
   }
 }
@@ -275,6 +277,6 @@ resource "aws_kms_key" "delivery_topic_kms_key" {
 
 resource "aws_kms_alias" "delivery_topic_kms_alias" {
   count         = (var.enable_feedback_notifications ? 1 : 0)
-  name          = "alias/${local.base_name}-delivery"
+  name          = local.delivery_topic_kms_key_alias
   target_key_id = aws_kms_key.delivery_topic_kms_key[0].key_id
 }

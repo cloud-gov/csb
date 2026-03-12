@@ -47,8 +47,9 @@ data "aws_iam_policy_document" "bounce_topic_policy_document" {
 }
 
 resource "aws_sns_topic" "bounce_topic" {
-  count = (var.enable_feedback_notifications ? 1 : 0)
-  name  = local.bounce_topic_name
+  depends_on = [aws_kms_alias.bounce_topic_kms_alias[0]]
+  count      = (var.enable_feedback_notifications ? 1 : 0)
+  name       = local.bounce_topic_name
 
   kms_master_key_id = local.bounce_topic_kms_key_alias
 }
@@ -102,8 +103,9 @@ data "aws_iam_policy_document" "complaint_topic_policy_document" {
 }
 
 resource "aws_sns_topic" "complaint_topic" {
-  count = (var.enable_feedback_notifications ? 1 : 0)
-  name  = local.complaint_topic_name
+  depends_on = [aws_kms_alias.complaint_topic_kms_alias[0]]
+  count      = (var.enable_feedback_notifications ? 1 : 0)
+  name       = local.complaint_topic_name
 
   kms_master_key_id = local.complaint_topic_kms_key_alias
 }
@@ -157,8 +159,9 @@ data "aws_iam_policy_document" "delivery_topic_policy_document" {
 }
 
 resource "aws_sns_topic" "delivery_topic" {
-  count = (var.enable_feedback_notifications ? 1 : 0)
-  name  = local.delivery_topic_name
+  depends_on = [aws_kms_alias.delivery_topic_kms_alias[0]]
+  count      = (var.enable_feedback_notifications ? 1 : 0)
+  name       = local.delivery_topic_name
 
   kms_master_key_id = local.delivery_topic_kms_key_alias
 }
