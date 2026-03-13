@@ -8,13 +8,31 @@ data "aws_iam_policy_document" "bounce_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
 
   statement {
+    sid = "Enable IAM User Permissions"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+
+    actions = [
+      "kms:*"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
     sid = "Enable admin permissions"
 
     principals {
       type = "AWS"
       identifiers = [
-        data.aws_caller_identity.current.arn,
-        var.kms_admin_iam_principal
+        data.aws_caller_identity.current.arn
       ]
     }
 
@@ -101,13 +119,31 @@ resource "aws_kms_alias" "bounce_topic_kms_alias" {
 data "aws_iam_policy_document" "complaint_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   statement {
+    sid = "Enable IAM user permissions"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+
+    actions = [
+      "kms:*"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
     sid = "Enable admin permissions"
 
     principals {
       type = "AWS"
       identifiers = [
-        data.aws_caller_identity.current.arn,
-        var.kms_admin_iam_principal
+        data.aws_caller_identity.current.arn
       ]
     }
 
@@ -192,13 +228,31 @@ resource "aws_kms_alias" "complaint_topic_kms_alias" {
 data "aws_iam_policy_document" "delivery_topic_kms_key_policy" {
   count = (var.enable_feedback_notifications ? 1 : 0)
   statement {
+    sid = "Enable IAM user permissions"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+
+    actions = [
+      "kms:*"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
     sid = "Enable admin permissions"
 
     principals {
       type = "AWS"
       identifiers = [
-        data.aws_caller_identity.current.arn,
-        var.kms_admin_iam_principal
+        data.aws_caller_identity.current.arn
       ]
     }
 
