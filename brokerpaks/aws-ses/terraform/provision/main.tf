@@ -103,35 +103,5 @@ locals {
   instructions = (local.manage_domain ? null : "Your SMTP service was provisioned, but is not yet verified. To verify your control of the ${var.domain} domain, create the 'required_records' provided here in the ${var.domain} zone before using the service.")
 }
 
-resource "aws_sesv2_email_identity" "identity" {
-  configuration_set_name = aws_sesv2_configuration_set.config.configuration_set_name
-  email_identity         = local.domain
-}
-
-resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
-  count = (local.setting_mail_from ? 1 : 0)
-
-  email_identity   = aws_sesv2_email_identity.identity.email_identity
-  mail_from_domain = local.mail_from_domain
-}
-
-resource "aws_sesv2_configuration_set" "config" {
-  configuration_set_name = local.base_name
-
-  delivery_options {
-    tls_policy = "REQUIRE"
-  }
-  reputation_options {
-    reputation_metrics_enabled = true
-  }
-  suppression_options {
-    suppressed_reasons = ["BOUNCE", "COMPLAINT"]
-  }
-
-  lifecycle {
-    # The csb-helper will disable sending on an identity if its reputation
-    # metrics exceed a certain threshold. To avoid the CSB accidentally
-    # overwriting this change, ignore changes to the sending_enabled field.
-    ignore_changes = [sending_options["sending_enabled"]]
-  }
-}
+data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
