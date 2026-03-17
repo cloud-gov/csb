@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-. csb-source/ci/ci-utils.sh
+. ci-source/ci/ci-utils.sh
 
 SERVICE_NAME="ses-acceptance-test-$TEST_NAME"
 
