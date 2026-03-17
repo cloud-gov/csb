@@ -75,7 +75,7 @@ jobs:
         on_failure:
           put: slack
           params: &slack-failure-config
-            channel: ((slack-failure-channel))
+            channel: ((slack-channel-customer-success))
             username: ((slack-username))
             icon_url: ((slack-icon-url))
             text: |
@@ -173,6 +173,13 @@ jobs:
                 <<: *acceptance-test-params
                 TEST_NAME: feedback-notifications
                 ENABLE_FEEDBACK_NOTIFICATIONS: "true"
+    on_failure:
+      put: slack
+      params:
+        <<: *slack-failure-config
+        text: |
+          :x: Acceptance tests FAILED in development
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
   - name: terraform-plan-apps-staging
     plan:
@@ -338,6 +345,13 @@ jobs:
                 <<: *staging-acceptance-test-params
                 TEST_NAME: feedback-notifications
                 ENABLE_FEEDBACK_NOTIFICATIONS: "true"
+    on_failure:
+      put: slack
+      params:
+        <<: *slack-failure-config
+        text: |
+          :x: Acceptance tests FAILED in staging
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
   - name: terraform-plan-apps-production
     plan:
@@ -498,6 +512,13 @@ jobs:
                 <<: *production-acceptance-test-params
                 TEST_NAME: feedback-notifications
                 ENABLE_FEEDBACK_NOTIFICATIONS: "true"
+    on_failure:
+      put: slack
+      params:
+        <<: *slack-failure-config
+        text: |
+          :x: Acceptance tests FAILED in production
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
 resources:
   - name: pipeline-tasks
