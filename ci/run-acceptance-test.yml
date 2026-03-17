@@ -5,4 +5,4 @@ inputs:
 - name: csb-source
 
 run:
-  path: csb-source/ci/run-acceptance-test.sh
+  path: ci-source/ci/run-acceptance-test.sh
