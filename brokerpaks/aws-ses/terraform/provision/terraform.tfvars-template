@@ -1,6 +1,34 @@
-region              = "us-west-2"               # Region to host SMTP server in
-domain              = ""                        # Custom domain
-default_domain      = "ssb-dev.data.gov"        # Domain under which to create a domain if none was supplied
-instance_id       = "instance-yourname"       # Avoids collisions with others
-email_receipt_error = "youraddress@yourdomain"  # Address where notification of email recipt errors should be sent
+aws_access_key_id_govcloud     = "<replace-me>" # AWS access key ID for GovCloud
+aws_secret_access_key_govcloud = "<replace-me>" # AWS secret access key for GovCloud
+aws_region_govcloud            = "<replace-me>" # Region for resources in AWS GovCloud
+
+aws_access_key_id_commercial     = "<replace-me>" # AWS access key ID for commercial
+aws_secret_access_key_commercial = "<replace-me>" # AWS secret access key for commercial
+aws_region_commercial            = "<replace-me>" # Region for resources in AWS commercial
+
+default_domain = "<your_domain>" # Domain to use for SES identities
+
+instance_id = "<insert-any-guid>"
+
+dmarc_report_aggregate_recipients = ["youraddress@yourdomain"] # Email addresses to receive aggregate DMARC reports
+dmarc_report_failure_recipients   = ["youraddress@yourdomain"] # Email addresses to receive failure DMARC reports
+
+domain = "" # Custom domain
+
 mail_from_subdomain = "mail"
+admin_email         = "youraddress@yourdomain"
+
+cloud_gov_email_notification_topic_arn = "<sns-topic-arn>"
+cloud_gov_slack_notification_topic_arn = "<sns-topic-arn>"
+
+cloud_gov_environment = "local"
+service_offering_name = "aws-ses"
+service_plan_name     = "domain"
+
+labels                        = {}
+context = {
+  space_name        = "any-space-nane"
+  organization_guid = "abc123"
+  space_guid        = "def456"
+  organization_name = "any-org-name"
+}
