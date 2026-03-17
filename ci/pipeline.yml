@@ -134,9 +134,16 @@ jobs:
 
   - name: acceptance-tests-development
     plan:
-      - get: csb-source
-        resource: terraform-config
-        passed: [terraform-apply-apps-development]
+      - in_parallel:
+        - get: csb-source
+          resource: terraform-config
+          passed: [terraform-apply-apps-development]
+        - get: csb-image
+          passed: [terraform-apply-apps-development]
+          trigger: true
+        - get: csb-helper-image
+          passed: [terraform-apply-apps-development]
+          trigger: true
       - in_parallel:
           steps:
             - task: acceptance-test-create
@@ -282,9 +289,16 @@ jobs:
 
   - name: acceptance-tests-staging
     plan:
-      - get: csb-source
-        resource: terraform-config
-        passed: [terraform-apply-apps-staging]
+      - in_parallel:
+        - get: csb-source
+          resource: terraform-config
+          passed: [terraform-apply-apps-staging]
+        - get: csb-image
+          passed: [terraform-apply-apps-staging]
+          trigger: true
+        - get: csb-helper-image
+          passed: [terraform-apply-apps-staging]
+          trigger: true
       - in_parallel:
           steps:
             - task: acceptance-test-create
