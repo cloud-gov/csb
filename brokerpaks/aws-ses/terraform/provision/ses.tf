@@ -6,7 +6,7 @@ resource "aws_sesv2_email_identity" "identity" {
 resource "aws_sesv2_email_identity_mail_from_attributes" "mail_from" {
   count = (local.setting_mail_from ? 1 : 0)
 
-  email_identity   = aws_sesv2_email_identity.identity.email_identity
+  email_identity   = local.domain
   mail_from_domain = local.mail_from_domain
 }
 

@@ -28,7 +28,7 @@ locals {
   }
 
   setting_mail_from = (var.mail_from_subdomain != "")
-  mail_from_domain  = "${var.mail_from_subdomain}.${aws_sesv2_email_identity.identity.email_identity}"
+  mail_from_domain  = "${var.mail_from_subdomain}.${local.domain}"
 
   mx_verification_record = {
     name    = local.mail_from_domain
