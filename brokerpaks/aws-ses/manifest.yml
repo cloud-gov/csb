@@ -35,7 +35,6 @@ required_env_variables:
   - CLOUD_GOV_ENVIRONMENT
   - CLOUD_GOV_EMAIL_NOTIFICATION_TOPIC_ARN
   - CLOUD_GOV_SLACK_NOTIFICATION_TOPIC_ARN
-  - CLOUD_GOV_KMS_ADMIN_ARN
 env_config_mapping:
   AWS_ACCESS_KEY_ID_COMMERCIAL: aws.commercial.access_key_id
   AWS_ACCESS_KEY_ID_GOVCLOUD: aws.govcloud.access_key_id
@@ -47,4 +46,3 @@ env_config_mapping:
   CLOUD_GOV_ENVIRONMENT: cloud_gov.environment
   CLOUD_GOV_EMAIL_NOTIFICATION_TOPIC_ARN: cloud_gov.email_notification_topic_arn
   CLOUD_GOV_SLACK_NOTIFICATION_TOPIC_ARN: cloud_gov.slack_notification_topic_arn
-  CLOUD_GOV_KMS_ADMIN_ARN: cloud_gov.kms_admin_arn
