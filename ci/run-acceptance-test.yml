@@ -2,7 +2,7 @@
 platform: linux
 
 inputs:
-- name: csb-source
+- name: ci-source
 
 run:
   path: ci-source/ci/run-acceptance-test.sh
