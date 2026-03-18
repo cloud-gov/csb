@@ -4,16 +4,25 @@ set -euxo pipefail
 
 . ci-source/ci/ci-utils.sh
 
+TEST_APP="ses-acceptance-test-$TEST_NAME-app"
 SERVICE_NAME="ses-acceptance-test-$TEST_NAME"
+APP_DIRECTORY="ci-source/brokerpaks/aws-ses/client/"
 
 # Log in to CF
 login
+
+# Delete existing app
+cf delete -f "$TEST_APP"
 
 # Clean up existing service if present
 if cf service "$SERVICE_NAME"; then
   cf delete-service -f "$SERVICE_NAME"
   wait_for_deletion "$SERVICE_NAME"
 fi
+
+# change into the directory and push the app without starting it.
+pushd $APP_DIRECTORY
+cf push "$TEST_APP" -f manifest.yml
 
 ENABLE_FEEDBACK_NOTIFICATIONS=${ENABLE_FEEDBACK_NOTIFICATIONS:-"false"}
 
@@ -25,6 +34,8 @@ else
 fi
 
 wait_for_service_instance "$SERVICE_NAME"
+
+wait_for_service_bindable "$TEST_APP" "$SERVICE_NAME"
 
 # Clean up app and service
 cf delete-service -f "$SERVICE_NAME"
