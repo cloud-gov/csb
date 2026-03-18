@@ -1,10 +1,10 @@
 jobs:
   - name: set-self
     plan:
-      - get: ci-source
+      - get: src
         trigger: true
       - set_pipeline: self
-        file: ci-source/ci/pipeline.yml
+        file: src/ci/pipeline.yml
 
   - name: terraform-plan-apps-development
     plan:
@@ -14,9 +14,9 @@ jobs:
           - get: terraform-templates
             resource: terraform-config
             trigger: true # Changes to the terraform deployment code trigger a rebuild
-          - get: ci-source
-            resource: ci-source
-            trigger: true
+          - get: src
+            resource: src
+            trigger: false
             passed: [set-self]
           # Changes to the iaas state file trigger a build. This is not a step
           # input because the state is accessed separately using a
@@ -94,8 +94,8 @@ jobs:
             resource: terraform-config
             passed: [terraform-plan-apps-development]
             trigger: true
-          - get: ci-source
-            trigger: true
+          - get: src
+            trigger: false
             passed: [terraform-plan-apps-development]
           - get: pipeline-tasks
           - get: general-task
@@ -138,8 +138,8 @@ jobs:
   - name: acceptance-tests-development
     plan:
       - in_parallel:
-        - get: ci-source
-          trigger: true
+        - get: src
+          trigger: false
           passed: [terraform-apply-apps-development]
         - get: csb-source
           resource: terraform-config
@@ -154,7 +154,7 @@ jobs:
       - in_parallel:
           steps:
             - task: acceptance-test-create
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params: &acceptance-test-params
                 TEST_NAME: default
@@ -167,7 +167,7 @@ jobs:
                 ADMIN_EMAIL: ((development-tests-admin-email))
 
             - task: acceptance-test-feedback-notifications
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params:
                 <<: *acceptance-test-params
@@ -204,8 +204,8 @@ jobs:
           - get: csb-helper-image
             passed: [acceptance-tests-development]
             trigger: true
-          - get: ci-source
-            trigger: true
+          - get: src
+            trigger: false
             passed: [acceptance-tests-development]
       - in_parallel:
           - load_var: csb-image-repository
@@ -275,8 +275,8 @@ jobs:
           - get: csb-helper-image
             passed: [terraform-plan-apps-staging]
             trigger: true
-          - get: ci-source
-            trigger: true
+          - get: src
+            trigger: false
             passed: [terraform-plan-apps-staging]
       - load_var: csb-image-repository
         file: csb-image/repository
@@ -319,14 +319,14 @@ jobs:
         - get: csb-helper-image
           passed: [terraform-apply-apps-staging]
           trigger: true
-        - get: ci-source
-          trigger: true
+        - get: src
+          trigger: false
           passed: [terraform-apply-apps-staging]
         - get: general-task
       - in_parallel:
           steps:
             - task: acceptance-test-create
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params: &staging-acceptance-test-params
                 TEST_NAME: default
@@ -339,7 +339,7 @@ jobs:
                 ADMIN_EMAIL: ((staging-tests-admin-email))
 
             - task: acceptance-test-feedback-notifications
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params:
                 <<: *staging-acceptance-test-params
@@ -376,8 +376,8 @@ jobs:
           - get: csb-helper-image
             passed: [acceptance-tests-staging]
             trigger: true
-          - get: ci-source
-            trigger: true
+          - get: src
+            trigger: false
             passed: [acceptance-tests-staging]
       - in_parallel:
           - load_var: csb-image-repository
@@ -447,8 +447,8 @@ jobs:
           - get: csb-helper-image
             passed: [terraform-plan-apps-production]
             trigger: true
-          - get: ci-source
-            trigger: true
+          - get: src
+            trigger: false
             passed: [terraform-plan-apps-production]
       - load_var: csb-image-repository
         file: csb-image/repository
@@ -486,14 +486,14 @@ jobs:
         - get: csb-source
           resource: terraform-config
           passed: [terraform-apply-apps-production]
-        - get: ci-source
-          trigger: true
+        - get: src
+          trigger: false
           passed: [terraform-apply-apps-production]
         - get: general-task
       - in_parallel:
           steps:
             - task: acceptance-test-create
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params: &production-acceptance-test-params
                 TEST_NAME: default
@@ -506,7 +506,7 @@ jobs:
                 ADMIN_EMAIL: ((production-tests-admin-email))
 
             - task: acceptance-test-feedback-notifications
-              file: ci-source/ci/run-acceptance-test.yml
+              file: src/ci/run-acceptance-test.yml
               image: general-task
               params:
                 <<: *production-acceptance-test-params
@@ -590,14 +590,12 @@ resources:
       aws_region: us-gov-west-1
       tag: latest
 
-  - name: ci-source
+  - name: src
     type: git
     source:
       commit_verification_keys: ((cloud-gov-pgp-keys))
       uri: https://github.com/cloud-gov/csb.git
       branch: main
-      paths:
-        - ci/*
 
   - name: terraform-plugin-cache
     type: s3-iam

@@ -2,11 +2,11 @@
 
 set -euxo pipefail
 
-. ci-source/ci/ci-utils.sh
+. src/ci/ci-utils.sh
 
 TEST_APP="ses-acceptance-test-$TEST_NAME-app"
 SERVICE_NAME="ses-acceptance-test-$TEST_NAME"
-APP_DIRECTORY="ci-source/brokerpaks/aws-ses/client/"
+APP_DIRECTORY="src/brokerpaks/aws-ses/client/"
 
 # Log in to CF
 login
