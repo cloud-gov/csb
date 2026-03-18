@@ -2,7 +2,7 @@
 platform: linux
 
 inputs:
-- name: ci-source
+- name: src
 
 run:
-  path: ci-source/ci/run-acceptance-test.sh
+  path: src/ci/run-acceptance-test.sh

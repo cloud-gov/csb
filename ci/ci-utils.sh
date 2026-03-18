@@ -9,7 +9,7 @@ login() {
 }
 
 # Function for waiting on a service instance to finish being processed.
-wait_for_service_instance() {
+function wait_for_service_instance {
   local service_name=$1
   local guid
   guid=$(cf service --guid "$service_name")
@@ -34,6 +34,18 @@ function wait_for_deletion {
       break
     fi
     echo "Waiting for $1 to be deleted"
+    sleep 60
+  done
+}
+
+function wait_for_service_bindable {
+  while true; do
+    if out=$(cf bind-service "$1" "$2"); then
+      break
+    fi
+    if [[ $out =~ "Instance not available yet" ]]; then
+      echo "${out}"
+    fi
     sleep 60
   done
 }
