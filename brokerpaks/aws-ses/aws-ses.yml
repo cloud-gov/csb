@@ -146,9 +146,9 @@ bind:
       default: []
       details: A list of IP ranges in CIDR format. If specified, requests made with this binding must originate from the specified ranges. By default, all requests are allowed.
       prohibit_update: false
-    - field_name: notification_webhook
+    - field_name: notification_email
       type: string
-      details: HTTPS endpoint to subscribe to feedback notifications.
+      details: Email to subscribe to feedback notifications.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string

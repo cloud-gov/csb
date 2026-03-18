@@ -56,7 +56,7 @@ variable "delivery_topic_arn" {
   default = ""
 }
 
-variable "notification_webhook" {
+variable "notification_email" {
   type    = string
   default = ""
 }
