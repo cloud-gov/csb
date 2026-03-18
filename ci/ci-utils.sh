@@ -39,8 +39,13 @@ function wait_for_deletion {
 }
 
 function wait_for_service_bindable {
+  command="cf bind-service $1 $2"
+  if [[ -n "$3" ]]; then
+    command="$command -c $3"
+  fi
+
   while true; do
-    if out=$(cf bind-service "$1" "$2"); then
+    if out=$($command); then
       break
     fi
     if [[ $out =~ "Instance not available yet" ]]; then

@@ -35,7 +35,11 @@ fi
 
 wait_for_service_instance "$SERVICE_NAME"
 
-wait_for_service_bindable "$TEST_APP" "$SERVICE_NAME"
+if [[ "$ENABLE_FEEDBACK_NOTIFICATIONS" == "true" ]]; then
+  wait_for_service_bindable "$TEST_APP" "$SERVICE_NAME" '{"notification_email": "'"$ADMIN_EMAIL"'"}'
+else
+  wait_for_service_bindable "$TEST_APP" "$SERVICE_NAME"
+fi
 
 # Clean up app and service
 cf delete -f "$TEST_APP"
