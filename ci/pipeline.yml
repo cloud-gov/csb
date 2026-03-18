@@ -178,7 +178,7 @@ jobs:
       params:
         <<: *slack-failure-config
         text: |
-          :x: Acceptance tests FAILED in development
+          :x: CSB acceptance tests FAILED in development
           <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
   - name: terraform-plan-apps-staging
@@ -350,7 +350,7 @@ jobs:
       params:
         <<: *slack-failure-config
         text: |
-          :x: Acceptance tests FAILED in staging
+          :x: CSB acceptance tests FAILED in staging
           <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
   - name: terraform-plan-apps-production
@@ -517,7 +517,7 @@ jobs:
       params:
         <<: *slack-failure-config
         text: |
-          :x: Acceptance tests FAILED in production
+          :x: CSB acceptance tests FAILED in production
           <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
 
 resources:
