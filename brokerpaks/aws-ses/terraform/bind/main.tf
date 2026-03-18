@@ -4,7 +4,7 @@ locals {
   subscribe_bounce_notification    = (var.bounce_topic_arn != "" && var.notification_email != null)
   subscribe_complaint_notification = (var.complaint_topic_arn != "" && var.notification_email != null)
   subscribe_delivery_notification  = (var.delivery_topic_arn != "" && var.notification_email != null)
-  subscribed_webhook               = ((local.subscribe_bounce_notification || local.subscribe_complaint_notification || local.subscribe_delivery_notification) ? var.notification_email : null)
+  subscribed_email                 = ((local.subscribe_bounce_notification || local.subscribe_complaint_notification || local.subscribe_delivery_notification) ? var.notification_email : null)
 }
 
 # Trivy: It is best practice to manage access via groups intead of by directly attaching

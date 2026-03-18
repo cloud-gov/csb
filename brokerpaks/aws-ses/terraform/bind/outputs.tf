@@ -20,6 +20,6 @@ output "aws_secret_access_key" {
   sensitive = true
 }
 
-output "notification_webhook" {
-  value = local.subscribed_webhook
+output "notification_email" {
+  value = local.subscribed_email
 }

@@ -226,9 +226,9 @@ bind:
     - field_name: aws_secret_access_key
       type: string
       details: AWS Secret Access Key.
-    - field_name: notification_webhook
+    - field_name: notification_email
       type: string
-      details: Subscribed endpoint for email feedback notifications
+      details: Subscribed email for feedback notifications
   template_refs:
     main: terraform/bind/main.tf
     outputs: terraform/bind/outputs.tf
