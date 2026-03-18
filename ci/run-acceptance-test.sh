@@ -38,5 +38,6 @@ wait_for_service_instance "$SERVICE_NAME"
 wait_for_service_bindable "$TEST_APP" "$SERVICE_NAME"
 
 # Clean up app and service
+cf delete -f "$TEST_APP"
 cf delete-service -f "$SERVICE_NAME"
 wait_for_deletion "$SERVICE_NAME"
