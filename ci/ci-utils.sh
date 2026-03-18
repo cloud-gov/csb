@@ -11,13 +11,21 @@ login() {
 # Function for waiting on a service instance to finish being processed.
 wait_for_service_instance() {
   local service_name=$1
-  local guid=$(cf service --guid $service_name)
-  local status=$(cf curl /v2/service_instances/${guid} | jq -r '.entity.last_operation.state')
+  local guid
+  guid=$(cf service --guid "$service_name")
+  local status
+  status=$(cf curl "/v2/service_instances/$guid" | jq -r '.entity.last_operation.state')
 
   while [ "$status" == "in progress" ]; do
     sleep 60
-    status=$(cf curl /v2/service_instances/${guid} | jq -r '.entity.last_operation.state')
+    status=$(cf curl "/v2/service_instances/$guid" | jq -r '.entity.last_operation.state')
   done
+
+  if [ "$status" == "failed" ]; then
+    echo "failed to create service instance"
+    cf service "$service_name"
+    exit 1
+  fi
 }
 
 function wait_for_deletion {

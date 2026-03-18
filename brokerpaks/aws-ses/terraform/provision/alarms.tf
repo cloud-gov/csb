@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_warning" {
 
   For more information, see: https://docs.cloud.gov/platform/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
-  - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
+  - SES identity: ${local.domain}
   - CF service instance GUID: ${var.instance_id}
   - CF organization GUID: ${local.organization_guid}
   - CF organization name: ${local.organization_name}
@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_bounce_rate_critical" {
 
   For more information, see: https://docs.cloud.gov/platform/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
-  - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
+  - SES identity: ${local.domain}
   - CF service instance GUID: ${var.instance_id}
   - CF organization GUID: ${local.organization_guid}
   - CF organization name: ${local.organization_name}
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_warning" {
 
   For more information, see: https://docs.cloud.gov/platform/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
-  - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
+  - SES identity: ${local.domain}
   - CF service instance GUID: ${var.instance_id}
   - CF organization GUID: ${local.organization_guid}
   - CF organization name: ${local.organization_name}
@@ -180,7 +180,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_complaint_rate_critical" {
 
   For more information, see: https://docs.cloud.gov/platform/services/aws-ses/. You can reach Cloud.gov support at support@cloud.gov.
 
-  - SES identity: ${aws_sesv2_email_identity.identity.email_identity}
+  - SES identity: ${local.domain}
   - CF service instance GUID: ${var.instance_id}
   - CF organization GUID: ${local.organization_guid}
   - CF organization name: ${local.organization_name}
