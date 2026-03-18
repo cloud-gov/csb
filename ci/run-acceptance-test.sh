@@ -22,7 +22,7 @@ fi
 
 # change into the directory and push the app without starting it.
 pushd $APP_DIRECTORY
-cf push "$TEST_APP" -f manifest.yml
+cf push "$TEST_APP" -f manifest-ci.yml --no-start --var email-recipient="$EMAIL_RECIPIENT"
 
 ENABLE_FEEDBACK_NOTIFICATIONS=${ENABLE_FEEDBACK_NOTIFICATIONS:-"false"}
 
