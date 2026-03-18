@@ -3,5 +3,4 @@ applications:
   - name: smtp-client
     buildpacks:
       - "go_buildpack"
-    services:
-      - name: email
+    command: smtp-client --recipient ((email-recipient))
