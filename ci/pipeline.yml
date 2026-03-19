@@ -485,13 +485,13 @@ jobs:
   - name: acceptance-tests-production
     plan:
       - in_parallel:
-        - get: csb-source
-          resource: terraform-config
-          passed: [terraform-apply-apps-production]
         - get: src
           trigger: false
           passed: [terraform-apply-apps-production]
         - get: general-task
+        - get: csb-image
+          passed: [terraform-apply-apps-production]
+          trigger: true
       - in_parallel:
           steps:
             - task: acceptance-test-create
