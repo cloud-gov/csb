@@ -23,3 +23,7 @@ output "aws_secret_access_key" {
 output "notification_email" {
   value = local.subscribed_email
 }
+
+output "notification_webhook" {
+  value = local.subscribed_webhook
+}

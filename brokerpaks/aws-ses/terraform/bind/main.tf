@@ -1,10 +1,14 @@
 locals {
-  instance_sha                     = "ses-${substr(sha256(var.instance_id), 0, 16)}"
-  base_name                        = "csb-aws-ses-${var.binding_id}"
-  subscribe_bounce_notification    = (var.bounce_topic_arn != "" && var.notification_email != null)
-  subscribe_complaint_notification = (var.complaint_topic_arn != "" && var.notification_email != null)
-  subscribe_delivery_notification  = (var.delivery_topic_arn != "" && var.notification_email != null)
-  subscribed_email                 = ((local.subscribe_bounce_notification || local.subscribe_complaint_notification || local.subscribe_delivery_notification) ? var.notification_email : null)
+  instance_sha                             = "ses-${substr(sha256(var.instance_id), 0, 16)}"
+  base_name                                = "csb-aws-ses-${var.binding_id}"
+  subscribe_bounce_notification_email      = (var.bounce_topic_arn != "" && var.notification_email != null)
+  subscribe_complaint_notification_email   = (var.complaint_topic_arn != "" && var.notification_email != null)
+  subscribe_delivery_notification_email    = (var.delivery_topic_arn != "" && var.notification_email != null)
+  subscribed_email                         = ((local.subscribe_bounce_notification_email || local.subscribe_complaint_notification_email || local.subscribe_delivery_notification_email) ? var.notification_email : null)
+  subscribe_bounce_notification_webhook    = (var.bounce_topic_arn != "" && var.notification_webhook != null)
+  subscribe_complaint_notification_webhook = (var.complaint_topic_arn != "" && var.notification_webhook != null)
+  subscribe_delivery_notification_webhook  = (var.delivery_topic_arn != "" && var.notification_webhook != null)
+  subscribed_webhook                       = ((local.subscribe_bounce_notification_webhook || local.subscribe_complaint_notification_webhook || local.subscribe_delivery_notification_webhook) ? var.notification_webhook : null)
 }
 
 # Trivy: It is best practice to manage access via groups intead of by directly attaching
@@ -42,7 +46,7 @@ resource "aws_iam_user_policy" "user_policy" {
 }
 
 resource "aws_sns_topic_subscription" "bounce_subscription" {
-  count = (local.subscribe_bounce_notification ? 1 : 0)
+  count = (local.subscribe_bounce_notification_email ? 1 : 0)
 
   topic_arn = var.bounce_topic_arn
   protocol  = "email"
@@ -50,7 +54,7 @@ resource "aws_sns_topic_subscription" "bounce_subscription" {
 }
 
 resource "aws_sns_topic_subscription" "complaint_subscription" {
-  count = (local.subscribe_complaint_notification ? 1 : 0)
+  count = (local.subscribe_complaint_notification_email ? 1 : 0)
 
   topic_arn = var.complaint_topic_arn
   protocol  = "email"
@@ -58,9 +62,33 @@ resource "aws_sns_topic_subscription" "complaint_subscription" {
 }
 
 resource "aws_sns_topic_subscription" "delivery_subscription" {
-  count = (local.subscribe_delivery_notification ? 1 : 0)
+  count = (local.subscribe_delivery_notification_email ? 1 : 0)
 
   topic_arn = var.delivery_topic_arn
   protocol  = "email"
   endpoint  = var.notification_email
+}
+
+resource "aws_sns_topic_subscription" "bounce_subscription_https" {
+  count = (local.subscribe_bounce_notification_webhook ? 1 : 0)
+
+  topic_arn = var.bounce_topic_arn
+  protocol  = "https"
+  endpoint  = var.notification_webhook
+}
+
+resource "aws_sns_topic_subscription" "complaint_subscription_https" {
+  count = (local.subscribe_complaint_notification_webhook ? 1 : 0)
+
+  topic_arn = var.complaint_topic_arn
+  protocol  = "https"
+  endpoint  = var.notification_webhook
+}
+
+resource "aws_sns_topic_subscription" "delivery_subscription_https" {
+  count = (local.subscribe_delivery_notification_webhook ? 1 : 0)
+
+  topic_arn = var.delivery_topic_arn
+  protocol  = "https"
+  endpoint  = var.notification_webhook
 }
