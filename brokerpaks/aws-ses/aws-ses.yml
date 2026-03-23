@@ -149,6 +149,9 @@ bind:
     - field_name: notification_email
       type: string
       details: Email to subscribe to feedback notifications.
+    - field_name: notification_webhook
+      type: string
+      details: HTTPS endpoint to subscribe to feedback notifications.
   computed_inputs:
     - name: aws_access_key_id_govcloud
       type: string
@@ -229,6 +232,9 @@ bind:
     - field_name: notification_email
       type: string
       details: Subscribed email for feedback notifications
+    - field_name: notification_webhook
+      type: string
+      details: Subscribed endpoint for feedback notifications
   template_refs:
     main: terraform/bind/main.tf
     outputs: terraform/bind/outputs.tf

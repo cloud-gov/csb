@@ -57,8 +57,15 @@ variable "delivery_topic_arn" {
 }
 
 variable "notification_email" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
+  description = "Email to subscribe to feedback notifications"
+}
+
+variable "notification_webhook" {
+  type        = string
+  default     = ""
+  description = "HTTPS endpoint to subscribe to feedback notifications"
 }
 
 variable "context" {
