@@ -581,7 +581,7 @@ resources:
       aws_secret_access_key: ((ecr_aws_secret))
       repository: cg-csb
       aws_region: us-gov-west-1
-      tag_regex: '[0-9a-f]{7}-[0-9a-f]{12}'
+      tag_regex: '^[0-9a-f]{7}-[0-9a-f]{12}'
       created_at_sort: true
 
 
@@ -592,7 +592,7 @@ resources:
       aws_secret_access_key: ((ecr_aws_secret))
       repository: csb-helper
       aws_region: us-gov-west-1
-      tag_regex: '[0-9a-f]{7}-[0-9a-f]{12}'
+      tag_regex: '^[0-9a-f]{7}-[0-9a-f]{12}'
       created_at_sort: true
 
 
