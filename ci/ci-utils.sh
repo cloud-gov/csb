@@ -14,11 +14,11 @@ function wait_for_service_instance {
   local guid
   guid=$(cf service --guid "$service_name")
   local status
-  status=$(cf curl "/v2/service_instances/$guid" | jq -r '.entity.last_operation.state')
+  status=$(cf curl "/v3/service_instances/$guid" | jq -r '.last_operation.state')
 
   while [ "$status" == "in progress" ]; do
     sleep 60
-    status=$(cf curl "/v2/service_instances/$guid" | jq -r '.entity.last_operation.state')
+    status=$(cf curl "/v3/service_instances/$guid" | jq -r '.last_operation.state')
   done
 
   if [ "$status" == "failed" ]; then
