@@ -7,8 +7,9 @@ export TF_PLUGIN_CACHE_DIR="$(pwd)/plugin-cache"
 tar xzf terraform-plugin-cache/cache.tar.gz
 
 # Use client credentials in CF_CLIENT_ID and CF_CLIENT_SECRET to fetch a token
-API_RESPONSE=$(curl -s $CF_API_URL/v2/info)
-TOKEN_ENDPOINT=$(echo ${API_RESPONSE} | jq -r '.token_endpoint // empty')
+# The v3 API root endpoint exposes the UAA endpoint at .links.uaa.href
+API_RESPONSE=$(curl -s "${CF_API_URL%/}/")
+TOKEN_ENDPOINT=$(echo "${API_RESPONSE}" | jq -r '.links.uaa.href // empty')
 
 if [ -z "${TOKEN_ENDPOINT}" ]; then
   echo "API didn't return a token endpoint: ${API_RESPONSE}"
