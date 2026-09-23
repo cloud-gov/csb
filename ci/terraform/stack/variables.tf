@@ -91,23 +91,3 @@ variable "csb_helper_instances" {
   type    = number
   default = 1
 }
-
-variable "ses_broker_tests_deployer_service_name" {
-  type        = string
-  description = "Name of service account used to manage SES broker test resources"
-}
-
-variable "ses_broker_tests_deployer_service_key_name" {
-  type        = string
-  description = "Name of service key for account used to manage SES broker test resources"
-}
-
-variable "ses_broker_tests_org_name" {
-  type        = string
-  description = "Name of CF organization where SES broker test resources are created"
-}
-
-variable "ses_broker_tests_space_name" {
-  type        = string
-  description = "Name of CF space where SES broker test resources are created"
-}
