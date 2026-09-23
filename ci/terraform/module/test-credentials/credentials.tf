@@ -23,6 +23,6 @@ resource "cloudfoundry_service_instance" "test_user" {
 
 resource "cloudfoundry_service_credential_binding" "test_user_key" {
   type             = "key"
-  name             = "${var.deployer_service_name}-key"
+  name             = var.deployer_service_key_name
   service_instance = cloudfoundry_service_instance.test_user.id
 }

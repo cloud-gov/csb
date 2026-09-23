@@ -1,4 +1,4 @@
-module "ses-broker-test-user" {
+module "ses_broker_test_user" {
   source = "../module/test-user"
 
   org_name              = var.ses_broker_tests_org_name
