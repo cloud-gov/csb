@@ -2,7 +2,7 @@ data "cloudfoundry_org" "tests_org" {
   name = var.org_name
 }
 
-data "cloudfoundry_space" "space_name" {
+data "cloudfoundry_space" "tests_space" {
   name = var.space_name
   org  = data.cloudfoundry_org.tests_org.id
 }
