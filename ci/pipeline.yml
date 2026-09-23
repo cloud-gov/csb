@@ -72,6 +72,10 @@ jobs:
           TF_VAR_iaas_stack_name: development
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
+          TF_VAR_ses_broker_tests_deployer_service_name: ((development-ses-test-service-account-name))
+          TF_VAR_ses_broker_tests_deployer_service_key_name: ((development-ses-test-service-account-key-name))
+          TF_VAR_ses_broker_tests_org_name: ((development-tests-cf-organization))
+          TF_VAR_ses_broker_tests_space_name: ((development-tests-cf-space))
         on_failure:
           put: slack
           params: &slack-failure-config
@@ -159,10 +163,10 @@ jobs:
               params: &acceptance-test-params
                 TEST_NAME: default
                 CF_API_URL: ((dev-cf-api-url))
-                CF_USERNAME: ((development-tests-cf-username))
-                CF_PASSWORD: ((development-tests-cf-password))
                 CF_ORGANIZATION: ((development-tests-cf-organization))
                 CF_SPACE: ((development-tests-cf-space))
+                CF_USER_SERVICE_NAME: ((development-ses-test-service-account-name))
+                CF_USER_SERVICE_KEY_NAME: ((development-ses-test-service-account-key-name))
                 SERVICE_PLAN: domain
                 ADMIN_EMAIL: ((development-tests-admin-email))
                 EMAIL_RECIPIENT: ((test-email-recipient))
@@ -250,6 +254,10 @@ jobs:
           TF_VAR_iaas_stack_name: staging
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
+          TF_VAR_ses_broker_tests_deployer_service_name: ((staging-ses-test-service-account-name))
+          TF_VAR_ses_broker_tests_deployer_service_key_name: ((staging-ses-test-service-account-key-name))
+          TF_VAR_ses_broker_tests_org_name: ((staging-tests-cf-organization))
+          TF_VAR_ses_broker_tests_space_name: ((staging-tests-cf-space))
         on_failure:
           put: slack
           params:
@@ -331,8 +339,8 @@ jobs:
               params: &staging-acceptance-test-params
                 TEST_NAME: default
                 CF_API_URL: ((staging-cf-api-url))
-                CF_USERNAME: ((staging-tests-cf-username))
-                CF_PASSWORD: ((staging-tests-cf-password))
+                CF_USER_SERVICE_NAME: ((staging-ses-test-service-account-name))
+                CF_USER_SERVICE_KEY_NAME: ((staging-ses-test-service-account-key-name))
                 CF_ORGANIZATION: ((staging-tests-cf-organization))
                 CF_SPACE: ((staging-tests-cf-space))
                 SERVICE_PLAN: domain
@@ -423,6 +431,10 @@ jobs:
           TF_VAR_iaas_stack_name: production
           TF_VAR_remote_state_bucket_external: ((tf-state-bucket-external))
           TF_VAR_remote_state_bucket_iaas: ((tf-state-bucket))
+          TF_VAR_ses_broker_tests_deployer_service_name: ((production-ses-test-service-account-name))
+          TF_VAR_ses_broker_tests_deployer_service_key_name: ((production-ses-test-service-account-key-name))
+          TF_VAR_ses_broker_tests_org_name: ((production-tests-cf-organization))
+          TF_VAR_ses_broker_tests_space_name: ((production-tests-cf-space))
         on_failure:
           put: slack
           params:
@@ -499,8 +511,8 @@ jobs:
               params: &production-acceptance-test-params
                 TEST_NAME: default
                 CF_API_URL: ((prod-cf-api-url))
-                CF_USERNAME: ((production-tests-cf-username))
-                CF_PASSWORD: ((production-tests-cf-password))
+                CF_USER_SERVICE_NAME: ((production-ses-test-service-account-name))
+                CF_USER_SERVICE_KEY_NAME: ((production-ses-test-service-account-key-name))
                 CF_ORGANIZATION: ((production-tests-cf-organization))
                 CF_SPACE: ((production-tests-cf-space))
                 SERVICE_PLAN: domain

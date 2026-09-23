@@ -3,7 +3,22 @@
 login() {
   cf api "$CF_API_URL"
   set +x
+
+  if [[ -z "$CF_USERNAME" || -z "$CF_PASSWORD" ]]; then
+    if [[ -n "$CF_USER_SERVICE_NAME" && -n "$CF_USER_SERVICE_KEY_NAME" ]]; then
+      CF_USER_SERVICE_KEY_GUID=$(cf service-key "$CF_USER_SERVICE_NAME" "$CF_USER_SERVICE_KEY_NAME" --guid)
+      CF_USERNAME=$(cf curl "/v3/service_credential_bindings/$CF_USER_SERVICE_KEY_GUID/details" | jq -r '.credentials.username')
+      CF_PASSWORD=$(cf curl "/v3/service_credential_bindings/$CF_USER_SERVICE_KEY_GUID/details" | jq -r '.credentials.password')
+    fi
+  fi
+
+  if [[ -z "$CF_USERNAME" || -z "$CF_PASSWORD" ]]; then
+    echo "missing required credentials for login"
+    exit 1
+  fi
+
   cf auth "$CF_USERNAME" "$CF_PASSWORD"
+
   set -x
   cf target -o "$CF_ORGANIZATION" -s "$CF_SPACE"
 }
