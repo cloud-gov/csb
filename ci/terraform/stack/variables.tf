@@ -91,3 +91,18 @@ variable "csb_helper_instances" {
   type    = number
   default = 1
 }
+
+variable "ses_broker_tests_deployer_service_name" {
+  type        = string
+  description = "Name of service account used to manage test resources"
+}
+
+variable "ses_broker_tests_org_name" {
+  type        = string
+  description = "Name of CF organization where test resources are created"
+}
+
+variable "ses_broker_tests_space_name" {
+  type        = string
+  description = "Name of CF space where test resources are created"
+}

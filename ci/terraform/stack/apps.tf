@@ -1,5 +1,5 @@
 module "csb" {
-  source = "../module"
+  source = "../module/csb"
 
   cloud_gov_environment = var.iaas_stack_name
 
