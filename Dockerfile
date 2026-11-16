@@ -19,8 +19,10 @@ cp /app/zscaler.crt $CERT_DIR ; update-ca-certificates ; \
 fi
 
 RUN /app/csb pak build brokerpaks/aws-ses
+RUN /app/csb pak build brokerpaks/openbao-stack
 
 FROM ${base_image}
 
 # Copy brokerpaks to final image
-COPY --from=build /app/aws-ses-0.1.0.brokerpak /app/
+COPY --from=build /app/aws-ses-0.1.0.brokerpak /app/openbao-stack-0.1.0.brokerpak /app/
+WORKDIR /app
