@@ -21,7 +21,7 @@ endif
 
 run: build
 ifeq ($(BROKERPAK),openbao-stack)
-	cd "$(BROKER_WORKDIR)" && $(OPENBAO_ENV) cloud-service-byroker serve
+	cd "$(BROKER_WORKDIR)" && $(OPENBAO_ENV) cloud-service-broker serve
 else
 	# Load environment variables from secrets.env, scoped to this command only.
 	@bash -c 'env $$(cat secrets.env | xargs) cloud-service-broker serve'
