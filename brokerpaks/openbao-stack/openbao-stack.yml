@@ -1,0 +1,131 @@
+version: 1
+name: openbao-stack
+id: 2C973029-64A6-419A-9EA3-F0CDEA158FEF
+description: Scaffold for an OpenBao stack.
+display_name: OpenBao stack (prototype)
+image_url: https://services.cloud.gov/images/amazon-ses.svg
+documentation_url: https://docs.cloud.gov/
+provider_display_name: cloud.gov
+support_url: https://cloud.gov/contact/
+tags: [openbao, secrets, prototype, scaffold]
+plan_updateable: false
+plans:
+  - name: dedicated
+    id: DB7FDFBE-8D55-4147-841B-9A4D78B7EA9D
+    description: One fixed dedicated stack
+    display_name: Dedicated (prototype)
+provision:
+  user_inputs: []
+  computed_inputs:
+    - name: instance_id
+      type: string
+      default: ${request.instance_id}
+      overwrite: true
+    - name: organization_guid
+      type: string
+      default: ${request.context["organization_guid"]}
+      overwrite: true
+    - name: space_guid
+      type: string
+      default: ${request.context["space_guid"]}
+      overwrite: true
+    - name: management_credential_ref
+      type: string
+      default: ${config("brokerpaks.openbao.root_store_prefix")}/${request.instance_id}/root_store_prefix
+      overwrite: true
+  template_refs:
+    main: terraform/provision/main.tf
+    variables: terraform/provision/variables.tf
+    outputs: terraform/provision/outputs.tf
+    version: terraform/provision/versions.tf
+  outputs:
+    - field_name: endpoint
+      type: string
+      details: Private HTTPS endpoint
+    - field_name: mount
+      type: string
+      details: Broker-managed KV v2 mount
+    - field_name: instance_id
+      type: string
+      details: Immutable service-instance identifier
+    - field_name: organization_guid
+      type: string
+      details: Owning organization from the platform request
+    - field_name: space_guid
+      type: string
+      details: Owning application space from the platform request
+bind:
+  user_inputs:
+    - field_name: path_prefix
+      type: string
+      required: true
+      details: Literal relative secret prefix. Wildcards are not supported.
+      constraints:
+        minLength: 1
+        maxLength: 128
+        pattern: ^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$
+    - field_name: access
+      type: string
+      default: read-only
+      details: Permission profile for this binding or key only
+      enum:
+        read-only: Read secrets and list within the supplied prefix
+        read-write: Read, write, and soft-delete secrets within the supplied prefix
+  computed_inputs:
+    - name: instance_id
+      type: string
+      default: ${request.instance_id}
+      overwrite: true
+    - name: binding_id
+      type: string
+      default: ${request.binding_id}
+      overwrite: true
+    - name: app_guid
+      type: string
+      default: ${request.app_guid}
+      overwrite: true
+    - name: organization_guid
+      type: string
+      default: ${instance.details["organization_guid"]}
+      overwrite: true
+    - name: space_guid
+      type: string
+      default: ${instance.details["space_guid"]}
+      overwrite: true
+    - name: endpoint
+      type: string
+      default: ${instance.details["endpoint"]}
+      overwrite: true
+    - name: mount
+      type: string
+      default: ${instance.details["mount"]}
+      overwrite: true
+    - name: management_credential_ref
+      type: string
+      default: ${config("brokerpaks.openbao.root_store_prefix")}/${request.instance_id}/root
+      overwrite: true
+  template_refs:
+    main: terraform/bind/main.tf
+    variables: terraform/bind/variables.tf
+    outputs: terraform/bind/outputs.tf
+    versions: terraform/bind/versions.tf
+  outputs:
+    - field_name: auth_mount
+      type: string
+      details: Broker-managed AppRole authentication mount
+    - field_name: role_id
+      type: string
+      details: RoleID belonging to this binding or key
+    - field_name: secret_id
+      type: string
+      details: Expiring SecretID belonging to this binding or key
+    - field_name: secret_id_ttl_seconds
+      type: string
+      details: Maximum SecretID lifetime in seconds; replacement is required after expiry
+    - field_name: path_prefix
+      type: string
+      details: Literal authorized prefix within the KV mount
+    - field_name: access
+      type: string
+      details: Applied permission profile
+      
