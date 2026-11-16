@@ -1,0 +1,21 @@
+packversion: 1
+name: openbao-stack
+version: 0.1.0
+metadata:
+  author: cloud.gov team
+  stage: scaffold-code-only
+platforms:
+  - os: linux
+    arch: amd64
+terraform_binaries:
+  - name: tofu
+    version: 1.13.1
+    source: https://github.com/opentofu/opentofu/archive/v1.13.1.zip
+    url_template: https://github.com/opentofu/opentofu/releases/download/v${version}/tofu_${version}_${os}_${arch}.zip
+    default: true
+terraform_upgrade_path:
+  - version: 1.13.1
+service_definitions:
+  - openbao-stack.yml
+env_config_mapping:
+   BP_OPENBAO_ROOT_STORE_PREFIX: brokerpaks.openbao.root_store_prefix
