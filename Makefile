@@ -42,10 +42,10 @@ openbao-up:
 	$(MAKE) run BROKERPAK=openbao-stack
 
 openbao-test:
-	python3 brokerpaks/openbao-stack/tools/run_unit.python3
+	python3 brokerpaks/openbao-stack/tools/run_unit.py
 
 openbao-smoke:
-	python3 brokerpaks/openbao-stack/tests/smoke
+	python3 brokerpaks/openbao-stack/tests/smoke.py
 
 openbao-probe:
 	python3 brokerpaks/openbao-stack/tools/probe_provider.py
