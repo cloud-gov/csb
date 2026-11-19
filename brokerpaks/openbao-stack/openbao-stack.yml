@@ -1,13 +1,13 @@
 version: 1
 name: openbao-stack
 id: 2C973029-64A6-419A-9EA3-F0CDEA158FEF
-description: Scaffold for an OpenBao stack.
+description: Dedicated, broker-managed OpenBao dev prototype
 display_name: OpenBao stack (prototype)
 image_url: https://services.cloud.gov/images/amazon-ses.svg
 documentation_url: https://docs.cloud.gov/
 provider_display_name: cloud.gov
 support_url: https://cloud.gov/contact/
-tags: [openbao, secrets, prototype, scaffold]
+tags: [openbao, secrets, prototype]
 plan_updateable: false
 plans:
   - name: dedicated
@@ -23,15 +23,19 @@ provision:
       overwrite: true
     - name: organization_guid
       type: string
-      default: ${request.context["organization_guid"]}
+      default: ${request.default_labels["pcf-organization-guid"]}
       overwrite: true
     - name: space_guid
       type: string
-      default: ${request.context["space_guid"]}
+      default: ${request.default_labels["pcf-space-guid"]}
+      overwrite: true
+    - name: dev_config
+      type: string
+      default: '${env("OPENBAO_DEV_CONFIG")}'
       overwrite: true
     - name: management_credential_ref
       type: string
-      default: ${config("brokerpaks.openbao.root_store_prefix")}/${request.instance_id}/root_store_prefix
+      default: ${config("brokerpaks.openbao.root_store_prefix")}/${request.instance_id}/root
       overwrite: true
   template_refs:
     main: terraform/provision/main.tf
@@ -99,6 +103,10 @@ bind:
     - name: mount
       type: string
       default: ${instance.details["mount"]}
+      overwrite: true
+    - name: secret_id_ttl_seconds
+      type: string
+      default: '${env("BP_OPENBAO_SECRET_ID_TTL")}'
       overwrite: true
     - name: management_credential_ref
       type: string
