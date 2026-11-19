@@ -3,7 +3,7 @@ name: openbao-stack
 version: 0.1.0
 metadata:
   author: cloud.gov team
-  stage: scaffold-code-only
+  stage: dev-prototype
 platforms:
   - os: linux
     arch: amd64
@@ -13,9 +13,22 @@ terraform_binaries:
     source: https://github.com/opentofu/opentofu/archive/v1.13.1.zip
     url_template: https://github.com/opentofu/opentofu/releases/download/v${version}/tofu_${version}_${os}_${arch}.zip
     default: true
+  - name: terraform-provider-aws
+    version: 5.92.0
+    provider: registry.terraform.io/hashicorp/aws
+    source: https://github.com/hashicorp/terraform-provider-aws/archive/refs/tags/v5.92.0.zip
+  - name: terraform-provider-cloudfoundry
+    version: 1.4.0
+    provider: registry.terraform.io/cloudfoundry/cloudfoundry
+    source: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/archive/refs/tags/v1.4.0.zip
+    url_template: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/releases/download/v${version}/${name}_${version}_${os}.${arch}.zip
+  - name: terraform-provider-external
+    version: 2.3.5
+    provider: registry.terraform.io/hashicorp/external
+    source: https://github.com/hashicorp/terraform-provider-external/archive/refs/tags/v2.3.5.zip
 terraform_upgrade_path:
   - version: 1.13.1
 service_definitions:
   - openbao-stack.yml
 env_config_mapping:
-   BP_OPENBAO_ROOT_STORE_PREFIX: brokerpaks.openbao.root_store_prefix
+  BP_OPENBAO_ROOT_STORE_PREFIX: brokerpaks.openbao.root_store_prefix
