@@ -1,32 +1,29 @@
 variable "instance_id" {
-    type = string
-    validation {
-      condition = can(regex("^[0-9a-f-]{36}$", var.instance_id))
-      error_message = "A platform-supplied service-instance GUID is required."
-    }
+  type = string
+  validation {
+    condition     = can(regex("^[0-9a-f-]{36}$", var.instance_id))
+    error_message = "A platform-supplied service-instance GUID is required."
+  }
 }
 
 variable "organization_guid" {
-    type = string
-    validation {
-        condition = length(var.organization_guid) > 0
-        error_message = "The platform organization GUID must be supplied"
-    }
+  type = string
 }
 
 variable "space_guid" {
   type = string
-  validation {
-    condition = length(var.space_guid) > 0
-    error_message = "The platform space GUID must be supplied"
-  }
 }
 
 variable "management_credential_ref" {
-  type = string
-  description = "Broker-private credential reference, never a root token and never an output"
+  description = "Broker-private SSM parameter name for the stack root token."
+  type        = string
+}
+
+variable "dev_config" {
+  description = "Non-secret operator settings from OPENBAO_DEV_CONFIG on the dev broker"
+  type        = string
   validation {
-    condition = length(var.management_credential_ref) > 0
-    error_message = "A broker-controlled credential reference is required."
+    condition     = can(keys(jsondecode(var.dev_config)))
+    error_message = "The broker must supply OPENBAO_DEV_CONFIG as a JSON object."
   }
 }
