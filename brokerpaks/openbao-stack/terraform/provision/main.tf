@@ -149,7 +149,7 @@ resource "cloudfoundry_app" "openbao" {
     BAO_DATABASE_SERVICE        = cloudfoundry_service_instance.database.name
     BAO_RUNTIME_API_ADDR        = local.endpoint
     BAO_RUNTIME_KMS_ENDPOINT    = local.kms_endpoint
-    BAO_RUNTIME_KMS_KEYj        = aws_kms_key.seal.arn
+    BAO_RUNTIME_KMS_KEY         = aws_kms_key.seal.arn
     AWS_REGION                  = local.dev_config.aws_region
     AWS_ROLE_ARN                = aws_iam_role.runtime.arn
     AWS_WEB_IDENTITY_TOKEN_FILE = local.dev_config.aws_token_file
