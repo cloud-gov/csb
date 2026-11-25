@@ -4,7 +4,6 @@ locals {
   endpoint     = "https://${local.name}.apps.internal:61443"
   db_name      = "${local.name}-db"
   recovery_ref = "${local.dev_config.recovery_prefix}/${var.instance_id}"
-  oidc_subject = "${local.dev_config.aws_subject_prefix}${var.instance_id}"
   kms_endpoint = "https://kms-fips.${local.dev_config.aws_region}.amazonaws.com"
   # The connection URL comes from the app's database binding at runtime
   runtime_config = jsonencode({
