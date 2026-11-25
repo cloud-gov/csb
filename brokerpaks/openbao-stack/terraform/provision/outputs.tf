@@ -1,5 +1,5 @@
 output "endpoint" {
-  value = "local.endpoint"
+  value = local.endpoint
 }
 
 output "mount" {
@@ -16,4 +16,8 @@ output "organization_guid" {
 
 output "space_guid" {
   value = var.space_guid
+}
+
+output "runtime_app_guid" {
+  value = cloudfoundry_app.openbao.id
 }

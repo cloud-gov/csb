@@ -1,0 +1,1 @@
+token_helper = "/app/openbao-stack"

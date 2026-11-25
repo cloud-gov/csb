@@ -1,7 +1,7 @@
 variable "instance_id" {
   type = string
   validation {
-    condition     = can(regex("^[0-9a-f-]{36}$", var.instance_id))
+    condition     = can(regex("^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", var.instance_id))
     error_message = "A platform-supplied service-instance GUID is required."
   }
 }
@@ -12,6 +12,15 @@ variable "organization_guid" {
 
 variable "space_guid" {
   type = string
+}
+
+variable "broker_app_guid" {
+  description = "Broker app GUID supplied from VCAP_APPLICATION at broker startup."
+  type        = string
+  validation {
+    condition     = can(regex("^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", var.broker_app_guid))
+    error_message = "The broker must supply its cloud foundry application GUID."
+  }
 }
 
 variable "management_credential_ref" {

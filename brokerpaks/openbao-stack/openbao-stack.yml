@@ -33,6 +33,10 @@ provision:
       type: string
       default: '${env("OPENBAO_DEV_CONFIG")}'
       overwrite: true
+    - name: broker_app_guid
+      type: string
+      default: '${env("BP_OPENBAO_BROKER_APP_GUID")}'
+      overwrite: true
     - name: management_credential_ref
       type: string
       default: ${config("brokerpaks.openbao.root_store_prefix")}/${request.instance_id}/root
@@ -42,6 +46,7 @@ provision:
     variables: terraform/provision/variables.tf
     outputs: terraform/provision/outputs.tf
     version: terraform/provision/versions.tf
+    openbao: terraform/provision/openbao.tf
   outputs:
     - field_name: endpoint
       type: string
@@ -58,6 +63,9 @@ provision:
     - field_name: space_guid
       type: string
       details: Owning application space from the platform request
+    - field_name: runtime_app_guid
+      type: string
+      details: Runtime application identifier retained for private network policies
 bind:
   user_inputs:
     - field_name: path_prefix
@@ -87,6 +95,10 @@ bind:
     - name: app_guid
       type: string
       default: ${request.app_guid}
+      overwrite: true
+    - name: runtime_app_guid
+      type: string
+      default: ${instance.details["runtime_app_guid"]}
       overwrite: true
     - name: organization_guid
       type: string
@@ -129,11 +141,10 @@ bind:
       details: Expiring SecretID belonging to this binding or key
     - field_name: secret_id_ttl_seconds
       type: string
-      details: Maximum SecretID lifetime in seconds; replacement is required after expiry
+      details: Configured SecretID TTL in seconds; expiry enforcement includes the server cleanup interval
     - field_name: path_prefix
       type: string
       details: Literal authorized prefix within the KV mount
     - field_name: access
       type: string
       details: Applied permission profile
-      

@@ -6,6 +6,29 @@ locals {
   recovery_ref = "${local.dev_config.recovery_prefix}/${var.instance_id}"
   oidc_subject = "${local.dev_config.aws_subject_prefix}${var.instance_id}"
   kms_endpoint = "https://kms-fips.${local.dev_config.aws_region}.amazonaws.com"
+  # The connection URL comes from the app's database binding at runtime
+  runtime_config = jsonencode({
+    api_addr      = local.endpoint
+    ui            = false
+    disable_mlock = true
+    storage       = { postgresql = {} }
+    listener = { tcp = {
+      address     = "0.0.0.0:8200"
+      tls_disable = true
+    } }
+    seal = { awskms = {
+      region     = local.dev_config.aws_region
+      kms_key_id = aws_kms_key.seal.arn
+      endpoint   = local.kms_endpoint
+    } }
+    audit = { file = { broker = {
+      local = false
+      options = {
+        file_path = "stdout"
+        log_raw   = "false"
+      }
+    } } }
+  })
 }
 
 resource "terraform_data" "owner" {
@@ -13,7 +36,7 @@ resource "terraform_data" "owner" {
 
   lifecycle {
     precondition {
-      condition     = var.organization_guid == local.dev_config.org_guid && can(regex("^0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", var.space_guid))
+      condition     = var.organization_guid == local.dev_config.org_guid && can(regex("^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$", var.space_guid))
       error_message = "The caller must be in the configured prototype organization and have a platform-supplied space GUID."
     }
     precondition {
@@ -24,22 +47,17 @@ resource "terraform_data" "owner" {
       condition = (
         can(regex("^us-gov-(east|west)-1$", local.dev_config.aws_region)) &&
         can(regex("^[0-9]{12}$", local.dev_config.aws_account_id)) &&
-        startswith(local.dev_config.aws_oidc_provider_arn, "arn:aws-us-gov:iam::${local.dev_config.aws_account_id}:oidc-provider/") &&
-        endswith(local.dev_config.aws_oidc_provider_arn, "/${local.dev_config.aws_oidc_issuer}") &&
-        !strcontains(local.dev_config.aws_subject_prefix, "*") &&
-        !strcontains(local.dev_config.aws_subject_prefix, "?") &&
-        startswith(local.dev_config.aws_token_file, "/") &&
         can(regex("@sha256:[0-9a-f]{64}$", local.dev_config.runtime_image)) &&
         startswith(local.dev_config.parameter_key_id, "arn:aws-us-gov:kms:${local.dev_config.aws_region}:${local.dev_config.aws_account_id}:key/") &&
         can(regex("^(/[A-Za-z0-9_.-]+)+$", local.dev_config.recovery_prefix)) &&
         length(local.dev_config.recovery_pgp_key) > 0 && length(local.dev_config.rds_ca_pem) > 0
       )
-      error_message = "Configure the GovCloud dev account, pinned image, renewable workload identity, and separate recovery custody."
+      error_message = "Configure the GovCloud dev account, pinned image, and separate recovery custody."
     }
 
     precondition {
       condition = length(local.dev_config.egress_rules) > 0 && alltrue([
-        for rule in local.dev.config.egress_rules :
+        for rule in local.dev_config.egress_rules :
         contains(["tcp", "udp"], rule.protocol) &&
         can(cidrhost(rule.destination, 0)) &&
         !endswith(rule.destination, "/0") &&
@@ -92,31 +110,30 @@ resource "aws_kms_key" "seal" {
   depends_on = [terraform_data.owner, terraform_data.root_custody]
 }
 
-resource "aws_iam_role" "runtime" {
-  name = local.name
-  assume_role_policy = jsondecode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Action    = "sts:AssumeRoleWithWebIdentity"
-      Principal = { Federated = local.dev_config.aws_oidc_provider_arn }
-      Condition = {
-        StringEquals = {
-          "${local.dev_config.aws_oidc_issuer}:sub" = local.oidc_subject
-          "${local.dev_config.aws_oidc_issuer}:aud" = local.dev_config.aws_oidc_audience
-        }
-      }
-    }]
-  })
+resource "aws_iam_user" "runtime" {
+  name          = local.name
+  path          = "/cf/openbao/"
+  force_destroy = false
 
   tags = { OpenBaoInstance = var.instance_id }
 
   depends_on = [terraform_data.owner]
 }
 
-resource "aws_iam_role_policy" "seal" {
+resource "aws_iam_access_key" "runtime" {
+  user   = aws_iam_user.runtime.name
+  status = "Active"
+
+  # A replacement key must exist before CF switches the app's environment.
+  # Production rotation still needs verification and a rollback procedure.
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_iam_user_policy" "seal" {
   name = "openbao-seal"
-  role = aws_iam_role.runtime.name
+  user = aws_iam_user.runtime.name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -145,19 +162,16 @@ resource "cloudfoundry_app" "openbao" {
   service_bindings = [{ service_instance = cloudfoundry_service_instance.database.name }]
 
   environment = {
-    BAO_DATABASE_CA_PEM         = local.dev_config.rds_ca_pem
-    BAO_DATABASE_SERVICE        = cloudfoundry_service_instance.database.name
-    BAO_RUNTIME_API_ADDR        = local.endpoint
-    BAO_RUNTIME_KMS_ENDPOINT    = local.kms_endpoint
-    BAO_RUNTIME_KMS_KEY         = aws_kms_key.seal.arn
-    AWS_REGION                  = local.dev_config.aws_region
-    AWS_ROLE_ARN                = aws_iam_role.runtime.arn
-    AWS_WEB_IDENTITY_TOKEN_FILE = local.dev_config.aws_token_file
-    AWS_EC2_METADATA_DISABLED   = "true"
-    AWS_USE_FIPS_ENDPOINT       = "true"
+    BAO_LOCAL_CONFIG          = local.runtime_config
+    BAO_DATABASE_CA_PEM       = local.dev_config.rds_ca_pem
+    AWS_REGION                = local.dev_config.aws_region
+    AWS_ACCESS_KEY_ID         = aws_iam_access_key.runtime.id
+    AWS_SECRET_ACCESS_KEY     = aws_iam_access_key.runtime.secret
+    AWS_EC2_METADATA_DISABLED = "true"
+    AWS_USE_FIPS_ENDPOINT     = "true"
   }
 
-  depends_on = [aws_iam_role_policy.seal, cloudfoundry_security_group.runtime]
+  depends_on = [aws_iam_user_policy.seal, cloudfoundry_security_group.runtime]
 }
 
 data "cloudfoundry_domain" "internal" {
@@ -180,7 +194,7 @@ resource "cloudfoundry_route" "internal" {
 
 resource "terraform_data" "bootstrap" {
   input = {
-    endpiont      = local.endpoint
+    endpoint      = local.endpoint
     app_guid      = cloudfoundry_app.openbao.id
     root_ref      = var.management_credential_ref
     recovery_ref  = local.recovery_ref
@@ -197,25 +211,16 @@ resource "terraform_data" "bootstrap" {
     }
   }
 
-  # Don't attach credential teardown to a creation provisioner that can be 
-  # tainted. The separately tracked cleanup resource below survives failures.
-  depends_on = [cloudfoundry_route.internal, terraform_data.cleanup]
+  depends_on = [cloudfoundry_route.internal, cloudfoundry_network_policy.management]
 }
 
-resource "terraform_data" "cleanup" {
-  input = {
-    app_guid   = cloudfoundry_app.openbao.id
-    root_ref   = var.management_credential_ref
-    aws_region = local.dev_config.aws_region
-  }
-
-  provisioner "local-exec" {
-    when        = destroy
-    command     = "/app/openbao-stack teardown"
-    environment = { OPENBAO_REQUEST = jsonecndoe(self.input) }
-  }
-
-  depends_on = [cloudfoundry_route.internal]
+resource "cloudfoundry_network_policy" "management" {
+  policies = [{
+    source_app      = var.broker_app_guid
+    destination_app = cloudfoundry_app.openbao.id
+    protocol        = "tcp"
+    port            = "61443"
+  }]
 }
 
 resource "terraform_data" "root_custody" {

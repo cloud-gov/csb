@@ -18,14 +18,14 @@ terraform_binaries:
     provider: registry.terraform.io/hashicorp/aws
     source: https://github.com/hashicorp/terraform-provider-aws/archive/refs/tags/v5.92.0.zip
   - name: terraform-provider-cloudfoundry
-    version: 1.4.0
+    version: 1.18.0
     provider: registry.terraform.io/cloudfoundry/cloudfoundry
-    source: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/archive/refs/tags/v1.4.0.zip
-    url_template: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/releases/download/v${version}/${name}_${version}_${os}.${arch}.zip
-  - name: terraform-provider-external
-    version: 2.3.5
-    provider: registry.terraform.io/hashicorp/external
-    source: https://github.com/hashicorp/terraform-provider-external/archive/refs/tags/v2.3.5.zip
+    source: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/archive/refs/tags/v1.18.0.zip
+    url_template: https://github.com/cloudfoundry/terraform-provider-cloudfoundry/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
+  - name: terraform-provider-vault
+    version: 4.8.0
+    provider: registry.terraform.io/hashicorp/vault
+    source: https://github.com/hashicorp/terraform-provider-vault/archive/refs/tags/v4.8.0.zip
 terraform_upgrade_path:
   - version: 1.13.1
 service_definitions:

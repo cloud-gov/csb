@@ -8,7 +8,11 @@ terraform {
     }
     cloudfoundry = {
       source  = "registry.terraform.io/cloudfoundry/cloudfoundry"
-      version = "= 1.4.0"
+      version = "= 1.18.0"
+    }
+    vault = {
+      source  = "registry.terraform.io/hashicorp/vault"
+      version = "= 4.8.0"
     }
   }
 }
